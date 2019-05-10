@@ -5,17 +5,17 @@ Validate members in a struct.
 
 This package supports a wide variety of types:
 
-* Scalar types
+* Scalar types:
   * `int/8/16/32/64`, `uint/8/16/32/64`, `float32/64`
   * `uintptr`
   * `string`
-* Complex types
+* Complex types:
   * `map`
   * `slice`
-* Aliased types
+* Aliased types:
   * time.Duration
   * e.g. type Enum string
-* Pointer types
+* Pointer types:
   * e.g, `*string`, `*int`
   
 ## Validation tags
