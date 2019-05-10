@@ -60,6 +60,10 @@ func validateField(value reflect.Value, kind reflect.Kind, name string, tag refl
 		if max, err := strconv.ParseUint(tag.Get(tagMax), 10, 64); err == nil && value.Uint() > max {
 			return errors.New(fmt.Sprint(name, " must not be greater than ", max))
 		}
+	case reflect.Map:
+		if notEmpty, err := strconv.ParseBool(tag.Get(tagNotEmpty)); err == nil && notEmpty && value.Len() == 0 {
+			return errors.New(fmt.Sprint(name, " must not be empty"))
+		}
 	case reflect.Slice:
 		if notEmpty, err := strconv.ParseBool(tag.Get(tagNotEmpty)); err == nil && notEmpty && value.Len() == 0 {
 			return errors.New(fmt.Sprint(name, " must not be empty"))
