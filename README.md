@@ -52,7 +52,6 @@ type Connection struct {
 ```
 connection := Connection{
 	Username: "admin",
-	Password: "password",
 }
 
 if err := validate.Validate(&connection); err != nil {
