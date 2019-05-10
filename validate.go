@@ -64,9 +64,21 @@ func validateField(value reflect.Value, kind reflect.Kind, name string, tag refl
 		if notEmpty, err := strconv.ParseBool(tag.Get(tagNotEmpty)); err == nil && notEmpty && value.Len() == 0 {
 			return errors.New(fmt.Sprint(name, " must not be empty"))
 		}
+		if min, err := strconv.Atoi(tag.Get(tagMin)); err == nil && value.Len() < min {
+			return errors.New(fmt.Sprint(name, " must not contain less than ", min, " elements"))
+		}
+		if max, err := strconv.Atoi(tag.Get(tagMax)); err == nil && value.Len() > max {
+			return errors.New(fmt.Sprint(name, " must not contain more than ", max, " elements"))
+		}
 	case reflect.Slice:
 		if notEmpty, err := strconv.ParseBool(tag.Get(tagNotEmpty)); err == nil && notEmpty && value.Len() == 0 {
-			return errors.New(fmt.Sprint(name, " must not be empty"))
+			return errors.New(fmt.Sprint(name, " must not contain empty"))
+		}
+		if min, err := strconv.Atoi(tag.Get(tagMin)); err == nil && value.Len() < min {
+			return errors.New(fmt.Sprint(name, " must not contain less than ", min, " elements"))
+		}
+		if max, err := strconv.Atoi(tag.Get(tagMax)); err == nil && value.Len() > max {
+			return errors.New(fmt.Sprint(name, " must not contain more than ", max, " elements"))
 		}
 	case reflect.Ptr:
 		if value.IsNil() {
