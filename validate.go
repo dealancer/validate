@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	tagMin      = "validate_min"
-	tagMax      = "validate_max"
-	tagNotEmpty = "validate_not_empty"
-	tagNotNil   = "validate_not_nil"
+	tagMin      = "min"
+	tagMax      = "max"
+	tagNotEmpty = "not_empty"
+	tagNotNil   = "not_nil"
 )
 
 var (
