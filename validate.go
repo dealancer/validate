@@ -56,6 +56,13 @@ func validateField(value reflect.Value, kind reflect.Kind, name string, tag refl
 		if max, err := strconv.ParseUint(tag.Get(tagMax), 10, 64); err == nil && value.Uint() > max {
 			return errors.New(fmt.Sprint(name, " must not be greater than ", max))
 		}
+	case reflect.Float32, reflect.Float64:
+		if min, err := strconv.ParseFloat(tag.Get(tagMin), 64); err == nil && value.Float() < min {
+			return errors.New(fmt.Sprint(name, " must not be less than ", min))
+		}
+		if max, err := strconv.ParseFloat(tag.Get(tagMax), 64); err == nil && value.Float() > max {
+			return errors.New(fmt.Sprint(name, " must not be greater than ", max))
+		}
 	case reflect.String, reflect.Map, reflect.Slice:
 		if isEmpty, err := strconv.ParseBool(tag.Get(tagIsEmpty)); err == nil {
 			if isEmpty && value.Len() > 0 {
