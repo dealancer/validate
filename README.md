@@ -3,7 +3,7 @@ Validate members in a struct.
 
 ## Types
 
-This package supports for a wide variety of types:
+This package supports a wide variety of types:
 
 * Scalar types
   * `int/8/16/32/64`, `uint/8/16/32/64`, `float32/64`
@@ -20,7 +20,7 @@ This package supports for a wide variety of types:
   
 ## Validation tags
 
-This package supports following tags:
+This package supports the following tags:
 
 * `is_empty`: works with strings, maps, and slices
 * `is_nil`: works with pointers
@@ -62,7 +62,7 @@ if err := validate.Validate(&connection); err != nil {
 
 ## Unmarshalling YAML/JSON
 
-This package can be used togeather with [github.com/creasty/defaults](http://github.com/creasty/defaults) for validating and providing default values for complex structs coming from YAML and JSON. This can be conviniently by implementing `UnmarshalYAML` or `UnmarshalJSON` interfaces.
+This package can be used together with [github.com/creasty/defaults](http://github.com/creasty/defaults) for validating and providing default values for complex structs coming from YAML and JSON. This can be conveniently by implementing `UnmarshalYAML` or `UnmarshalJSON` interfaces.
 
 ```
 func (this *Connection) UnmarshalYAML(unmarshal func(interface{}) error) error {
