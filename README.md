@@ -37,13 +37,13 @@ go get github.com/dealancer/validate
 
 ```
 type Connection struct {
-	Name      string   `is_empty:"false"`
-	Hosts     []string `is_empty:"false" max:"10"`
-	Username  string   `is_empty:"false"`
-	Password  string   `min:"12"`
-	Version   int      `min:"5" max:"8"`
-	Ssl       *bool    `is_nil:"false"`
-	SslVerify *bool    `is_nil:"false"`
+	Name      string    `is_empty:"false"`
+	Hosts     []string  `is_empty:"false" max:"10"`
+	Username  string    `is_empty:"false"`
+	Password  *string   `min:"12"`
+	Version   int       `min:"5" max:"8"`
+	Ssl       *bool     `is_nil:"false"`
+	SslVerify *bool     `is_nil:"false"`
 
 	XXX map[string]interface{} `is_empty:"true"`
 }
