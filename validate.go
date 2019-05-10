@@ -64,6 +64,11 @@ func validateField(value reflect.Value, kind reflect.Kind, name string, tag refl
 		if notEmpty, err := strconv.ParseBool(tag.Get(tagNotEmpty)); err == nil && notEmpty && value.Len() == 0 {
 			return errors.New(fmt.Sprint(name, " must not be empty"))
 		}
+		for i := 0; i < value.Len(); i++ {
+			if err := validateField(value.Index(i), value.Index(i).Kind(), name, tag); err != nil {
+				return err
+			}
+		}
 	case reflect.Ptr:
 		if value.IsNil() {
 			if notNil, err := strconv.ParseBool(tag.Get(tagNotNil)); err == nil && notNil {
