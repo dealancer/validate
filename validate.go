@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"time"
 )
 
 const (
@@ -43,13 +44,17 @@ func Validate(ptr interface{}) error {
 func validateField(value reflect.Value, kind reflect.Kind, name string, tag reflect.StructTag) error {
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		if min, err := strconv.ParseInt(tag.Get(tagMin), 10, 64); err == nil && value.Int() < min {
+		if min, err := time.ParseDuration(tag.Get(tagMin)); err == nil && time.Duration(value.Int()) < min {
+			return errors.New(fmt.Sprint(name, " must not be less than ", min))
+		} else if min, err := strconv.ParseInt(tag.Get(tagMin), 10, 64); err == nil && value.Int() < min {
 			return errors.New(fmt.Sprint(name, " must not be less than ", min))
 		}
-		if max, err := strconv.ParseInt(tag.Get(tagMax), 10, 64); err == nil && value.Int() > max {
+		if max, err := time.ParseDuration(tag.Get(tagMax)); err == nil && time.Duration(value.Int()) > max {
+			return errors.New(fmt.Sprint(name, " must not be greater than ", max))
+		} else if max, err := strconv.ParseInt(tag.Get(tagMax), 10, 64); err == nil && value.Int() > max {
 			return errors.New(fmt.Sprint(name, " must not be greater than ", max))
 		}
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		if min, err := strconv.ParseUint(tag.Get(tagMin), 10, 64); err == nil && value.Uint() < min {
 			return errors.New(fmt.Sprint(name, " must not be less than ", min))
 		}
