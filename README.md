@@ -13,8 +13,8 @@ This package supports a wide variety of types:
   * `map`
   * `slice`
 * Aliased types:
-  * time.Duration
-  * e.g. type Enum string
+  * `time.Duration`
+  * e.g. `rune`, `type Enum string`
 * Pointer types:
   * e.g, `*string`, `*int`
   
