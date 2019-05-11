@@ -5,6 +5,42 @@ import (
 	"time"
 )
 
+func TestType(t *testing.T) {
+	if nil == Validate(1) {
+		t.Errorf("validate should validate int type")
+	}
+
+	if nil == Validate(map[string]string{
+		"a": "a",
+	}) {
+		t.Errorf("validate should validate map type")
+	}
+
+	if nil == Validate([]string{
+		"a", "b",
+	}) {
+		t.Errorf("validate should validate slice type")
+	}
+
+	v := 1
+	if nil == Validate(&v) {
+		t.Errorf("validate should validate &int type")
+	}
+
+	s := struct {
+		field int
+	}{
+		field: 1,
+	}
+	if nil != Validate(s) {
+		t.Errorf("validate does no validate struct type")
+	}
+	if nil != Validate(s) {
+		t.Errorf("validate does no validate struct pointer type")
+	}
+
+}
+
 func TestMinTagForDuration(t *testing.T) {
 	if nil == Validate(struct {
 		field time.Duration `min:"0s"`
