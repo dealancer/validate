@@ -1,4 +1,7 @@
 # validate
+[![GitHub release](https://img.shields.io/github/release/dealancer/validate.svg)](https://github.com/dealancer/validate/releases)
+[![License](https://img.shields.io/github/license/dealancer/validate.svg)](./LICENSE)
+
 **Validate** validates members of a Go struct.
 
 ## Types
