@@ -35,7 +35,7 @@ go get github.com/dealancer/validate
 
 ## Usage
 
-```
+```go
 type Connection struct {
 	Name      string    `is_empty:"false"`
 	Hosts     []string  `is_empty:"false" max:"10"`
@@ -49,7 +49,7 @@ type Connection struct {
 }
 ```
 
-```
+```go
 connection := Connection{
 	Username: "admin",
 }
@@ -63,7 +63,7 @@ if err := validate.Validate(&connection); err != nil {
 
 This package can be used together with [github.com/creasty/defaults](http://github.com/creasty/defaults) for validating and providing default values for complex structs coming from YAML and JSON. This can be conveniently by implementing `UnmarshalYAML` or `UnmarshalJSON` interfaces.
 
-```
+```go
 func (this *Connection) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := defaults.Set(this); err != nil {
 		return err
