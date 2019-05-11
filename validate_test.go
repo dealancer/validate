@@ -622,3 +622,36 @@ func TestMaxTagForSlice(t *testing.T) {
 		t.Errorf("min tag does not validate for string")
 	}
 }
+func TestIsEmptyTagForString(t *testing.T) {
+	if nil == Validate(struct {
+		field string `is_empty:"true"`
+	}{
+		field: "a",
+	}) {
+		t.Errorf("is_empty tag does not validate for string")
+	}
+
+	if nil != Validate(struct {
+		field string
+	}{
+		field: "",
+	}) {
+		t.Errorf("is_empty tag does not validate for string")
+	}
+
+	if nil == Validate(struct {
+		field string `is_empty:"false"`
+	}{
+		field: "",
+	}) {
+		t.Errorf("is_empty tag does not validate for string")
+	}
+
+	if nil != Validate(struct {
+		field string
+	}{
+		field: "a",
+	}) {
+		t.Errorf("is_empty tag does not validate for string")
+	}
+}
