@@ -66,7 +66,7 @@ if err := validate.Validate(&connection); err != nil {
 
 ## Unmarshalling YAML/JSON
 
-This package can be used together with [github.com/creasty/defaults](http://github.com/creasty/defaults) for validating and providing default values for complex structs coming from YAML and JSON. This can be conveniently by implementing `UnmarshalYAML` or `UnmarshalJSON` interfaces.
+This package can be used together with [github.com/creasty/defaults](http://github.com/creasty/defaults) for validating and providing default values for complex structs coming from YAML and JSON. This can be conveniently done by implementing `UnmarshalYAML` or `UnmarshalJSON` interfaces.
 
 ```go
 func (this *Connection) UnmarshalYAML(unmarshal func(interface{}) error) error {
