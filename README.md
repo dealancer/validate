@@ -1,5 +1,5 @@
 # validate
-Validate members in a struct.
+**Validate** validates members of a Go struct.
 
 ## Types
 
