@@ -550,3 +550,39 @@ func TestMaxForMap(t *testing.T) {
 		t.Errorf("max tag does not validate for map")
 	}
 }
+
+func TestMinTagForSlice(t *testing.T) {
+	if nil == Validate(struct {
+		field []string `min:"2"`
+	}{
+		field: []string{"a"},
+	}) {
+		t.Errorf("min tag does not validate for string")
+	}
+
+	if nil != Validate(struct {
+		field []string `min:"2"`
+	}{
+		field: []string{"a", "b"},
+	}) {
+		t.Errorf("min tag does not validate for string")
+	}
+}
+
+func TestMaxTagForSlice(t *testing.T) {
+	if nil == Validate(struct {
+		field []string `max:"2"`
+	}{
+		field: []string{"a", "b", "c"},
+	}) {
+		t.Errorf("min tag does not validate for string")
+	}
+
+	if nil != Validate(struct {
+		field []string `max:"2"`
+	}{
+		field: []string{"a", "b"},
+	}) {
+		t.Errorf("min tag does not validate for string")
+	}
+}
