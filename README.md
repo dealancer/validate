@@ -27,10 +27,10 @@ This package supports a wide variety of types:
 
 This package supports following tags:
 
+* `min`, `max`: works with numbers, strings, maps, and slices
 * `is_empty`: works with strings, maps, and slices
 * `is_nil`: works with pointers
-* `min`, `max`: works with numbers, strings, maps, and slices
-* `child_is_empty`, `child_is_nil`, `child_min`, `child_max`: works with child elementts of slices and referenced elements of pointers
+* `child_is_empty`, `child_is_nil`, `child_min`, `child_max`: works with child elements of slices and referenced elements of pointers
 
 ## Installation
 
