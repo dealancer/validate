@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func TestType(t *testing.T) {
+func TestBasic(t *testing.T) {
 	v := 1
 	if nil == Validate(v) {
 		t.Errorf("validate validates int type")
@@ -53,11 +53,9 @@ func TestType(t *testing.T) {
 	if nil != Validate(&st) {
 		t.Errorf("validate does not validate struct pointer type")
 	}
-}
 
-func TestBasic(t *testing.T) {
 	stFail := struct {
-		field int `max:"0"`
+		field int `validate:"max=0"`
 	}{
 		field: 1,
 	}
@@ -65,13 +63,13 @@ func TestBasic(t *testing.T) {
 		t.Errorf("validate does not validate struct type")
 	}
 	if nil == Validate(&stFail) {
-		t.Errorf("validate does nott validate struct pointer type")
+		t.Errorf("validate does not validate struct pointer type")
 	}
 
 	stAnotherFail := struct {
 		a     int
 		b     int
-		field int `max:"0"`
+		field int `validate:"max=0"`
 		c     int
 		d     int
 	}{
@@ -81,604 +79,671 @@ func TestBasic(t *testing.T) {
 		t.Errorf("validate does not validate struct type")
 	}
 	if nil == Validate(&stAnotherFail) {
-		t.Errorf("validate does nott validate struct pointer type")
+		t.Errorf("validate does not validate struct pointer type")
 	}
 }
 
-func TestMinTagForDuration(t *testing.T) {
+func TestMultiVal(t *testing.T) {
 	if nil == Validate(struct {
-		field time.Duration `min:"0s"`
+		field int `validate:"min=0,max=10"`
+	}{
+		field: -1,
+	}) {
+		t.Errorf("multiple validators does not validate")
+	}
+
+	if nil == Validate(struct {
+		field int `validate:"min=0,max=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("multiple validators does not validate")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:"min=0,max=10"`
+	}{
+		field: 5,
+	}) {
+		t.Errorf("multiple validators does not validate")
+	}
+
+	if nil == Validate(struct {
+		field int `validate:"min=1,max=-1"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("multiple validators does not validate")
+	}
+}
+
+func TestFormatVal(t *testing.T) {
+	if nil == Validate(struct {
+		field int `validate:" min = 0 , max = 10 , bla= "`
+	}{
+		field: -1,
+	}) {
+		t.Errorf("validators with spaces does not validate")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:" min = 0 , max = 10 , bla = "`
+	}{
+		field: 5,
+	}) {
+		t.Errorf("validators with spaces does not validate")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:"1234567890=!@#$%^&*()"`
+	}{
+		field: 5,
+	}) {
+		t.Errorf("incorrect validator must not validate")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:""`
+	}{
+		field: 5,
+	}) {
+		t.Errorf("empty validator must not validate")
+	}
+}
+func TestMinValForDuration(t *testing.T) {
+	if nil == Validate(struct {
+		field time.Duration `validate:"min=0s"`
 	}{
 		field: -time.Second,
 	}) {
-		t.Errorf("min tag does not validate for time.Duratuon")
+		t.Errorf("min validator does not validate for time.Duratuon")
 	}
 
 	if nil == Validate(struct {
-		field time.Duration `min:"-1s"`
+		field time.Duration `validate:"min=-1s"`
 	}{
 		field: -time.Minute,
 	}) {
-		t.Errorf("min tag does not validate for time.Duratuon")
+		t.Errorf("min validator does not validate for time.Duratuon")
 	}
 
 	if nil != Validate(struct {
-		field time.Duration `min:"0s"`
+		field time.Duration `validate:"min=0s"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min tag does not validate for time.Duratuon")
+		t.Errorf("min validator does not validate for time.Duratuon")
 	}
 
 	if nil != Validate(struct {
-		field time.Duration `min:"-1s"`
+		field time.Duration `validate:"min=-1s"`
 	}{
 		field: -time.Millisecond,
 	}) {
-		t.Errorf("min tag does not validate for time.Duratuon")
+		t.Errorf("min validator does not validate for time.Duratuon")
 	}
 }
 
-func TestMaxTagForDuration(t *testing.T) {
+func TestMaxValForDuration(t *testing.T) {
 	if nil == Validate(struct {
-		field time.Duration `max:"0s"`
+		field time.Duration `validate:"max=0s"`
 	}{
 		field: time.Second,
 	}) {
-		t.Errorf("max tag does not validate for time.Duratuon")
+		t.Errorf("max validator does not validate for time.Duratuon")
 	}
 
 	if nil == Validate(struct {
-		field time.Duration `max:"1s"`
+		field time.Duration `validate:"max=1s"`
 	}{
 		field: time.Minute,
 	}) {
-		t.Errorf("max tag does not validate for time.Duratuon")
+		t.Errorf("max validator does not validate for time.Duratuon")
 	}
 
 	if nil != Validate(struct {
-		field time.Duration `max:"0s"`
+		field time.Duration `validate:"max=0s"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for time.Duratuon")
+		t.Errorf("max validator does not validate for time.Duratuon")
 	}
 
 	if nil != Validate(struct {
-		field time.Duration `max:"1s"`
+		field time.Duration `validate:"max=1s"`
 	}{
 		field: time.Millisecond,
 	}) {
-		t.Errorf("max tag does not validate for time.Duratuon")
+		t.Errorf("max validator does not validate for time.Duratuon")
 	}
 }
 
-func TestMinTagForInt(t *testing.T) {
+func TestMinValForInt(t *testing.T) {
 	if nil == Validate(struct {
-		field int `min:"0"`
+		field int `validate:"min=0"`
 	}{
 		field: -1,
 	}) {
-		t.Errorf("min tag does not validate for int")
+		t.Errorf("min validator does not validate for int")
 	}
 
 	if nil == Validate(struct {
-		field int8 `min:"0"`
+		field int8 `validate:"min=0"`
 	}{
 		field: -1,
 	}) {
-		t.Errorf("min tag does not validate for int8")
+		t.Errorf("min validator does not validate for int8")
 	}
 
 	if nil == Validate(struct {
-		field int16 `min:"0"`
+		field int16 `validate:"min=0"`
 	}{
 		field: -1,
 	}) {
-		t.Errorf("min tag does not validate for int16")
+		t.Errorf("min validator does not validate for int16")
 	}
 
 	if nil == Validate(struct {
-		field int32 `min:"0"`
+		field int32 `validate:"min=0"`
 	}{
 		field: -1,
 	}) {
-		t.Errorf("min tag does not validate for int32")
+		t.Errorf("min validator does not validate for int32")
 	}
 
 	if nil == Validate(struct {
-		field int64 `min:"0"`
+		field int64 `validate:"min=0"`
 	}{
 		field: -1,
 	}) {
-		t.Errorf("min tag does not validate for int64")
+		t.Errorf("min validator does not validate for int64")
 	}
 
 	if nil != Validate(struct {
-		field int `min:"0"`
+		field int `validate:"min=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min tag does not validate for int")
+		t.Errorf("min validator does not validate for int")
 	}
 
 	if nil != Validate(struct {
-		field int8 `min:"0"`
+		field int8 `validate:"min=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min tag does not validate for int8")
+		t.Errorf("min validator does not validate for int8")
 	}
 
 	if nil != Validate(struct {
-		field int16 `min:"0"`
+		field int16 `validate:"min=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min tag does not validate for int16")
+		t.Errorf("min validator does not validate for int16")
 	}
 
 	if nil != Validate(struct {
-		field int32 `min:"0"`
+		field int32 `validate:"min=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min tag does not validate for int32")
+		t.Errorf("min validator does not validate for int32")
 	}
 
 	if nil != Validate(struct {
-		field int64 `min:"0"`
+		field int64 `validate:"min=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min tag does not validate for int64")
+		t.Errorf("min validator does not validate for int64")
 	}
 }
 
-func TestMaxTagForInt(t *testing.T) {
+func TestMaxValForInt(t *testing.T) {
 	if nil == Validate(struct {
-		field int `max:"0"`
+		field int `validate:"max=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max tag does not validate for int")
+		t.Errorf("max validator does not validate for int")
 	}
 
 	if nil == Validate(struct {
-		field int8 `max:"0"`
+		field int8 `validate:"max=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max tag does not validate for int8")
+		t.Errorf("max validator does not validate for int8")
 	}
 
 	if nil == Validate(struct {
-		field int16 `max:"0"`
+		field int16 `validate:"max=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max tag does not validate for int16")
+		t.Errorf("max validator does not validate for int16")
 	}
 
 	if nil == Validate(struct {
-		field int32 `max:"0"`
+		field int32 `validate:"max=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max tag does not validate for int32")
+		t.Errorf("max validator does not validate for int32")
 	}
 
 	if nil == Validate(struct {
-		field int64 `max:"0"`
+		field int64 `validate:"max=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max tag does not validate for int64")
+		t.Errorf("max validator does not validate for int64")
 	}
 
 	if nil != Validate(struct {
-		field int `max:"0"`
+		field int `validate:"max=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for int")
+		t.Errorf("max validator does not validate for int")
 	}
 
 	if nil != Validate(struct {
-		field int8 `max:"0"`
+		field int8 `validate:"max=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for int8")
+		t.Errorf("max validator does not validate for int8")
 	}
 
 	if nil != Validate(struct {
-		field int16 `max:"0"`
+		field int16 `validate:"max=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for int16")
+		t.Errorf("max validator does not validate for int16")
 	}
 
 	if nil != Validate(struct {
-		field int32 `max:"0"`
+		field int32 `validate:"max=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for int32")
+		t.Errorf("max validator does not validate for int32")
 	}
 
 	if nil != Validate(struct {
-		field int64 `max:"0"`
+		field int64 `validate:"max=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for int64")
+		t.Errorf("max validator does not validate for int64")
 	}
 }
 
-func TestMinTagForRune(t *testing.T) {
+func TestMinValForRune(t *testing.T) {
 	if nil == Validate(struct {
-		field rune `min:"0"`
+		field rune `validate:"min=0"`
 	}{
 		field: -1,
 	}) {
-		t.Errorf("min tag does not validate for rune")
+		t.Errorf("min validator does not validate for rune")
 	}
 
 	if nil != Validate(struct {
-		field rune `min:"0"`
+		field rune `validate:"min=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min tag does not validate for rune")
+		t.Errorf("min validator does not validate for rune")
 	}
 }
 
-func TestMaxTagForRune(t *testing.T) {
+func TestMaxValForRune(t *testing.T) {
 	if nil == Validate(struct {
-		field rune `max:"0"`
+		field rune `validate:"max=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max tag does not validate for rune")
+		t.Errorf("max validator does not validate for rune")
 	}
 
 	if nil != Validate(struct {
-		field rune `max:"0"`
+		field rune `validate:"max=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for rune")
+		t.Errorf("max validator does not validate for rune")
 	}
 }
 
-func TestMinTagForUint(t *testing.T) {
+func TestMinValForUint(t *testing.T) {
 	if nil == Validate(struct {
-		field uint `min:"10"`
+		field uint `validate:"min=10"`
 	}{
 		field: 9,
 	}) {
-		t.Errorf("min tag does not validate for uint")
+		t.Errorf("min validator does not validate for uint")
 	}
 
 	if nil == Validate(struct {
-		field uint8 `min:"10"`
+		field uint8 `validate:"min=10"`
 	}{
 		field: 9,
 	}) {
-		t.Errorf("min tag does not validate for uint8")
+		t.Errorf("min validator does not validate for uint8")
 	}
 
 	if nil == Validate(struct {
-		field uint16 `min:"10"`
+		field uint16 `validate:"min=10"`
 	}{
 		field: 9,
 	}) {
-		t.Errorf("min tag does not validate for uint16")
+		t.Errorf("min validator does not validate for uint16")
 	}
 
 	if nil == Validate(struct {
-		field uint32 `min:"10"`
+		field uint32 `validate:"min=10"`
 	}{
 		field: 9,
 	}) {
-		t.Errorf("min tag does not validate for uint32")
+		t.Errorf("min validator does not validate for uint32")
 	}
 
 	if nil == Validate(struct {
-		field uint64 `min:"10"`
+		field uint64 `validate:"min=10"`
 	}{
 		field: 9,
 	}) {
-		t.Errorf("min tag does not validate for uint64")
+		t.Errorf("min validator does not validate for uint64")
 	}
 
 	if nil == Validate(struct {
-		field uintptr `min:"10"`
+		field uintptr `validate:"min=10"`
 	}{
 		field: 9,
 	}) {
-		t.Errorf("min tag does not validate for uintptr")
+		t.Errorf("min validator does not validate for uintptr")
 	}
 
 	if nil != Validate(struct {
-		field uint `min:"10"`
+		field uint `validate:"min=10"`
 	}{
 		field: 10,
 	}) {
-		t.Errorf("min tag does not validate for uint")
+		t.Errorf("min validator does not validate for uint")
 	}
 
 	if nil != Validate(struct {
-		field uint8 `min:"10"`
+		field uint8 `validate:"min=10"`
 	}{
 		field: 10,
 	}) {
-		t.Errorf("min tag does not validate for uint8")
+		t.Errorf("min validator does not validate for uint8")
 	}
 
 	if nil != Validate(struct {
-		field uint16 `min:"10"`
+		field uint16 `validate:"min=10"`
 	}{
 		field: 10,
 	}) {
-		t.Errorf("min tag does not validate for uint16")
+		t.Errorf("min validator does not validate for uint16")
 	}
 
 	if nil != Validate(struct {
-		field uint32 `min:"10"`
+		field uint32 `validate:"min=10"`
 	}{
 		field: 10,
 	}) {
-		t.Errorf("min tag does not validate for uint32")
+		t.Errorf("min validator does not validate for uint32")
 	}
 
 	if nil != Validate(struct {
-		field uint64 `min:"10"`
+		field uint64 `validate:"min=10"`
 	}{
 		field: 10,
 	}) {
-		t.Errorf("min tag does not validate for uint64")
+		t.Errorf("min validator does not validate for uint64")
 	}
 
 	if nil != Validate(struct {
-		field uintptr `min:"10"`
+		field uintptr `validate:"min=10"`
 	}{
 		field: 10,
 	}) {
-		t.Errorf("min tag does not validate for uintptr")
+		t.Errorf("min validator does not validate for uintptr")
 	}
 }
 
-func TestMaxTagForUint(t *testing.T) {
+func TestMaxValForUint(t *testing.T) {
 	if nil == Validate(struct {
-		field uint `max:"0"`
+		field uint `validate:"max=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max tag does not validate for uint")
+		t.Errorf("max validator does not validate for uint")
 	}
 
 	if nil == Validate(struct {
-		field uint8 `max:"0"`
+		field uint8 `validate:"max=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max tag does not validate for uint8")
+		t.Errorf("max validator does not validate for uint8")
 	}
 
 	if nil == Validate(struct {
-		field uint16 `max:"0"`
+		field uint16 `validate:"max=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max tag does not validate for uint16")
+		t.Errorf("max validator does not validate for uint16")
 	}
 
 	if nil == Validate(struct {
-		field uint32 `max:"0"`
+		field uint32 `validate:"max=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max tag does not validate for uint32")
+		t.Errorf("max validator does not validate for uint32")
 	}
 
 	if nil == Validate(struct {
-		field uint64 `max:"0"`
+		field uint64 `validate:"max=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max tag does not validate for uint64")
+		t.Errorf("max validator does not validate for uint64")
 	}
 
 	if nil == Validate(struct {
-		field uintptr `max:"0"`
+		field uintptr `validate:"max=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max tag does not validate for uintptr")
+		t.Errorf("max validator does not validate for uintptr")
 	}
 
 	if nil != Validate(struct {
-		field uint `max:"0"`
+		field uint `validate:"max=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for uint")
+		t.Errorf("max validator does not validate for uint")
 	}
 
 	if nil != Validate(struct {
-		field uint8 `max:"0"`
+		field uint8 `validate:"max=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for uint8")
+		t.Errorf("max validator does not validate for uint8")
 	}
 
 	if nil != Validate(struct {
-		field uint16 `max:"0"`
+		field uint16 `validate:"max=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for uint16")
+		t.Errorf("max validator does not validate for uint16")
 	}
 
 	if nil != Validate(struct {
-		field uint32 `max:"0"`
+		field uint32 `validate:"max=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for uint32")
+		t.Errorf("max validator does not validate for uint32")
 	}
 
 	if nil != Validate(struct {
-		field uint64 `max:"0"`
+		field uint64 `validate:"max=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for uint64")
+		t.Errorf("max validator does not validate for uint64")
 	}
 
 	if nil != Validate(struct {
-		field uint64 `max:"0"`
+		field uint64 `validate:"max=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for uintptr")
+		t.Errorf("max validator does not validate for uintptr")
 	}
 }
 
-func TestMinTagForFloat(t *testing.T) {
+func TestMinValForFloat(t *testing.T) {
 	if nil == Validate(struct {
-		field float32 `min:"0"`
+		field float32 `validate:"min=0"`
 	}{
 		field: -0.1,
 	}) {
-		t.Errorf("min tag does not validate for flaot32")
+		t.Errorf("min validator does not validate for flaot32")
 	}
 
 	if nil == Validate(struct {
-		field float64 `min:"0"`
+		field float64 `validate:"min=0"`
 	}{
 		field: -0.1,
 	}) {
-		t.Errorf("min tag does not validate for flaot64")
+		t.Errorf("min validator does not validate for flaot64")
 	}
 
 	if nil != Validate(struct {
-		field float32 `min:"0"`
+		field float32 `validate:"min=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min tag does not validate for flaot32")
+		t.Errorf("min validator does not validate for flaot32")
 	}
 
 	if nil != Validate(struct {
-		field float64 `min:"0"`
+		field float64 `validate:"min=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min tag does not validate for flaot64")
+		t.Errorf("min validator does not validate for flaot64")
 	}
 }
 
-func TestMaxTagForFloat(t *testing.T) {
+func TestMaxValForFloat(t *testing.T) {
 	if nil == Validate(struct {
-		field float32 `max:"0"`
+		field float32 `validate:"max=0"`
 	}{
 		field: 0.1,
 	}) {
-		t.Errorf("max tag does not validate for flaot32")
+		t.Errorf("max validator does not validate for flaot32")
 	}
 
 	if nil == Validate(struct {
-		field float64 `max:"0"`
+		field float64 `validate:"max=0"`
 	}{
 		field: 0.1,
 	}) {
-		t.Errorf("max tag does not validate for flaot64")
+		t.Errorf("max validator does not validate for flaot64")
 	}
 
 	if nil != Validate(struct {
-		field float32 `max:"0"`
+		field float32 `validate:"max=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for flaot32")
+		t.Errorf("max validator does not validate for flaot32")
 	}
 
 	if nil != Validate(struct {
-		field float64 `max:"0"`
+		field float64 `validate:"max=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max tag does not validate for flaot64")
+		t.Errorf("max validator does not validate for flaot64")
 	}
 }
 
-func TestMinTagForString(t *testing.T) {
+func TestMinValForString(t *testing.T) {
 	if nil == Validate(struct {
-		field string `min:"2"`
+		field string `validate:"min=2"`
 	}{
 		field: "a",
 	}) {
-		t.Errorf("min tag does not validate for string")
+		t.Errorf("min validator does not validate for string")
 	}
 
 	if nil != Validate(struct {
-		field string `min:"2"`
+		field string `validate:"min=2"`
 	}{
 		field: "ab",
 	}) {
-		t.Errorf("min tag does not validate for string")
+		t.Errorf("min validator does not validate for string")
 	}
 }
 
-func TestMaxTagForString(t *testing.T) {
+func TestMaxValForString(t *testing.T) {
 	if nil == Validate(struct {
-		field string `max:"2"`
+		field string `validate:"max=2"`
 	}{
 		field: "abc",
 	}) {
-		t.Errorf("max tag does not validate for string")
+		t.Errorf("max validator does not validate for string")
 	}
 
 	if nil != Validate(struct {
-		field string `max:"2"`
+		field string `validate:"max=2"`
 	}{
 		field: "ab",
 	}) {
-		t.Errorf("max tag does not validate for string")
+		t.Errorf("max validator does not validate for string")
 	}
 }
 
-func TestMinTagForMap(t *testing.T) {
+func TestMinValForMap(t *testing.T) {
 	if nil == Validate(struct {
-		field map[string]string `min:"2"`
+		field map[string]string `validate:"min=2"`
 	}{
 		field: map[string]string{
 			"a": "a",
 		},
 	}) {
-		t.Errorf("min tag does not validate for map")
+		t.Errorf("min validator does not validate for map")
 	}
 
 	if nil != Validate(struct {
-		field map[string]string `min:"2"`
+		field map[string]string `validate:"min=2"`
 	}{
 		field: map[string]string{
 			"a": "a",
 			"b": "b",
 		},
 	}) {
-		t.Errorf("min tag does not validate for map")
+		t.Errorf("min validator does not validate for map")
 	}
 }
 
 func TestMaxForMap(t *testing.T) {
 	if nil == Validate(struct {
-		field map[string]string `max:"2"`
+		field map[string]string `validate:"max=2"`
 	}{
 		field: map[string]string{
 			"a": "a",
@@ -686,304 +751,304 @@ func TestMaxForMap(t *testing.T) {
 			"c": "c",
 		},
 	}) {
-		t.Errorf("max tag does not validate for map")
+		t.Errorf("max validator does not validate for map")
 	}
 
 	if nil != Validate(struct {
-		field map[string]string `max:"2"`
+		field map[string]string `validate:"max=2"`
 	}{
 		field: map[string]string{
 			"a": "a",
 			"b": "b",
 		},
 	}) {
-		t.Errorf("max tag does not validate for map")
+		t.Errorf("max validator does not validate for map")
 	}
 }
 
-func TestMinTagForSlice(t *testing.T) {
+func TestMinValForSlice(t *testing.T) {
 	if nil == Validate(struct {
-		field []string `min:"2"`
+		field []string `validate:"min=2"`
 	}{
 		field: []string{"a"},
 	}) {
-		t.Errorf("min tag does not validate for string")
+		t.Errorf("min validator does not validate for string")
 	}
 
 	if nil != Validate(struct {
-		field []string `min:"2"`
+		field []string `validate:"min=2"`
 	}{
 		field: []string{"a", "b"},
 	}) {
-		t.Errorf("min tag does not validate for string")
+		t.Errorf("min validator does not validate for string")
 	}
 }
 
-func TestMaxTagForSlice(t *testing.T) {
+func TestMaxValForSlice(t *testing.T) {
 	if nil == Validate(struct {
-		field []string `max:"2"`
+		field []string `validate:"max=2"`
 	}{
 		field: []string{"a", "b", "c"},
 	}) {
-		t.Errorf("min tag does not validate for string")
+		t.Errorf("min validator does not validate for string")
 	}
 
 	if nil != Validate(struct {
-		field []string `max:"2"`
+		field []string `validate:"max=2"`
 	}{
 		field: []string{"a", "b"},
 	}) {
-		t.Errorf("min tag does not validate for string")
+		t.Errorf("min validator does not validate for string")
 	}
 }
 
-func TestIsEmptyTagForString(t *testing.T) {
+func TestIsEmptyValForString(t *testing.T) {
 	if nil == Validate(struct {
-		field string `is_empty:"true"`
+		field string `validate:"is_empty=true"`
 	}{
 		field: "a",
 	}) {
-		t.Errorf("is_empty tag does not validate for string")
+		t.Errorf("is_empty validator does not validate for string")
 	}
 
 	if nil != Validate(struct {
-		field string `is_empty:"true"`
+		field string `validate:"is_empty=true"`
 	}{
 		field: "",
 	}) {
-		t.Errorf("is_empty tag does not validate for string")
+		t.Errorf("is_empty validator does not validate for string")
 	}
 
 	if nil == Validate(struct {
-		field string `is_empty:"false"`
+		field string `validate:"is_empty=false"`
 	}{
 		field: "",
 	}) {
-		t.Errorf("is_empty tag does not validate for string")
+		t.Errorf("is_empty validator does not validate for string")
 	}
 
 	if nil != Validate(struct {
-		field string `is_empty:"false"`
+		field string `validate:"is_empty=false"`
 	}{
 		field: "a",
 	}) {
-		t.Errorf("is_empty tag does not validate for string")
+		t.Errorf("is_empty validator does not validate for string")
 	}
 }
 
-func TestIsEmptyTagForMap(t *testing.T) {
+func TestIsEmptyValForMap(t *testing.T) {
 	if nil == Validate(struct {
-		field map[string]string `is_empty:"true"`
+		field map[string]string `validate:"is_empty=true"`
 	}{
 		field: map[string]string{"a": "a"},
 	}) {
-		t.Errorf("is_empty tag does not validate for map")
+		t.Errorf("is_empty validator does not validate for map")
 	}
 
 	if nil != Validate(struct {
-		field map[string]string `is_empty:"true"`
+		field map[string]string `validate:"is_empty=true"`
 	}{
 		field: map[string]string{},
 	}) {
-		t.Errorf("is_empty tag does not validate for map")
+		t.Errorf("is_empty validator does not validate for map")
 	}
 
 	if nil == Validate(struct {
-		field map[string]string `is_empty:"false"`
+		field map[string]string `validate:"is_empty=false"`
 	}{
 		field: map[string]string{},
 	}) {
-		t.Errorf("is_empty tag does not validate for map")
+		t.Errorf("is_empty validator does not validate for map")
 	}
 
 	if nil != Validate(struct {
-		field map[string]string `is_empty:"false"`
+		field map[string]string `validate:"is_empty=false"`
 	}{
 		field: map[string]string{"a": "a"},
 	}) {
-		t.Errorf("is_empty tag does not validate for map")
+		t.Errorf("is_empty validator does not validate for map")
 	}
 }
 
-func TestIsEmptyTagForSlice(t *testing.T) {
+func TestIsEmptyValForSlice(t *testing.T) {
 	if nil == Validate(struct {
-		field []string `is_empty:"true"`
+		field []string `validate:"is_empty=true"`
 	}{
 		field: []string{
 			"a",
 		},
 	}) {
-		t.Errorf("is_empty tag does not validate for slice")
+		t.Errorf("is_empty validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []string `is_empty:"true"`
+		field []string `validate:"is_empty=true"`
 	}{
 		field: []string{},
 	}) {
-		t.Errorf("is_empty tag does not validate for sclie")
+		t.Errorf("is_empty validator does not validate for sclie")
 	}
 
 	if nil == Validate(struct {
-		field []string `is_empty:"false"`
+		field []string `validate:"is_empty=false"`
 	}{
 		field: []string{},
 	}) {
-		t.Errorf("is_empty tag does not validate for slice")
+		t.Errorf("is_empty validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []string `is_empty:"false"`
+		field []string `validate:"is_empty=false"`
 	}{
 		field: []string{"a"},
 	}) {
-		t.Errorf("is_empty tag does not validate for slice")
+		t.Errorf("is_empty validator does not validate for slice")
 	}
 }
 
-func TestIsNilTagForPtr(t *testing.T) {
+func TestIsNilValForPtr(t *testing.T) {
 	if nil == Validate(struct {
-		field *int `is_nil:"true"`
+		field *int `validate:"is_nil=true"`
 	}{
 		field: new(int),
 	}) {
-		t.Errorf("is_nill tag does not validate for pointer")
+		t.Errorf("is_nill validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *int `is_nil:"true"`
+		field *int `validate:"is_nil=true"`
 	}{
 		field: nil,
 	}) {
-		t.Errorf("is_nill tag does not validate for pointer")
+		t.Errorf("is_nill validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field *int `is_nil:"false"`
+		field *int `validate:"is_nil=false"`
 	}{
 		field: nil,
 	}) {
-		t.Errorf("is_nill tag does not validate for pointer")
+		t.Errorf("is_nill validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *int `is_nil:"false"`
+		field *int `validate:"is_nil=false"`
 	}{
 		field: new(int),
 	}) {
-		t.Errorf("is_nill tag does not validate for pointer")
+		t.Errorf("is_nill validator does not validate for pointer")
 	}
 }
 
-func TestChildTagsForSlice(t *testing.T) {
+func TestChildValsForSlice(t *testing.T) {
 	if nil == Validate(struct {
-		field []int `child_min:"0"`
+		field []int `validate:"child_min=0"`
 	}{
 		field: []int{0, -1},
 	}) {
-		t.Errorf("child_min tag does not validate for slice")
+		t.Errorf("child_min validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []int `child_min:"0"`
+		field []int `validate:"child_min=0"`
 	}{
 		field: []int{0, 0},
 	}) {
-		t.Errorf("child_min tag does not validate for slice")
+		t.Errorf("child_min validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field []int `child_max:"0"`
+		field []int `validate:"child_max=0"`
 	}{
 		field: []int{0, 1},
 	}) {
-		t.Errorf("child_max tag does not validate for slice")
+		t.Errorf("child_max validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []int `child_max:"0"`
+		field []int `validate:"child_max=0"`
 	}{
 		field: []int{0, 0},
 	}) {
-		t.Errorf("child_max tag does not validate for slice")
+		t.Errorf("child_max validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field [][]int `child_is_empty:"true"`
+		field [][]int `validate:"child_is_empty=true"`
 	}{
 		field: [][]int{
 			[]int{0},
 		},
 	}) {
-		t.Errorf("child_is_empty tag does not validate for slice")
+		t.Errorf("child_is_empty validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field [][]int `child_is_empty:"true"`
+		field [][]int `validate:"child_is_empty=true"`
 	}{
 		field: [][]int{
 			[]int{},
 		},
 	}) {
-		t.Errorf("child_is_empty tag does not validate for slice")
+		t.Errorf("child_is_empty validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field [][]int `child_is_empty:"false"`
+		field [][]int `validate:"child_is_empty=false"`
 	}{
 		field: [][]int{
 			[]int{},
 		},
 	}) {
-		t.Errorf("child_is_empty tag does not validate for slice")
+		t.Errorf("child_is_empty validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field [][]int `child_is_empty:"false"`
+		field [][]int `validate:"child_is_empty=false"`
 	}{
 		field: [][]int{
 			[]int{0},
 		},
 	}) {
-		t.Errorf("child_is_empty tag does not validate for slice")
+		t.Errorf("child_is_empty validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field []*int `child_is_nil:"true"`
+		field []*int `validate:"child_is_nil=true"`
 	}{
 		field: []*int{
 			new(int),
 		},
 	}) {
-		t.Errorf("child_is_nil tag does not validate for slice")
+		t.Errorf("child_is_nil validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []*int `child_is_nil:"true"`
+		field []*int `validate:"child_is_nil=true"`
 	}{
 		field: []*int{nil},
 	}) {
-		t.Errorf("child_is_nil tag does not validate for slice")
+		t.Errorf("child_is_nil validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field []*int `child_is_nil:"false"`
+		field []*int `validate:"child_is_nil=false"`
 	}{
 		field: []*int{nil},
 	}) {
-		t.Errorf("child_is_nil tag does not validate for slice")
+		t.Errorf("child_is_nil validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []*int `child_is_nil:"false"`
+		field []*int `validate:"child_is_nil=false"`
 	}{
 		field: []*int{new(int)},
 	}) {
-		t.Errorf("child_is_nil tag does not validate for slice")
+		t.Errorf("child_is_nil validator does not validate for slice")
 	}
 }
 
-func TestChildTagsForPtr(t *testing.T) {
+func TestChildValsForPtr(t *testing.T) {
 	minusOne := -1
 	zero := 0
 	one := 1
@@ -993,99 +1058,99 @@ func TestChildTagsForPtr(t *testing.T) {
 	var nilPtr *int
 
 	if nil == Validate(struct {
-		field *int `child_min:"0"`
+		field *int `validate:"child_min=0"`
 	}{
 		field: &minusOne,
 	}) {
-		t.Errorf("child_min tag does not validate for pointer")
+		t.Errorf("child_min validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *int `child_min:"0"`
+		field *int `validate:"child_min=0"`
 	}{
 		field: &zero,
 	}) {
-		t.Errorf("child_min tag does not validate for pointer")
+		t.Errorf("child_min validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field *int `child_max:"0"`
+		field *int `validate:"child_max=0"`
 	}{
 		field: &one,
 	}) {
-		t.Errorf("child_max tag does not validate for pointer")
+		t.Errorf("child_max validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *int `child_max:"0"`
+		field *int `validate:"child_max=0"`
 	}{
 		field: &zero,
 	}) {
-		t.Errorf("child_max tag does not validate for pointer")
+		t.Errorf("child_max validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field *string `child_is_empty:"true"`
+		field *string `validate:"child_is_empty=true"`
 	}{
 		field: &notEmpty,
 	}) {
-		t.Errorf("child_is_empty tag does not validate for pointer")
+		t.Errorf("child_is_empty validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *string `child_is_empty:"true"`
+		field *string `validate:"child_is_empty=true"`
 	}{
 		field: &empty,
 	}) {
-		t.Errorf("child_is_empty tag does not validate for pointer")
+		t.Errorf("child_is_empty validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field *string `child_is_empty:"false"`
+		field *string `validate:"child_is_empty=false"`
 	}{
 		field: &empty,
 	}) {
-		t.Errorf("child_is_empty tag does not validate for pointer")
+		t.Errorf("child_is_empty validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *string `child_is_empty:"false"`
+		field *string `validate:"child_is_empty=false"`
 	}{
 		field: &notEmpty,
 	}) {
-		t.Errorf("child_is_empty tag does not validate for pointer")
+		t.Errorf("child_is_empty validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field **int `child_is_nil:"true"`
+		field **int `validate:"child_is_nil=true"`
 	}{
 		field: &onePtr,
 	}) {
-		t.Errorf("child_is_nil tag does not validate for pointer")
+		t.Errorf("child_is_nil validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field **int `child_is_nil:"true"`
+		field **int `validate:"child_is_nil=true"`
 	}{
 		field: &nilPtr,
 	}) {
-		t.Errorf("child_is_nil tag does not validate for pointer")
+		t.Errorf("child_is_nil validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field **int `child_is_nil:"false"`
+		field **int `validate:"child_is_nil=false"`
 	}{
 		field: &nilPtr,
 	}) {
-		t.Errorf("child_is_nil tag does not validate for pointer")
+		t.Errorf("child_is_nil validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field **int `child_is_nil:"false"`
+		field **int `validate:"child_is_nil=false"`
 	}{
 		field: &onePtr,
 	}) {
-		t.Errorf("child_is_nil tag does not validate for pointer")
+		t.Errorf("child_is_nil validator does not validate for pointer")
 	}
 }
 
@@ -1093,20 +1158,20 @@ func TestOneLevelDeep(t *testing.T) {
 	// Should not validate one level deep
 
 	if nil != Validate(struct {
-		field []int `min:"0"`
+		field []int `validate:"min=0"`
 	}{
 		field: []int{-1},
 	}) {
-		t.Errorf("min tag validates one level deep for slice")
+		t.Errorf("min validator validates one level deep for slice")
 	}
 
 	one := 1
 	if nil != Validate(struct {
-		field *int `max:"0"`
+		field *int `validate:"max=0"`
 	}{
 		field: &one,
 	}) {
-		t.Errorf("max tag validates one level deep for pointer")
+		t.Errorf("max validator validates one level deep for pointer")
 	}
 }
 
@@ -1114,23 +1179,23 @@ func TestTwoLevelDeep(t *testing.T) {
 	// Should not validate two level deep
 
 	if nil != Validate(struct {
-		field [][]int `child_min:"0"`
+		field [][]int `validate:"child_min=0"`
 	}{
 		field: [][]int{
 			[]int{-1},
 		},
 	}) {
-		t.Errorf("child_min tag validates two level deep for slice")
+		t.Errorf("child_min validator validates two level deep for slice")
 	}
 
 	one := 1
 	onePtr := &one
 
 	if nil != Validate(struct {
-		field **int `child_max:"0"`
+		field **int `validate:"child_max=0"`
 	}{
 		field: &onePtr,
 	}) {
-		t.Errorf("child_max tag validates two level deep for pointer")
+		t.Errorf("child_max validator validates two level deep for pointer")
 	}
 }

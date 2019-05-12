@@ -23,9 +23,9 @@ This package supports a wide variety of types:
 * Pointer types:
   * e.g, `*string`, `*int`
   
-## Validation tags
+## Validators
 
-This package supports following tags:
+This package supports following validators:
 
 * `min`, `max`: works with numbers, strings, maps, and slices
 * `is_empty`: works with strings, maps, and slices
@@ -42,15 +42,15 @@ go get github.com/dealancer/validate
 
 ```go
 type Connection struct {
-	Name      string   `is_empty:"false"`
-	Hosts     []string `is_empty:"false" child_is_empty:"false"`
-	Username  string   `is_empty:"false"`
-	Password  *string  `child_min:"12"`
-	Ssl       *bool    `is_nil:"false"`
-	SslVerify *bool    `is_nil:"false""`
-	Version   int      `min:"5" max:"8"`
+	Name      string   `validate:"is_empty=false"`
+	Hosts     []string `validate:"is_empty=false,child_is_empty=false"`
+	Username  string   `validate:"is_empty=false"`
+	Password  *string  `validate:"child_min=12"`
+	Ssl       *bool    `validate:"is_nil=false"`
+	SslVerify *bool    `validate:"is_nil=false"`
+	Version   int      `validate:"min=5,max=8"`
 
-	XXX map[string]interface{} `is_empty:"true"`
+	XXX map[string]interface{} `validate:"is_empty=true"`
 }
 ```
 
