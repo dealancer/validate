@@ -662,9 +662,7 @@ func TestIsEmptyTagForMap(t *testing.T) {
 	if nil == Validate(struct {
 		field map[string]string `is_empty:"true"`
 	}{
-		field: map[string]string{
-			"a": "a",
-		},
+		field: map[string]string{"a": "a"},
 	}) {
 		t.Errorf("is_empty tag does not validate for map")
 	}
@@ -688,9 +686,7 @@ func TestIsEmptyTagForMap(t *testing.T) {
 	if nil != Validate(struct {
 		field map[string]string `is_empty:"false"`
 	}{
-		field: map[string]string{
-			"a": "a",
-		},
+		field: map[string]string{"a": "a"},
 	}) {
 		t.Errorf("is_empty tag does not validate for map")
 	}
@@ -726,9 +722,7 @@ func TestIsEmptyTagForSlice(t *testing.T) {
 	if nil != Validate(struct {
 		field []string `is_empty:"false"`
 	}{
-		field: []string{
-			"a",
-		},
+		field: []string{"a"},
 	}) {
 		t.Errorf("is_empty tag does not validate for slice")
 	}
@@ -745,13 +739,17 @@ func TestIsNilTagForPtr(t *testing.T) {
 
 	if nil != Validate(struct {
 		field *int `is_nil:"true"`
-	}{}) {
+	}{
+		field: nil,
+	}) {
 		t.Errorf("is_nill tag does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
 		field *int `is_nil:"false"`
-	}{}) {
+	}{
+		field: nil,
+	}) {
 		t.Errorf("is_nill tag does not validate for pointer")
 	}
 
@@ -761,5 +759,113 @@ func TestIsNilTagForPtr(t *testing.T) {
 		field: new(int),
 	}) {
 		t.Errorf("is_nill tag does not validate for pointer")
+	}
+}
+
+func TestChildTagsForSlice(t *testing.T) {
+	if nil == Validate(struct {
+		field []int `child_min:"0"`
+	}{
+		field: []int{0, -1},
+	}) {
+		t.Errorf("child_min tag does not validate for slice")
+	}
+
+	if nil != Validate(struct {
+		field []int `child_min:"0"`
+	}{
+		field: []int{0, 0},
+	}) {
+		t.Errorf("child_min tag does not validate for slice")
+	}
+
+	if nil == Validate(struct {
+		field []int `child_max:"0"`
+	}{
+		field: []int{0, 1},
+	}) {
+		t.Errorf("child_max tag does not validate for slice")
+	}
+
+	if nil != Validate(struct {
+		field []int `child_max:"0"`
+	}{
+		field: []int{0, 0},
+	}) {
+		t.Errorf("child_max tag does not validate for slice")
+	}
+
+	if nil == Validate(struct {
+		field [][]int `child_is_empty:"true"`
+	}{
+		field: [][]int{
+			[]int{0},
+		},
+	}) {
+		t.Errorf("child_is_empty tag does not validate for slice")
+	}
+
+	if nil != Validate(struct {
+		field [][]int `child_is_empty:"true"`
+	}{
+		field: [][]int{
+			[]int{},
+		},
+	}) {
+		t.Errorf("child_is_empty tag does not validate for slice")
+	}
+
+	if nil == Validate(struct {
+		field [][]int `child_is_empty:"false"`
+	}{
+		field: [][]int{
+			[]int{},
+		},
+	}) {
+		t.Errorf("child_is_empty tag does not validate for slice")
+	}
+
+	if nil != Validate(struct {
+		field [][]int `child_is_empty:"false"`
+	}{
+		field: [][]int{
+			[]int{0},
+		},
+	}) {
+		t.Errorf("child_is_empty tag does not validate for slice")
+	}
+
+	if nil == Validate(struct {
+		field []*int `child_is_nil:"true"`
+	}{
+		field: []*int{
+			new(int),
+		},
+	}) {
+		t.Errorf("child_is_nil tag does not validate for slice")
+	}
+
+	if nil != Validate(struct {
+		field []*int `child_is_nil:"true"`
+	}{
+		field: []*int{nil},
+	}) {
+		t.Errorf("child_is_nil tag does not validate for slice")
+	}
+
+	if nil == Validate(struct {
+		field []*int `child_is_nil:"false"`
+	}{
+		field: []*int{nil},
+	}) {
+		t.Errorf("child_is_nil tag does not validate for slice")
+	}
+
+	if nil != Validate(struct {
+		field []*int `child_is_nil:"false"`
+	}{
+		field: []*int{new(int)},
+	}) {
+		t.Errorf("child_is_nil tag does not validate for slice")
 	}
 }
