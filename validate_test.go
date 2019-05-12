@@ -6,37 +6,82 @@ import (
 )
 
 func TestType(t *testing.T) {
-	if nil == Validate(1) {
-		t.Errorf("validate should validate int type")
-	}
-
-	if nil == Validate(map[string]string{
-		"a": "a",
-	}) {
-		t.Errorf("validate should validate map type")
-	}
-
-	if nil == Validate([]string{
-		"a", "b",
-	}) {
-		t.Errorf("validate should validate slice type")
-	}
-
 	v := 1
+	if nil == Validate(v) {
+		t.Errorf("validate validates int type")
+	}
 	if nil == Validate(&v) {
-		t.Errorf("validate should validate &int type")
+		t.Errorf("validate validates &int type")
 	}
 
-	s := struct {
+	s := ""
+	if nil == Validate(s) {
+		t.Errorf("validate validates string type")
+	}
+	if nil == Validate(&s) {
+		t.Errorf("validate validates &string type")
+	}
+
+	m := map[string]string{
+		"a": "a",
+	}
+	if nil == Validate(m) {
+		t.Errorf("validate validates map type")
+	}
+	if nil == Validate(m) {
+		t.Errorf("validate validates &map type")
+	}
+
+	sl := []string{
+		"a", "b",
+	}
+	if nil == Validate(sl) {
+		t.Errorf("validate validates slice type")
+	}
+	if nil == Validate(&sl) {
+		t.Errorf("validate validates slice type")
+	}
+
+	st := struct {
 		field int
 	}{
 		field: 1,
 	}
-	if nil != Validate(s) {
-		t.Errorf("validate does no validate struct type")
+	if nil != Validate(st) {
+		t.Errorf("validate does not validate struct type")
 	}
-	if nil != Validate(&s) {
-		t.Errorf("validate does no validate struct pointer type")
+	if nil != Validate(&st) {
+		t.Errorf("validate does not validate struct pointer type")
+	}
+}
+
+func TestBasic(t *testing.T) {
+	stFail := struct {
+		field int `max:"0"`
+	}{
+		field: 1,
+	}
+	if nil == Validate(stFail) {
+		t.Errorf("validate does not validate struct type")
+	}
+	if nil == Validate(&stFail) {
+		t.Errorf("validate does nott validate struct pointer type")
+	}
+
+	stAnotherFail := struct {
+		a     int
+		b     int
+		field int `max:"0"`
+		c     int
+		d     int
+	}{
+		field: 1,
+	}
+	if nil == Validate(stAnotherFail) {
+		t.Errorf("validate does not validate struct type")
+	}
+	if nil == Validate(&stAnotherFail) {
+		t.Errorf("validate does nott validate struct pointer type")
 	}
 }
 
