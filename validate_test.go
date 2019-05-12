@@ -38,7 +38,6 @@ func TestType(t *testing.T) {
 	if nil != Validate(s) {
 		t.Errorf("validate does no validate struct pointer type")
 	}
-
 }
 
 func TestMinTagForDuration(t *testing.T) {
@@ -272,6 +271,7 @@ func TestMaxTagForInt(t *testing.T) {
 		t.Errorf("max tag does not validate for int64")
 	}
 }
+
 func TestMinTagForUint(t *testing.T) {
 	if nil == Validate(struct {
 		field uint `min:"10"`
@@ -521,6 +521,7 @@ func TestMinTagForString(t *testing.T) {
 		t.Errorf("min tag does not validate for string")
 	}
 }
+
 func TestMaxTagForString(t *testing.T) {
 	if nil == Validate(struct {
 		field string `max:"2"`
