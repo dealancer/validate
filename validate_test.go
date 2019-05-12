@@ -622,6 +622,7 @@ func TestMaxTagForSlice(t *testing.T) {
 		t.Errorf("min tag does not validate for string")
 	}
 }
+
 func TestIsEmptyTagForString(t *testing.T) {
 	if nil == Validate(struct {
 		field string `is_empty:"true"`
@@ -632,7 +633,7 @@ func TestIsEmptyTagForString(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field string
+		field string `is_empty:"true"`
 	}{
 		field: "",
 	}) {
@@ -648,10 +649,86 @@ func TestIsEmptyTagForString(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field string
+		field string `is_empty:"false"`
 	}{
 		field: "a",
 	}) {
 		t.Errorf("is_empty tag does not validate for string")
+	}
+}
+
+func TestIsEmptyTagForMap(t *testing.T) {
+	if nil == Validate(struct {
+		field map[string]string `is_empty:"true"`
+	}{
+		field: map[string]string{
+			"a": "a",
+		},
+	}) {
+		t.Errorf("is_empty tag does not validate for map")
+	}
+
+	if nil != Validate(struct {
+		field map[string]string `is_empty:"true"`
+	}{
+		field: map[string]string{},
+	}) {
+		t.Errorf("is_empty tag does not validate for map")
+	}
+
+	if nil == Validate(struct {
+		field map[string]string `is_empty:"false"`
+	}{
+		field: map[string]string{},
+	}) {
+		t.Errorf("is_empty tag does not validate for map")
+	}
+
+	if nil != Validate(struct {
+		field map[string]string `is_empty:"false"`
+	}{
+		field: map[string]string{
+			"a": "a",
+		},
+	}) {
+		t.Errorf("is_empty tag does not validate for map")
+	}
+}
+
+func TestIsEmptyTagForSlice(t *testing.T) {
+	if nil == Validate(struct {
+		field []string `is_empty:"true"`
+	}{
+		field: []string{
+			"a",
+		},
+	}) {
+		t.Errorf("is_empty tag does not validate for slice")
+	}
+
+	if nil != Validate(struct {
+		field []string `is_empty:"true"`
+	}{
+		field: []string{},
+	}) {
+		t.Errorf("is_empty tag does not validate for sclie")
+	}
+
+	if nil == Validate(struct {
+		field []string `is_empty:"false"`
+	}{
+		field: []string{},
+	}) {
+		t.Errorf("is_empty tag does not validate for slice")
+	}
+
+	if nil != Validate(struct {
+		field []string `is_empty:"false"`
+	}{
+		field: []string{
+			"a",
+		},
+	}) {
+		t.Errorf("is_empty tag does not validate for slice")
 	}
 }
