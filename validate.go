@@ -48,20 +48,29 @@ func validateStruct(value reflect.Value) error {
 
 func validateField(value reflect.Value, field reflect.StructField, isChild bool) error {
 	kind := value.Kind()
+	typ := value.Type()
 	name := field.Name
 	tag := field.Tag
 
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		if min, err := time.ParseDuration(getTag(tag, tagMin, isChild)); err == nil && time.Duration(value.Int()) < min {
-			return errors.New(fmt.Sprint(name, " must not be less than ", min))
-		} else if min, err := strconv.ParseInt(getTag(tag, tagMin, isChild), 10, 64); err == nil && value.Int() < min {
-			return errors.New(fmt.Sprint(name, " must not be less than ", min))
+		if typ == reflect.TypeOf((time.Duration)(0)) {
+			if min, err := time.ParseDuration(getTag(tag, tagMin, isChild)); err == nil && time.Duration(value.Int()) < min {
+				return errors.New(fmt.Sprint(name, " must not be less than ", min))
+			}
+		} else {
+			if min, err := strconv.ParseInt(getTag(tag, tagMin, isChild), 10, 64); err == nil && value.Int() < min {
+				return errors.New(fmt.Sprint(name, " must not be less than ", min))
+			}
 		}
-		if max, err := time.ParseDuration(getTag(tag, tagMax, isChild)); err == nil && time.Duration(value.Int()) > max {
-			return errors.New(fmt.Sprint(name, " must not be greater than ", max))
-		} else if max, err := strconv.ParseInt(getTag(tag, tagMax, isChild), 10, 64); err == nil && value.Int() > max {
-			return errors.New(fmt.Sprint(name, " must not be greater than ", max))
+		if typ == reflect.TypeOf((time.Duration)(0)) {
+			if max, err := time.ParseDuration(getTag(tag, tagMax, isChild)); err == nil && time.Duration(value.Int()) > max {
+				return errors.New(fmt.Sprint(name, " must not be greater than ", max))
+			}
+		} else {
+			if max, err := strconv.ParseInt(getTag(tag, tagMax, isChild), 10, 64); err == nil && value.Int() > max {
+				return errors.New(fmt.Sprint(name, " must not be greater than ", max))
+			}
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		if min, err := strconv.ParseUint(getTag(tag, tagMin, isChild), 10, 64); err == nil && value.Uint() < min {
