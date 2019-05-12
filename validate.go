@@ -12,15 +12,15 @@ import (
 const (
 	masterTag = "validate"
 
-	valMin     = "min"
-	valMax     = "max"
-	valIsEmpty = "is_empty"
-	valIsNil   = "is_nil"
+	valMin   = "min"
+	valMax   = "max"
+	valEmpty = "empty"
+	valNil   = "nil"
 
-	valChildMin     = "child_min"
-	valChildMax     = "child_max"
-	valChildIsEmpty = "child_is_empty"
-	valChildIsNil   = "child_is_nil"
+	valChildMin   = "child_min"
+	valChildMax   = "child_max"
+	valChildEmpty = "child_empty"
+	valChildNil   = "child_nil"
 )
 
 // Validate validates members of a struct
@@ -91,7 +91,7 @@ func validateField(value reflect.Value, field reflect.StructField, isChild bool)
 			return errors.New(fmt.Sprint(name, " must not be greater than ", max))
 		}
 	case reflect.String:
-		if isEmpty, err := strconv.ParseBool(getVal(valMap, valIsEmpty, isChild)); err == nil {
+		if isEmpty, err := strconv.ParseBool(getVal(valMap, valEmpty, isChild)); err == nil {
 			if isEmpty && value.Len() > 0 {
 				return errors.New(fmt.Sprint(name, " must be empty"))
 			} else if !isEmpty && value.Len() == 0 {
@@ -105,7 +105,7 @@ func validateField(value reflect.Value, field reflect.StructField, isChild bool)
 			return errors.New(fmt.Sprint(name, " must not contain more than ", max, " characters"))
 		}
 	case reflect.Map:
-		if isEmpty, err := strconv.ParseBool(getVal(valMap, valIsEmpty, isChild)); err == nil {
+		if isEmpty, err := strconv.ParseBool(getVal(valMap, valEmpty, isChild)); err == nil {
 			if isEmpty && value.Len() > 0 {
 				return errors.New(fmt.Sprint(name, " must be empty"))
 			} else if !isEmpty && value.Len() == 0 {
@@ -119,7 +119,7 @@ func validateField(value reflect.Value, field reflect.StructField, isChild bool)
 			return errors.New(fmt.Sprint(name, " must not contain more than ", max, " elements"))
 		}
 	case reflect.Slice:
-		if isEmpty, err := strconv.ParseBool(getVal(valMap, valIsEmpty, isChild)); err == nil {
+		if isEmpty, err := strconv.ParseBool(getVal(valMap, valEmpty, isChild)); err == nil {
 			if isEmpty && value.Len() > 0 {
 				return errors.New(fmt.Sprint(name, " must be empty"))
 			} else if !isEmpty && value.Len() == 0 {
@@ -140,7 +140,7 @@ func validateField(value reflect.Value, field reflect.StructField, isChild bool)
 			}
 		}
 	case reflect.Ptr:
-		if isNil, err := strconv.ParseBool(getVal(valMap, valIsNil, isChild)); err == nil {
+		if isNil, err := strconv.ParseBool(getVal(valMap, valNil, isChild)); err == nil {
 			if isNil && !value.IsNil() {
 				return errors.New(fmt.Sprint(name, " must be nil"))
 			} else if !isNil && value.IsNil() {
@@ -176,10 +176,10 @@ func parseVals(tag reflect.StructTag) map[string]string {
 
 func getVal(valMap map[string]string, valName string, child bool) string {
 	var valChildMap = map[string]string{
-		valMin:     valChildMin,
-		valMax:     valChildMax,
-		valIsEmpty: valChildIsEmpty,
-		valIsNil:   valChildIsNil,
+		valMin:   valChildMin,
+		valMax:   valChildMax,
+		valEmpty: valChildEmpty,
+		valNil:   valChildNil,
 	}
 
 	if child {

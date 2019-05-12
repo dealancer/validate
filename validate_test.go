@@ -802,141 +802,141 @@ func TestMaxValForSlice(t *testing.T) {
 	}
 }
 
-func TestIsEmptyValForString(t *testing.T) {
+func TestEmptyValForString(t *testing.T) {
 	if nil == Validate(struct {
-		field string `validate:"is_empty=true"`
+		field string `validate:"empty=true"`
 	}{
 		field: "a",
 	}) {
-		t.Errorf("is_empty validator does not validate for string")
+		t.Errorf("empty validator does not validate for string")
 	}
 
 	if nil != Validate(struct {
-		field string `validate:"is_empty=true"`
+		field string `validate:"empty=true"`
 	}{
 		field: "",
 	}) {
-		t.Errorf("is_empty validator does not validate for string")
+		t.Errorf("empty validator does not validate for string")
 	}
 
 	if nil == Validate(struct {
-		field string `validate:"is_empty=false"`
+		field string `validate:"empty=false"`
 	}{
 		field: "",
 	}) {
-		t.Errorf("is_empty validator does not validate for string")
+		t.Errorf("empty validator does not validate for string")
 	}
 
 	if nil != Validate(struct {
-		field string `validate:"is_empty=false"`
+		field string `validate:"empty=false"`
 	}{
 		field: "a",
 	}) {
-		t.Errorf("is_empty validator does not validate for string")
+		t.Errorf("empty validator does not validate for string")
 	}
 }
 
-func TestIsEmptyValForMap(t *testing.T) {
+func TestEmptyValForMap(t *testing.T) {
 	if nil == Validate(struct {
-		field map[string]string `validate:"is_empty=true"`
+		field map[string]string `validate:"empty=true"`
 	}{
 		field: map[string]string{"a": "a"},
 	}) {
-		t.Errorf("is_empty validator does not validate for map")
+		t.Errorf("empty validator does not validate for map")
 	}
 
 	if nil != Validate(struct {
-		field map[string]string `validate:"is_empty=true"`
+		field map[string]string `validate:"empty=true"`
 	}{
 		field: map[string]string{},
 	}) {
-		t.Errorf("is_empty validator does not validate for map")
+		t.Errorf("empty validator does not validate for map")
 	}
 
 	if nil == Validate(struct {
-		field map[string]string `validate:"is_empty=false"`
+		field map[string]string `validate:"empty=false"`
 	}{
 		field: map[string]string{},
 	}) {
-		t.Errorf("is_empty validator does not validate for map")
+		t.Errorf("empty validator does not validate for map")
 	}
 
 	if nil != Validate(struct {
-		field map[string]string `validate:"is_empty=false"`
+		field map[string]string `validate:"empty=false"`
 	}{
 		field: map[string]string{"a": "a"},
 	}) {
-		t.Errorf("is_empty validator does not validate for map")
+		t.Errorf("empty validator does not validate for map")
 	}
 }
 
-func TestIsEmptyValForSlice(t *testing.T) {
+func TestEmptyValForSlice(t *testing.T) {
 	if nil == Validate(struct {
-		field []string `validate:"is_empty=true"`
+		field []string `validate:"empty=true"`
 	}{
 		field: []string{
 			"a",
 		},
 	}) {
-		t.Errorf("is_empty validator does not validate for slice")
+		t.Errorf("empty validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []string `validate:"is_empty=true"`
+		field []string `validate:"empty=true"`
 	}{
 		field: []string{},
 	}) {
-		t.Errorf("is_empty validator does not validate for sclie")
+		t.Errorf("empty validator does not validate for sclie")
 	}
 
 	if nil == Validate(struct {
-		field []string `validate:"is_empty=false"`
+		field []string `validate:"empty=false"`
 	}{
 		field: []string{},
 	}) {
-		t.Errorf("is_empty validator does not validate for slice")
+		t.Errorf("empty validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []string `validate:"is_empty=false"`
+		field []string `validate:"empty=false"`
 	}{
 		field: []string{"a"},
 	}) {
-		t.Errorf("is_empty validator does not validate for slice")
+		t.Errorf("empty validator does not validate for slice")
 	}
 }
 
-func TestIsNilValForPtr(t *testing.T) {
+func TestNilValForPtr(t *testing.T) {
 	if nil == Validate(struct {
-		field *int `validate:"is_nil=true"`
+		field *int `validate:"nil=true"`
 	}{
 		field: new(int),
 	}) {
-		t.Errorf("is_nill validator does not validate for pointer")
+		t.Errorf("nil validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *int `validate:"is_nil=true"`
+		field *int `validate:"nil=true"`
 	}{
 		field: nil,
 	}) {
-		t.Errorf("is_nill validator does not validate for pointer")
+		t.Errorf("nil validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field *int `validate:"is_nil=false"`
+		field *int `validate:"nil=false"`
 	}{
 		field: nil,
 	}) {
-		t.Errorf("is_nill validator does not validate for pointer")
+		t.Errorf("nil validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *int `validate:"is_nil=false"`
+		field *int `validate:"nil=false"`
 	}{
 		field: new(int),
 	}) {
-		t.Errorf("is_nill validator does not validate for pointer")
+		t.Errorf("nil validator does not validate for pointer")
 	}
 }
 
@@ -974,77 +974,77 @@ func TestChildValsForSlice(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field [][]int `validate:"child_is_empty=true"`
+		field [][]int `validate:"child_empty=true"`
 	}{
 		field: [][]int{
 			[]int{0},
 		},
 	}) {
-		t.Errorf("child_is_empty validator does not validate for slice")
+		t.Errorf("child_empty validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field [][]int `validate:"child_is_empty=true"`
+		field [][]int `validate:"child_empty=true"`
 	}{
 		field: [][]int{
 			[]int{},
 		},
 	}) {
-		t.Errorf("child_is_empty validator does not validate for slice")
+		t.Errorf("child_empty validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field [][]int `validate:"child_is_empty=false"`
+		field [][]int `validate:"child_empty=false"`
 	}{
 		field: [][]int{
 			[]int{},
 		},
 	}) {
-		t.Errorf("child_is_empty validator does not validate for slice")
+		t.Errorf("child_empty validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field [][]int `validate:"child_is_empty=false"`
+		field [][]int `validate:"child_empty=false"`
 	}{
 		field: [][]int{
 			[]int{0},
 		},
 	}) {
-		t.Errorf("child_is_empty validator does not validate for slice")
+		t.Errorf("child_empty validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field []*int `validate:"child_is_nil=true"`
+		field []*int `validate:"child_nil=true"`
 	}{
 		field: []*int{
 			new(int),
 		},
 	}) {
-		t.Errorf("child_is_nil validator does not validate for slice")
+		t.Errorf("child_nil validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []*int `validate:"child_is_nil=true"`
+		field []*int `validate:"child_nil=true"`
 	}{
 		field: []*int{nil},
 	}) {
-		t.Errorf("child_is_nil validator does not validate for slice")
+		t.Errorf("child_nil validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field []*int `validate:"child_is_nil=false"`
+		field []*int `validate:"child_nil=false"`
 	}{
 		field: []*int{nil},
 	}) {
-		t.Errorf("child_is_nil validator does not validate for slice")
+		t.Errorf("child_nil validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []*int `validate:"child_is_nil=false"`
+		field []*int `validate:"child_nil=false"`
 	}{
 		field: []*int{new(int)},
 	}) {
-		t.Errorf("child_is_nil validator does not validate for slice")
+		t.Errorf("child_nil validator does not validate for slice")
 	}
 }
 
@@ -1090,67 +1090,67 @@ func TestChildValsForPtr(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field *string `validate:"child_is_empty=true"`
+		field *string `validate:"child_empty=true"`
 	}{
 		field: &notEmpty,
 	}) {
-		t.Errorf("child_is_empty validator does not validate for pointer")
+		t.Errorf("child_empty validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *string `validate:"child_is_empty=true"`
+		field *string `validate:"child_empty=true"`
 	}{
 		field: &empty,
 	}) {
-		t.Errorf("child_is_empty validator does not validate for pointer")
+		t.Errorf("child_empty validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field *string `validate:"child_is_empty=false"`
+		field *string `validate:"child_empty=false"`
 	}{
 		field: &empty,
 	}) {
-		t.Errorf("child_is_empty validator does not validate for pointer")
+		t.Errorf("child_empty validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *string `validate:"child_is_empty=false"`
+		field *string `validate:"child_empty=false"`
 	}{
 		field: &notEmpty,
 	}) {
-		t.Errorf("child_is_empty validator does not validate for pointer")
+		t.Errorf("child_empty validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field **int `validate:"child_is_nil=true"`
+		field **int `validate:"child_nil=true"`
 	}{
 		field: &onePtr,
 	}) {
-		t.Errorf("child_is_nil validator does not validate for pointer")
+		t.Errorf("child_nil validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field **int `validate:"child_is_nil=true"`
+		field **int `validate:"child_nil=true"`
 	}{
 		field: &nilPtr,
 	}) {
-		t.Errorf("child_is_nil validator does not validate for pointer")
+		t.Errorf("child_nil validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field **int `validate:"child_is_nil=false"`
+		field **int `validate:"child_nil=false"`
 	}{
 		field: &nilPtr,
 	}) {
-		t.Errorf("child_is_nil validator does not validate for pointer")
+		t.Errorf("child_nil validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field **int `validate:"child_is_nil=false"`
+		field **int `validate:"child_nil=false"`
 	}{
 		field: &onePtr,
 	}) {
-		t.Errorf("child_is_nil validator does not validate for pointer")
+		t.Errorf("child_nil validator does not validate for pointer")
 	}
 }
 
