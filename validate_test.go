@@ -35,7 +35,7 @@ func TestType(t *testing.T) {
 	if nil != Validate(s) {
 		t.Errorf("validate does no validate struct type")
 	}
-	if nil != Validate(s) {
+	if nil != Validate(&s) {
 		t.Errorf("validate does no validate struct pointer type")
 	}
 }
