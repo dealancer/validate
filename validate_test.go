@@ -149,6 +149,30 @@ func TestFormatVal(t *testing.T) {
 	}) {
 		t.Errorf("empty validator must not validate")
 	}
+
+	if nil == Validate(struct {
+		field int `validate:" one_of = 1 | 2 | 3 "`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("validators with spaces does not validate")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:" one_of = 1 | 2 | 3 "`
+	}{
+		field: 2,
+	}) {
+		t.Errorf("validators with spaces does not validate")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:"one_of="`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("empty one_of validate should not validate")
+	}
 }
 func TestMinValForDuration(t *testing.T) {
 	if nil == Validate(struct {
