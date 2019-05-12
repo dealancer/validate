@@ -940,6 +940,240 @@ func TestNilValForPtr(t *testing.T) {
 	}
 }
 
+func TestOneOfValForDuration(t *testing.T) {
+	if nil == Validate(struct {
+		field time.Duration `validate:"one_of=1s|2s|3s"`
+	}{
+		field: 4 * time.Second,
+	}) {
+		t.Errorf("one_of validator does not validate for time.Duration")
+	}
+
+	if nil != Validate(struct {
+		field time.Duration `validate:"one_of=1s|2s|3s"`
+	}{
+		field: 2 * time.Second,
+	}) {
+		t.Errorf("one_of validator does not validate for time.Duration")
+	}
+}
+
+func TestOneOfValForInt(t *testing.T) {
+	if nil == Validate(struct {
+		field int `validate:"one_of=1|2|3"`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("one_of validator does not validate for int")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:"one_of=1|2|3"`
+	}{
+		field: 2,
+	}) {
+		t.Errorf("one_of validator does not validate for int")
+	}
+
+	if nil == Validate(struct {
+		field int8 `validate:"one_of=1|2|3"`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("one_of validator does not validate for int8")
+	}
+
+	if nil != Validate(struct {
+		field int8 `validate:"one_of=1|2|3"`
+	}{
+		field: 2,
+	}) {
+		t.Errorf("one_of validator does not validate for int8")
+	}
+
+	if nil == Validate(struct {
+		field int16 `validate:"one_of=1|2|3"`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("one_of validator does not validate for int16")
+	}
+
+	if nil != Validate(struct {
+		field int16 `validate:"one_of=1|2|3"`
+	}{
+		field: 2,
+	}) {
+		t.Errorf("one_of validator does not validate for int16")
+	}
+
+	if nil == Validate(struct {
+		field int32 `validate:"one_of=1|2|3"`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("one_of validator does not validate for int32")
+	}
+
+	if nil != Validate(struct {
+		field int32 `validate:"one_of=1|2|3"`
+	}{
+		field: 2,
+	}) {
+		t.Errorf("one_of validator does not validate for int32")
+	}
+
+	if nil == Validate(struct {
+		field int64 `validate:"one_of=1|2|3"`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("one_of validator does not validate for int64")
+	}
+
+	if nil != Validate(struct {
+		field int64 `validate:"one_of=1|2|3"`
+	}{
+		field: 2,
+	}) {
+		t.Errorf("one_of validator does not validate for int64")
+	}
+}
+
+func TestOneOfValForUint(t *testing.T) {
+	if nil == Validate(struct {
+		field uint `validate:"one_of=1|2|3"`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("one_of validator does not validate for uint")
+	}
+
+	if nil != Validate(struct {
+		field uint `validate:"one_of=1|2|3"`
+	}{
+		field: 2,
+	}) {
+		t.Errorf("one_of validator does not validate for uint")
+	}
+
+	if nil == Validate(struct {
+		field uint8 `validate:"one_of=1|2|3"`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("one_of validator does not validate for uint8")
+	}
+
+	if nil != Validate(struct {
+		field uint8 `validate:"one_of=1|2|3"`
+	}{
+		field: 2,
+	}) {
+		t.Errorf("one_of validator does not validate for uint8")
+	}
+
+	if nil == Validate(struct {
+		field uint16 `validate:"one_of=1|2|3"`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("one_of validator does not validate for uint16")
+	}
+
+	if nil != Validate(struct {
+		field uint16 `validate:"one_of=1|2|3"`
+	}{
+		field: 2,
+	}) {
+		t.Errorf("one_of validator does not validate for uint16")
+	}
+
+	if nil == Validate(struct {
+		field uint32 `validate:"one_of=1|2|3"`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("one_of validator does not validate for uint32")
+	}
+
+	if nil != Validate(struct {
+		field uint32 `validate:"one_of=1|2|3"`
+	}{
+		field: 2,
+	}) {
+		t.Errorf("one_of validator does not validate for uint32")
+	}
+
+	if nil == Validate(struct {
+		field uint64 `validate:"one_of=1|2|3"`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("one_of validator does not validate for uint64")
+	}
+
+	if nil != Validate(struct {
+		field uint64 `validate:"one_of=1|2|3"`
+	}{
+		field: 2,
+	}) {
+		t.Errorf("one_of validator does not validate for uint64")
+	}
+}
+
+func TestOneOfValForFloat(t *testing.T) {
+	if nil == Validate(struct {
+		field float32 `validate:"one_of=1.0|2.0|3.0"`
+	}{
+		field: 4.0,
+	}) {
+		t.Errorf("one_of validator does not validate for float32")
+	}
+
+	if nil != Validate(struct {
+		field float32 `validate:"one_of=1.0|2.0|3.0"`
+	}{
+		field: 2.0,
+	}) {
+		t.Errorf("one_of validator does not validate for float32")
+	}
+
+	if nil == Validate(struct {
+		field float64 `validate:"one_of=1.0|2.0|3.0"`
+	}{
+		field: 4.0,
+	}) {
+		t.Errorf("one_of validator does not validate for float64")
+	}
+
+	if nil != Validate(struct {
+		field float64 `validate:"one_of=1.0|2.0|3.0"`
+	}{
+		field: 2.0,
+	}) {
+		t.Errorf("one_of validator does not validate for float64")
+	}
+}
+
+func TestOneOfValForString(t *testing.T) {
+	if nil == Validate(struct {
+		field string `validate:"one_of=one|two|three"`
+	}{
+		field: "four",
+	}) {
+		t.Errorf("one_of validator does not validate for string")
+	}
+
+	if nil != Validate(struct {
+		field string `validate:"one_of=one|two|three"`
+	}{
+		field: "two",
+	}) {
+		t.Errorf("one_of validator does not validate for string")
+	}
+}
+
 func TestChildValsForSlice(t *testing.T) {
 	if nil == Validate(struct {
 		field []int `validate:"child_min=0"`
@@ -1046,12 +1280,29 @@ func TestChildValsForSlice(t *testing.T) {
 	}) {
 		t.Errorf("child_nil validator does not validate for slice")
 	}
+
+	if nil == Validate(struct {
+		field []int `validate:"child_one_of=1|2|3"`
+	}{
+		field: []int{4},
+	}) {
+		t.Errorf("child_one_of validator does not validate for slice")
+	}
+
+	if nil != Validate(struct {
+		field []int `validate:"child_one_of=1|2|3"`
+	}{
+		field: []int{1, 2, 3},
+	}) {
+		t.Errorf("child_one_of validator does not validate for slice")
+	}
 }
 
 func TestChildValsForPtr(t *testing.T) {
 	minusOne := -1
 	zero := 0
 	one := 1
+	four := 4
 	empty := ""
 	notEmpty := "a"
 	onePtr := &one
@@ -1151,6 +1402,22 @@ func TestChildValsForPtr(t *testing.T) {
 		field: &onePtr,
 	}) {
 		t.Errorf("child_nil validator does not validate for pointer")
+	}
+
+	if nil == Validate(struct {
+		field *int `validate:"child_one_of=1|2|3"`
+	}{
+		field: &four,
+	}) {
+		t.Errorf("child_one_of validator does not validate for pointer")
+	}
+
+	if nil != Validate(struct {
+		field *int `validate:"child_one_of=1|2|3"`
+	}{
+		field: &one,
+	}) {
+		t.Errorf("child_one_of validator does not validate for pointer")
 	}
 }
 

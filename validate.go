@@ -16,11 +16,13 @@ const (
 	valMax   = "max"
 	valEmpty = "empty"
 	valNil   = "nil"
+	valOneOf = "one_of"
 
 	valChildMin   = "child_min"
 	valChildMax   = "child_max"
 	valChildEmpty = "child_empty"
 	valChildNil   = "child_nil"
+	valChildOneOf = "child_one_of"
 )
 
 // Validate validates members of a struct
@@ -62,18 +64,39 @@ func validateField(value reflect.Value, field reflect.StructField, isChild bool)
 			if min, err := time.ParseDuration(getVal(valMap, valMin, isChild)); err == nil && time.Duration(value.Int()) < min {
 				return errors.New(fmt.Sprint(name, " must not be less than ", min))
 			}
+			if max, err := time.ParseDuration(getVal(valMap, valMax, isChild)); err == nil && time.Duration(value.Int()) > max {
+				return errors.New(fmt.Sprint(name, " must not be greater than ", max))
+			}
+			oneOf := getVal(valMap, valOneOf, isChild)
+			if tokens := parseTokens(oneOf); len(tokens) > 0 {
+				for i, token := range tokens {
+					tokens[i] = nil
+					if token, err := time.ParseDuration(token.(string)); err == nil {
+						tokens[i] = token
+					}
+				}
+				if !isOneOf(time.Duration(value.Int()), tokens) {
+					return errors.New(fmt.Sprint(name, " must be one of ", oneOf))
+				}
+			}
 		} else {
 			if min, err := strconv.ParseInt(getVal(valMap, valMin, isChild), 10, 64); err == nil && value.Int() < min {
 				return errors.New(fmt.Sprint(name, " must not be less than ", min))
 			}
-		}
-		if typ == reflect.TypeOf((time.Duration)(0)) {
-			if max, err := time.ParseDuration(getVal(valMap, valMax, isChild)); err == nil && time.Duration(value.Int()) > max {
-				return errors.New(fmt.Sprint(name, " must not be greater than ", max))
-			}
-		} else {
 			if max, err := strconv.ParseInt(getVal(valMap, valMax, isChild), 10, 64); err == nil && value.Int() > max {
 				return errors.New(fmt.Sprint(name, " must not be greater than ", max))
+			}
+			oneOf := getVal(valMap, valOneOf, isChild)
+			if tokens := parseTokens(oneOf); len(tokens) > 0 {
+				for i, token := range tokens {
+					tokens[i] = nil
+					if token, err := strconv.ParseInt(token.(string), 10, 64); err == nil {
+						tokens[i] = token
+					}
+				}
+				if !isOneOf(value.Int(), tokens) {
+					return errors.New(fmt.Sprint(name, " must be one of ", oneOf))
+				}
 			}
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
@@ -83,12 +106,36 @@ func validateField(value reflect.Value, field reflect.StructField, isChild bool)
 		if max, err := strconv.ParseUint(getVal(valMap, valMax, isChild), 10, 64); err == nil && value.Uint() > max {
 			return errors.New(fmt.Sprint(name, " must not be greater than ", max))
 		}
+		oneOf := getVal(valMap, valOneOf, isChild)
+		if tokens := parseTokens(oneOf); len(tokens) > 0 {
+			for i, token := range tokens {
+				tokens[i] = nil
+				if token, err := strconv.ParseUint(token.(string), 10, 64); err == nil {
+					tokens[i] = token
+				}
+			}
+			if !isOneOf(value.Uint(), tokens) {
+				return errors.New(fmt.Sprint(name, " must be one of ", oneOf))
+			}
+		}
 	case reflect.Float32, reflect.Float64:
 		if min, err := strconv.ParseFloat(getVal(valMap, valMin, isChild), 64); err == nil && value.Float() < min {
 			return errors.New(fmt.Sprint(name, " must not be less than ", min))
 		}
 		if max, err := strconv.ParseFloat(getVal(valMap, valMax, isChild), 64); err == nil && value.Float() > max {
 			return errors.New(fmt.Sprint(name, " must not be greater than ", max))
+		}
+		oneOf := getVal(valMap, valOneOf, isChild)
+		if tokens := parseTokens(oneOf); len(tokens) > 0 {
+			for i, token := range tokens {
+				tokens[i] = nil
+				if token, err := strconv.ParseFloat(token.(string), 64); err == nil {
+					tokens[i] = token
+				}
+			}
+			if !isOneOf(value.Float(), tokens) {
+				return errors.New(fmt.Sprint(name, " must be one of ", oneOf))
+			}
 		}
 	case reflect.String:
 		if isEmpty, err := strconv.ParseBool(getVal(valMap, valEmpty, isChild)); err == nil {
@@ -103,6 +150,12 @@ func validateField(value reflect.Value, field reflect.StructField, isChild bool)
 		}
 		if max, err := strconv.Atoi(getVal(valMap, valMax, isChild)); err == nil && value.Len() > max {
 			return errors.New(fmt.Sprint(name, " must not contain more than ", max, " characters"))
+		}
+		oneOf := getVal(valMap, valOneOf, isChild)
+		if tokens := parseTokens(oneOf); len(tokens) > 0 {
+			if !isOneOf(value.String(), tokens) {
+				return errors.New(fmt.Sprint(name, " must be one of ", oneOf))
+			}
 		}
 	case reflect.Map:
 		if isEmpty, err := strconv.ParseBool(getVal(valMap, valEmpty, isChild)); err == nil {
@@ -180,6 +233,7 @@ func getVal(valMap map[string]string, valName string, child bool) string {
 		valMax:   valChildMax,
 		valEmpty: valChildEmpty,
 		valNil:   valChildNil,
+		valOneOf: valChildOneOf,
 	}
 
 	if child {
@@ -191,4 +245,28 @@ func getVal(valMap map[string]string, valName string, child bool) string {
 	}
 
 	return ""
+}
+
+func parseTokens(str string) []interface{} {
+	if strings.TrimSpace(str) == "" {
+		return nil
+	}
+
+	tokenStrings := strings.Split(str, "|")
+	tokens := make([]interface{}, len(tokenStrings))
+	for i := range tokenStrings {
+		tokens[i] = strings.TrimSpace(tokenStrings[i])
+	}
+
+	return tokens
+}
+
+func isOneOf(token interface{}, tokens []interface{}) bool {
+	for _, t := range tokens {
+		if t == token {
+			return true
+		}
+	}
+
+	return false
 }
