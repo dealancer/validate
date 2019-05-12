@@ -317,6 +317,42 @@ func TestMaxTagForInt(t *testing.T) {
 	}
 }
 
+func TestMinTagForRune(t *testing.T) {
+	if nil == Validate(struct {
+		field rune `min:"0"`
+	}{
+		field: -1,
+	}) {
+		t.Errorf("min tag does not validate for rune")
+	}
+
+	if nil != Validate(struct {
+		field rune `min:"0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("min tag does not validate for rune")
+	}
+}
+
+func TestMaxTagForRune(t *testing.T) {
+	if nil == Validate(struct {
+		field rune `max:"0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("max tag does not validate for rune")
+	}
+
+	if nil != Validate(struct {
+		field rune `max:"0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("max tag does not validate for rune")
+	}
+}
+
 func TestMinTagForUint(t *testing.T) {
 	if nil == Validate(struct {
 		field uint `min:"10"`
@@ -358,6 +394,14 @@ func TestMinTagForUint(t *testing.T) {
 		t.Errorf("min tag does not validate for uint64")
 	}
 
+	if nil == Validate(struct {
+		field uintptr `min:"10"`
+	}{
+		field: 9,
+	}) {
+		t.Errorf("min tag does not validate for uintptr")
+	}
+
 	if nil != Validate(struct {
 		field uint `min:"10"`
 	}{
@@ -396,6 +440,14 @@ func TestMinTagForUint(t *testing.T) {
 		field: 10,
 	}) {
 		t.Errorf("min tag does not validate for uint64")
+	}
+
+	if nil != Validate(struct {
+		field uintptr `min:"10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("min tag does not validate for uintptr")
 	}
 }
 
@@ -440,6 +492,14 @@ func TestMaxTagForUint(t *testing.T) {
 		t.Errorf("max tag does not validate for uint64")
 	}
 
+	if nil == Validate(struct {
+		field uintptr `max:"0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("max tag does not validate for uintptr")
+	}
+
 	if nil != Validate(struct {
 		field uint `max:"0"`
 	}{
@@ -478,6 +538,14 @@ func TestMaxTagForUint(t *testing.T) {
 		field: 0,
 	}) {
 		t.Errorf("max tag does not validate for uint64")
+	}
+
+	if nil != Validate(struct {
+		field uint64 `max:"0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("max tag does not validate for uintptr")
 	}
 }
 
