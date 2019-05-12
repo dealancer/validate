@@ -869,3 +869,109 @@ func TestChildTagsForSlice(t *testing.T) {
 		t.Errorf("child_is_nil tag does not validate for slice")
 	}
 }
+
+func TestChildTagsForPtr(t *testing.T) {
+	minusOne := -1
+	zero := 0
+	one := 1
+	empty := ""
+	notEmpty := "a"
+	onePtr := &one
+	var nilPtr *int
+
+	if nil == Validate(struct {
+		field *int `child_min:"0"`
+	}{
+		field: &minusOne,
+	}) {
+		t.Errorf("child_min tag does not validate for pointer")
+	}
+
+	if nil != Validate(struct {
+		field *int `child_min:"0"`
+	}{
+		field: &zero,
+	}) {
+		t.Errorf("child_min tag does not validate for pointer")
+	}
+
+	if nil == Validate(struct {
+		field *int `child_max:"0"`
+	}{
+		field: &one,
+	}) {
+		t.Errorf("child_max tag does not validate for pointer")
+	}
+
+	if nil != Validate(struct {
+		field *int `child_max:"0"`
+	}{
+		field: &zero,
+	}) {
+		t.Errorf("child_max tag does not validate for pointer")
+	}
+
+	if nil == Validate(struct {
+		field *string `child_is_empty:"true"`
+	}{
+		field: &notEmpty,
+	}) {
+		t.Errorf("child_is_empty tag does not validate for pointer")
+	}
+
+	if nil != Validate(struct {
+		field *string `child_is_empty:"true"`
+	}{
+		field: &empty,
+	}) {
+		t.Errorf("child_is_empty tag does not validate for pointer")
+	}
+
+	if nil == Validate(struct {
+		field *string `child_is_empty:"false"`
+	}{
+		field: &empty,
+	}) {
+		t.Errorf("child_is_empty tag does not validate for pointer")
+	}
+
+	if nil != Validate(struct {
+		field *string `child_is_empty:"false"`
+	}{
+		field: &notEmpty,
+	}) {
+		t.Errorf("child_is_empty tag does not validate for pointer")
+	}
+
+	if nil == Validate(struct {
+		field **int `child_is_nil:"true"`
+	}{
+		field: &onePtr,
+	}) {
+		t.Errorf("child_is_nil tag does not validate for pointer")
+	}
+
+	if nil != Validate(struct {
+		field **int `child_is_nil:"true"`
+	}{
+		field: &nilPtr,
+	}) {
+		t.Errorf("child_is_nil tag does not validate for pointer")
+	}
+
+	if nil == Validate(struct {
+		field **int `child_is_nil:"false"`
+	}{
+		field: &nilPtr,
+	}) {
+		t.Errorf("child_is_nil tag does not validate for pointer")
+	}
+
+	if nil != Validate(struct {
+		field **int `child_is_nil:"false"`
+	}{
+		field: &onePtr,
+	}) {
+		t.Errorf("child_is_nil tag does not validate for pointer")
+	}
+}
