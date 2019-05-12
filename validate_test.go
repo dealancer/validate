@@ -732,3 +732,33 @@ func TestIsEmptyTagForSlice(t *testing.T) {
 		t.Errorf("is_empty tag does not validate for slice")
 	}
 }
+
+func TestIsNilTagForPtr(t *testing.T) {
+	if nil == Validate(struct {
+		field *int `is_nil:"true"`
+	}{
+		field: new(int),
+	}) {
+		t.Errorf("is_nill tag does not validate for pointer")
+	}
+
+	if nil != Validate(struct {
+		field *int `is_nil:"true"`
+	}{}) {
+		t.Errorf("is_nill tag does not validate for pointer")
+	}
+
+	if nil == Validate(struct {
+		field *int `is_nil:"false"`
+	}{}) {
+		t.Errorf("is_nill tag does not validate for pointer")
+	}
+
+	if nil != Validate(struct {
+		field *int `is_nil:"false"`
+	}{
+		field: new(int),
+	}) {
+		t.Errorf("is_nill tag does not validate for pointer")
+	}
+}
