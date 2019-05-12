@@ -1088,3 +1088,49 @@ func TestChildTagsForPtr(t *testing.T) {
 		t.Errorf("child_is_nil tag does not validate for pointer")
 	}
 }
+
+func TestOneLevelDeep(t *testing.T) {
+	// Should not validate one level deep
+
+	if nil != Validate(struct {
+		field []int `min:"0"`
+	}{
+		field: []int{-1},
+	}) {
+		t.Errorf("min tag validates one level deep for slice")
+	}
+
+	one := 1
+	if nil != Validate(struct {
+		field *int `max:"0"`
+	}{
+		field: &one,
+	}) {
+		t.Errorf("max tag validates one level deep for pointer")
+	}
+}
+
+func TestTwoLevelDeep(t *testing.T) {
+	// Should not validate two level deep
+
+	if nil != Validate(struct {
+		field [][]int `child_min:"0"`
+	}{
+		field: [][]int{
+			[]int{-1},
+		},
+	}) {
+		t.Errorf("child_min tag validates two level deep for slice")
+	}
+
+	one := 1
+	onePtr := &one
+
+	if nil != Validate(struct {
+		field **int `child_max:"0"`
+	}{
+		field: &onePtr,
+	}) {
+		t.Errorf("child_max tag validates two level deep for pointer")
+	}
+}
