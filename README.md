@@ -47,7 +47,7 @@ go get github.com/dealancer/validate
 type Connection struct {
 	Name      string   `validate:"empty=false"`
 	Hosts     []string `validate:"empty=false,child_empty=false"`
-	Username  string   `validate:"is_one_of=joe|ivan|li"`
+	Username  string   `validate:"one_of=joe|ivan|li"`
 	Password  *string  `validate:"child_min=12"`
 	Ssl       *bool    `validate:"nil=false"`
 	SslVerify *bool    `validate:"nil=false"`
