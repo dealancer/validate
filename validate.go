@@ -77,6 +77,10 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 
 	// Dive one level deep into arrays and pointers
 	switch kind {
+	case reflect.Struct:
+		if err := validateStruct(value); err != nil {
+			return err
+		}
 	case reflect.Map:
 		iter := value.MapRange()
 		for iter.Next() {
