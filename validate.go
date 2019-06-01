@@ -51,7 +51,7 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 	kind := value.Kind()
 
 	// Perform validators
-	_, valValidators, validators := splitValidators(validators)
+	keyValidators, valValidators, validators := splitValidators(validators)
 	valValidatorsMap := parseValidators(valValidators)
 
 	for valType, validator := range valValidatorsMap {
@@ -77,6 +77,16 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 
 	// Dive one level deep into arrays and pointers
 	switch kind {
+	case reflect.Map:
+		iter := value.MapRange()
+		for iter.Next() {
+			if err := validateField(iter.Key(), fieldName, keyValidators); err != nil {
+				return err
+			}
+			if err := validateField(iter.Value(), fieldName, validators); err != nil {
+				return err
+			}
+		}
 	case reflect.Slice:
 		for i := 0; i < value.Len(); i++ {
 			if err := validateField(value.Index(i), fieldName, validators); err != nil {

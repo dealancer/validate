@@ -1287,6 +1287,283 @@ func TestOneOfValForString(t *testing.T) {
 	}
 }
 
+func TestDeepValsForMapKeys(t *testing.T) {
+	s := " "
+
+	if nil == Validate(struct {
+		field map[int]int `validate:"[min=0]"`
+	}{
+		field: map[int]int{0: 0, -1: 0},
+	}) {
+		t.Errorf("[min] validator does not validate for map key")
+	}
+
+	if nil != Validate(struct {
+		field map[int]int `validate:"[min=0]"`
+	}{
+		field: map[int]int{0: 0},
+	}) {
+		t.Errorf("[min] validator does not validate map key")
+	}
+
+	if nil == Validate(struct {
+		field map[int]int `validate:"[max=0]"`
+	}{
+		field: map[int]int{0: 0, 1: 0},
+	}) {
+		t.Errorf("[max] validator does not validate for map key")
+	}
+
+	if nil != Validate(struct {
+		field map[int]int `validate:"[max=0]"`
+	}{
+		field: map[int]int{0: 0},
+	}) {
+		t.Errorf("[max] validator does not validate for map key")
+	}
+
+	if nil == Validate(struct {
+		field map[string]int `validate:"[empty=true]"`
+	}{
+		field: map[string]int{
+			" ": 0,
+		},
+	}) {
+		t.Errorf("[empty] validator does not validate for map key")
+	}
+
+	if nil != Validate(struct {
+		field map[string]int `validate:"[empty=true]"`
+	}{
+		field: map[string]int{
+			"": 0,
+		},
+	}) {
+		t.Errorf("[empty] validator does not validate for map key")
+	}
+
+	if nil == Validate(struct {
+		field map[string]int `validate:"[empty=false]"`
+	}{
+		field: map[string]int{
+			"": 0,
+		},
+	}) {
+		t.Errorf("[empty] validator does not validate for map key")
+	}
+
+	if nil != Validate(struct {
+		field map[string]int `validate:"[empty=false]"`
+	}{
+		field: map[string]int{
+			" ": 0,
+		},
+	}) {
+		t.Errorf("[empty] validator does not validate for map key")
+	}
+
+	if nil == Validate(struct {
+		field map[*string]int `validate:"[nil=true]"`
+	}{
+		field: map[*string]int{
+			&s: 0,
+		},
+	}) {
+		t.Errorf("[nil] validator does not validate for map key")
+	}
+
+	if nil != Validate(struct {
+		field map[*string]int `validate:"[nil=true]"`
+	}{
+		field: map[*string]int{
+			nil: 0,
+		},
+	}) {
+		t.Errorf("[nil] validator does not validate for map key")
+	}
+
+	if nil == Validate(struct {
+		field map[*string]int `validate:"[nil=false]"`
+	}{
+		field: map[*string]int{
+			nil: 0,
+		},
+	}) {
+		t.Errorf("[nil] validator does not validate for map key")
+	}
+
+	if nil != Validate(struct {
+		field map[*string]int `validate:"[nil=false]"`
+	}{
+		field: map[*string]int{
+			&s: 0,
+		},
+	}) {
+		t.Errorf("[nil] validator does not validate for map key")
+	}
+
+	if nil == Validate(struct {
+		field map[int]int `validate:"[one_of=1,2,3]"`
+	}{
+		field: map[int]int{
+			4: 0,
+		},
+	}) {
+		t.Errorf("[one_of] validator does not validate for map key")
+	}
+
+	if nil != Validate(struct {
+		field map[int]int `validate:"[one_of=1,2,3]"`
+	}{
+		field: map[int]int{
+			1: 0,
+			2: 0,
+			3: 0,
+		},
+	}) {
+		t.Errorf("[one_of] validator does not validate for map key")
+	}
+}
+
+func TestDeepValsForMapValues(t *testing.T) {
+	s := " "
+
+	if nil == Validate(struct {
+		field map[int]int `validate:"> min=0"`
+	}{
+		field: map[int]int{0: 0, 1: -1},
+	}) {
+		t.Errorf(">min validator does not validate for map values")
+	}
+
+	if nil != Validate(struct {
+		field map[int]int `validate:"> min=0"`
+	}{
+		field: map[int]int{0: 0},
+	}) {
+		t.Errorf(">min validator does not validate map values")
+	}
+
+	if nil == Validate(struct {
+		field map[int]int `validate:"> max=0"`
+	}{
+		field: map[int]int{0: 0, -1: 1},
+	}) {
+		t.Errorf(">max validator does not validate for map values")
+	}
+
+	if nil != Validate(struct {
+		field map[int]int `validate:"> max=0"`
+	}{
+		field: map[int]int{0: 0},
+	}) {
+		t.Errorf(">max validator does not validate for map values")
+	}
+
+	if nil == Validate(struct {
+		field map[int]string `validate:"> empty=true"`
+	}{
+		field: map[int]string{
+			0: " ",
+		},
+	}) {
+		t.Errorf(">empty validator does not validate for map values")
+	}
+
+	if nil != Validate(struct {
+		field map[int]string `validate:"> empty=true"`
+	}{
+		field: map[int]string{
+			0: "",
+		},
+	}) {
+		t.Errorf(">empty validator does not validate for map values")
+	}
+
+	if nil == Validate(struct {
+		field map[int]string `validate:"> empty=false"`
+	}{
+		field: map[int]string{
+			0: "",
+		},
+	}) {
+		t.Errorf(">empty validator does not validate for map values")
+	}
+
+	if nil != Validate(struct {
+		field map[int]string `validate:"> empty=false"`
+	}{
+		field: map[int]string{
+			0: " ",
+		},
+	}) {
+		t.Errorf(">empty validator does not validate for map values")
+	}
+
+	if nil == Validate(struct {
+		field map[int]*string `validate:"> nil=true"`
+	}{
+		field: map[int]*string{
+			0: &s,
+		},
+	}) {
+		t.Errorf(">nil validator does not validate for map values")
+	}
+
+	if nil != Validate(struct {
+		field map[int]*string `validate:"> nil=true"`
+	}{
+		field: map[int]*string{
+			0: nil,
+		},
+	}) {
+		t.Errorf(">nil validator does not validate for map values")
+	}
+
+	if nil == Validate(struct {
+		field map[int]*string `validate:"> nil=false"`
+	}{
+		field: map[int]*string{
+			0: nil,
+		},
+	}) {
+		t.Errorf(">nil validator does not validate for map values")
+	}
+
+	if nil != Validate(struct {
+		field map[int]*string `validate:"> nil=false]"`
+	}{
+		field: map[int]*string{
+			0: &s,
+		},
+	}) {
+		t.Errorf(">nil validator does not validate for map values")
+	}
+
+	if nil == Validate(struct {
+		field map[int]int `validate:"> one_of=1,2,3"`
+	}{
+		field: map[int]int{
+			0: 4,
+		},
+	}) {
+		t.Errorf(">one_of validator does not validate for map values")
+	}
+
+	if nil != Validate(struct {
+		field map[int]int `validate:"> one_of=1,2,3"`
+	}{
+		field: map[int]int{
+			-1: 1,
+			-2: 2,
+			-3: 3,
+		},
+	}) {
+		t.Errorf(">one_of validator does not validate for map values")
+	}
+
+}
+
 func TestDeepValsForSlice(t *testing.T) {
 	if nil == Validate(struct {
 		field []int `validate:">min=0"`
@@ -1395,7 +1672,7 @@ func TestDeepValsForSlice(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field []int `validate:">one_of=1|2|3"`
+		field []int `validate:">one_of=1,2,3"`
 	}{
 		field: []int{4},
 	}) {
