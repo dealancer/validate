@@ -7,17 +7,35 @@ import (
 	"strings"
 )
 
-const masterTag = "validate"
+const (
+	// MasterTag is a main validation tag
+	MasterTag = "validate"
+
+	// ValidatorMin is a min validator
+	ValidatorMin = "min"
+
+	// ValidatorMax is a max validator
+	ValidatorMax = "max"
+
+	// ValidatorEmpty is an empty validator
+	ValidatorEmpty = "empty"
+
+	// ValidatorNil is a nil validator
+	ValidatorNil = "nil"
+
+	// ValidatorOneOf is a one of validator
+	ValidatorOneOf = "one_of"
+)
 
 type validatorFunc func(value reflect.Value, name string, validator string) error
 
 func getValidatorTypeMap() map[string]validatorFunc {
 	return map[string]validatorFunc{
-		"min":    validateMin,
-		"max":    validateMax,
-		"empty":  validateEmpty,
-		"nil":    validateNil,
-		"one_of": validateOneOf,
+		ValidatorMin:   validateMin,
+		ValidatorMax:   validateMax,
+		ValidatorEmpty: validateEmpty,
+		ValidatorNil:   validateNil,
+		ValidatorOneOf: validateOneOf,
 	}
 }
 
@@ -102,7 +120,7 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 
 // getValidators gets validators
 func getValidators(tag reflect.StructTag) string {
-	return tag.Get(masterTag)
+	return tag.Get(MasterTag)
 }
 
 // splitValidators splits validators into key validators, value validators and remaning validators of the next level
