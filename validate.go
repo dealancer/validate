@@ -82,12 +82,11 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 			return err
 		}
 	case reflect.Map:
-		iter := value.MapRange()
-		for iter.Next() {
-			if err := validateField(iter.Key(), fieldName, keyValidators); err != nil {
+		for _, key := range value.MapKeys() {
+			if err := validateField(key, fieldName, keyValidators); err != nil {
 				return err
 			}
-			if err := validateField(iter.Value(), fieldName, validators); err != nil {
+			if err := validateField(value.MapIndex(key), fieldName, validators); err != nil {
 				return err
 			}
 		}
