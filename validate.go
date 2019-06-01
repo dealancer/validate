@@ -7,15 +7,19 @@ import (
 	"strings"
 )
 
-const (
-	masterTag = "validate"
+const masterTag = "validate"
 
-	valTypeMin   = "min"
-	valTypeMax   = "max"
-	valTypeEmpty = "empty"
-	valTypeNil   = "nil"
-	valTypeOneOf = "one_of"
-)
+type validatorFunc func(value reflect.Value, name string, validator string) error
+
+func getValidatorTypeMap() map[string]validatorFunc {
+	return map[string]validatorFunc{
+		"min":    validateMin,
+		"max":    validateMax,
+		"empty":  validateEmpty,
+		"nil":    validateNil,
+		"one_of": validateOneOf,
+	}
+}
 
 // Validate validates members of a struct
 func Validate(element interface{}) error {
@@ -50,28 +54,17 @@ func validateStruct(value reflect.Value) error {
 func validateField(value reflect.Value, fieldName string, validators string) error {
 	kind := value.Kind()
 
+	// Get validators
+	keyValidators, valueValidators, validators := splitValidators(validators)
+	valueValidatorMap := parseValidators(valueValidators)
+
 	// Perform validators
-	keyValidators, valValidators, validators := splitValidators(validators)
-	valValidatorsMap := parseValidators(valValidators)
-
-	for valType, validator := range valValidatorsMap {
-		var err error
-
-		switch valType {
-		case valTypeMin:
-			err = validateMin(value, fieldName, validator)
-		case valTypeMax:
-			err = validateMax(value, fieldName, validator)
-		case valTypeEmpty:
-			err = validateEmpty(value, fieldName, validator)
-		case valTypeNil:
-			err = validateNil(value, fieldName, validator)
-		case valTypeOneOf:
-			err = validateOneOf(value, fieldName, validator)
-		}
-
-		if err != nil {
-			return err
+	validatorTypeMap := getValidatorTypeMap()
+	for validatorType, validator := range valueValidatorMap {
+		if validatorFunc, ok := validatorTypeMap[validatorType]; ok {
+			if err := validatorFunc(value, fieldName, validator); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -159,8 +152,8 @@ loop:
 }
 
 // parseValidators parses validators into the hash map
-func parseValidators(validators string) (valMap map[string]string) {
-	valMap = make(map[string]string)
+func parseValidators(validators string) (validatorMap map[string]string) {
+	validatorMap = make(map[string]string)
 
 	r, err := regexp.Compile(`([[:alnum:]_\s]+)=?([^=;]*);?`)
 	if err != nil {
@@ -174,11 +167,11 @@ func parseValidators(validators string) (valMap map[string]string) {
 		v := strings.TrimSpace(e[2])
 
 		if n != "" {
-			valMap[n] = v
+			validatorMap[n] = v
 		}
 	}
 
-	return valMap
+	return validatorMap
 }
 
 // parseTokens parses tokens into array
