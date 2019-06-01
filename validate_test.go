@@ -1999,7 +1999,7 @@ func TestDeepDeepVal(t *testing.T) {
 	str := " "
 	emptyStr := ""
 	zero := 0
-	minus_one := -1
+	minusOne := -1
 
 	if nil != Validate(struct {
 		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
@@ -2018,7 +2018,7 @@ func TestDeepDeepVal(t *testing.T) {
 	}{
 		field: []map[*string]*int{
 			map[*string]*int{
-				&emptyStr: &minus_one,
+				&emptyStr: &minusOne,
 			},
 		},
 	}) {
