@@ -1995,8 +1995,93 @@ func TestDeepValsForPtr(t *testing.T) {
 	}
 }
 
-func TestDeepVal(t *testing.T) {
-	// Should not validate one level deep
+func TestDeepDeepVal(t *testing.T) {
+	str := " "
+	empty_str := ""
+	zero := 0
+	minus_one := -1
+
+	if nil != Validate(struct {
+		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
+	}{
+		field: []map[*string]*int{
+			map[*string]*int{
+				&empty_str: &zero,
+			},
+		},
+	}) {
+		t.Errorf("complex validator does not validate")
+	}
+
+	if nil == Validate(struct {
+		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
+	}{
+		field: []map[*string]*int{
+			map[*string]*int{
+				&empty_str: &minus_one,
+			},
+		},
+	}) {
+		t.Errorf("complex validator does not validate")
+	}
+
+	if nil == Validate(struct {
+		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
+	}{
+		field: []map[*string]*int{
+			map[*string]*int{
+				&empty_str: nil,
+			},
+		},
+	}) {
+		t.Errorf("complex validator does not validate")
+	}
+
+	if nil == Validate(struct {
+		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
+	}{
+		field: []map[*string]*int{
+			map[*string]*int{
+				&str: &zero,
+			},
+		},
+	}) {
+		t.Errorf("complex validator does not validate")
+	}
+
+	if nil == Validate(struct {
+		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
+	}{
+		field: []map[*string]*int{
+			map[*string]*int{
+				nil: &zero,
+			},
+		},
+	}) {
+		t.Errorf("complex validator does not validate")
+	}
+
+	if nil == Validate(struct {
+		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
+	}{
+		field: []map[*string]*int{
+			map[*string]*int{},
+		},
+	}) {
+		t.Errorf("complex validator does not validate")
+	}
+
+	if nil == Validate(struct {
+		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
+	}{
+		field: []map[*string]*int{},
+	}) {
+		t.Errorf("complex validator does not validate")
+	}
+}
+
+func TestIncorrectDeepVal(t *testing.T) {
+	one := 1
 
 	if nil != Validate(struct {
 		field []int `validate:"min=0"`
@@ -2006,7 +2091,6 @@ func TestDeepVal(t *testing.T) {
 		t.Errorf("min validator validates one level deep for slice")
 	}
 
-	one := 1
 	if nil != Validate(struct {
 		field *int `validate:"max=0"`
 	}{
