@@ -101,7 +101,7 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 				return err
 			}
 		}
-	case reflect.Slice:
+	case reflect.Slice, reflect.Array:
 		for i := 0; i < value.Len(); i++ {
 			if err := validateField(value.Index(i), fieldName, validators); err != nil {
 				return err

@@ -885,7 +885,7 @@ func TestMinValForSlice(t *testing.T) {
 	}{
 		field: []string{"a"},
 	}) {
-		t.Errorf("min validator does not validate for string")
+		t.Errorf("min validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
@@ -893,7 +893,7 @@ func TestMinValForSlice(t *testing.T) {
 	}{
 		field: []string{"a", "b"},
 	}) {
-		t.Errorf("min validator does not validate for string")
+		t.Errorf("min validator does not validate for slice")
 	}
 }
 
@@ -903,7 +903,7 @@ func TestMaxValForSlice(t *testing.T) {
 	}{
 		field: []string{"a", "b", "c"},
 	}) {
-		t.Errorf("min validator does not validate for string")
+		t.Errorf("min validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
@@ -911,10 +911,45 @@ func TestMaxValForSlice(t *testing.T) {
 	}{
 		field: []string{"a", "b"},
 	}) {
+		t.Errorf("min validator does not validate for slice")
+	}
+}
+
+func TestMinValForArray(t *testing.T) {
+	if nil == Validate(struct {
+		field [1]string `validate:"min=2"`
+	}{
+		field: [1]string{"a"},
+	}) {
+		t.Errorf("min validator does not validate for string")
+	}
+
+	if nil != Validate(struct {
+		field [2]string `validate:"min=2"`
+	}{
+		field: [2]string{"a", "b"},
+	}) {
 		t.Errorf("min validator does not validate for string")
 	}
 }
 
+func TestMaxValForArray(t *testing.T) {
+	if nil == Validate(struct {
+		field [3]string `validate:"max=2"`
+	}{
+		field: [3]string{"a", "b", "c"},
+	}) {
+		t.Errorf("min validator does not validate for array")
+	}
+
+	if nil != Validate(struct {
+		field [2]string `validate:"max=2"`
+	}{
+		field: [2]string{"a", "b"},
+	}) {
+		t.Errorf("min validator does not validate for array")
+	}
+}
 func TestEmptyValForString(t *testing.T) {
 	if nil == Validate(struct {
 		field string `validate:"empty=true"`
@@ -999,7 +1034,7 @@ func TestEmptyValForSlice(t *testing.T) {
 	}{
 		field: []string{},
 	}) {
-		t.Errorf("empty validator does not validate for sclie")
+		t.Errorf("empty validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
@@ -1016,6 +1051,42 @@ func TestEmptyValForSlice(t *testing.T) {
 		field: []string{"a"},
 	}) {
 		t.Errorf("empty validator does not validate for slice")
+	}
+}
+
+func TestEmptyValForArray(t *testing.T) {
+	if nil == Validate(struct {
+		field [1]string `validate:"empty=true"`
+	}{
+		field: [1]string{
+			"a",
+		},
+	}) {
+		t.Errorf("empty validator does not validate for array")
+	}
+
+	if nil != Validate(struct {
+		field [0]string `validate:"empty=true"`
+	}{
+		field: [0]string{},
+	}) {
+		t.Errorf("empty validator does not validate for array")
+	}
+
+	if nil == Validate(struct {
+		field [0]string `validate:"empty=false"`
+	}{
+		field: [0]string{},
+	}) {
+		t.Errorf("empty validator does not validate for array")
+	}
+
+	if nil != Validate(struct {
+		field [1]string `validate:"empty=false"`
+	}{
+		field: [1]string{"a"},
+	}) {
+		t.Errorf("empty validator does not validate for array")
 	}
 }
 
@@ -1869,6 +1940,130 @@ func TestDeepValsForSlice(t *testing.T) {
 		field: []int{1, 2, 3},
 	}) {
 		t.Errorf(">one_of validator does not validate for slice")
+	}
+}
+
+func TestDeepValsForArray(t *testing.T) {
+	if nil == Validate(struct {
+		field [2]int `validate:">min=0"`
+	}{
+		field: [2]int{0, -1},
+	}) {
+		t.Errorf(">min validator does not validate for array")
+	}
+
+	if nil != Validate(struct {
+		field [2]int `validate:">min=0"`
+	}{
+		field: [2]int{0, 0},
+	}) {
+		t.Errorf(">min validator does not validate for array")
+	}
+
+	if nil == Validate(struct {
+		field [2]int `validate:">max=0"`
+	}{
+		field: [2]int{0, 1},
+	}) {
+		t.Errorf(">max validator does not validate for array")
+	}
+
+	if nil != Validate(struct {
+		field [2]int `validate:">max=0"`
+	}{
+		field: [2]int{0, 0},
+	}) {
+		t.Errorf(">max validator does not validate for array")
+	}
+
+	if nil == Validate(struct {
+		field [1][1]int `validate:">empty=true"`
+	}{
+		field: [1][1]int{
+			[1]int{0},
+		},
+	}) {
+		t.Errorf(">empty validator does not validate for array")
+	}
+
+	if nil != Validate(struct {
+		field [1][0]int `validate:">empty=true"`
+	}{
+		field: [1][0]int{
+			[0]int{},
+		},
+	}) {
+		t.Errorf(">empty validator does not validate for array")
+	}
+
+	if nil == Validate(struct {
+		field [1][0]int `validate:">empty=false"`
+	}{
+		field: [1][0]int{
+			[0]int{},
+		},
+	}) {
+		t.Errorf(">empty validator does not validate for array")
+	}
+
+	if nil != Validate(struct {
+		field [1][1]int `validate:">empty=false"`
+	}{
+		field: [1][1]int{
+			[1]int{0},
+		},
+	}) {
+		t.Errorf(">empty validator does not validate for array")
+	}
+
+	if nil == Validate(struct {
+		field [1]*int `validate:">nil=true"`
+	}{
+		field: [1]*int{
+			new(int),
+		},
+	}) {
+		t.Errorf(">nil validator does not validate for array")
+	}
+
+	if nil != Validate(struct {
+		field [1]*int `validate:">nil=true"`
+	}{
+		field: [1]*int{nil},
+	}) {
+		t.Errorf(">nil validator does not validate for array")
+	}
+
+	if nil == Validate(struct {
+		field [1]*int `validate:">nil=false"`
+	}{
+		field: [1]*int{nil},
+	}) {
+		t.Errorf(">nil validator does not validate for array")
+	}
+
+	if nil != Validate(struct {
+		field [1]*int `validate:">nil=false"`
+	}{
+		field: [1]*int{new(int)},
+	}) {
+		t.Errorf(">nil validator does not validate for array")
+	}
+
+	if nil == Validate(struct {
+		field [1]int `validate:">one_of=1,2,3"`
+	}{
+		field: [1]int{4},
+	}) {
+		t.Errorf(">one_of validator does not validate for array")
+	}
+
+	if nil != Validate(struct {
+		field [3]int `validate:">one_of=1,2,3"`
+	}{
+		field: [3]int{1, 2, 3},
+	}) {
+		t.Errorf(">one_of validator does not validate for array")
 	}
 }
 

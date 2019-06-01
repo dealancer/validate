@@ -35,7 +35,7 @@ func validateMin(value reflect.Value, name string, validator string) error {
 		if min, err := strconv.Atoi(validator); err == nil && value.Len() < min {
 			return errors.New(fmt.Sprint(name, " must not contain less than ", min, " characters"))
 		}
-	case reflect.Map, reflect.Slice:
+	case reflect.Map, reflect.Slice, reflect.Array:
 		if min, err := strconv.Atoi(validator); err == nil && value.Len() < min {
 			return errors.New(fmt.Sprint(name, " must not contain less than ", min, " elements"))
 		}
@@ -71,7 +71,7 @@ func validateMax(value reflect.Value, name string, validator string) error {
 		if max, err := strconv.Atoi(validator); err == nil && value.Len() > max {
 			return errors.New(fmt.Sprint(name, " must not contain more than ", max, " characters"))
 		}
-	case reflect.Map, reflect.Slice:
+	case reflect.Map, reflect.Slice, reflect.Array:
 		if max, err := strconv.Atoi(validator); err == nil && value.Len() > max {
 			return errors.New(fmt.Sprint(name, " must not contain more than ", max, " elements"))
 		}
@@ -84,7 +84,7 @@ func validateEmpty(value reflect.Value, name string, validator string) error {
 	kind := value.Kind()
 
 	switch kind {
-	case reflect.String, reflect.Map, reflect.Slice:
+	case reflect.String, reflect.Map, reflect.Slice, reflect.Array:
 		if isEmpty, err := strconv.ParseBool(validator); err == nil {
 			if isEmpty && value.Len() > 0 {
 				return errors.New(fmt.Sprint(name, " must be empty"))
