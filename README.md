@@ -27,13 +27,13 @@ This package supports a wide variety of types:
   
 ## Validators
 
-This package supports following validators:
+This package supports following syntax:
 
-* `min`, `max`: works with scalar types (numbers, strings), aliased types, maps, and slices
-* `one_of`: works with with scalar types (numbers, strings) and aliased types
-* `empty`: works with strings, maps, and slices
-* `nil`: works with pointers
-* `child_min`, `child_max`, `child_one_of`, `child_empty`, `child_nil`: works with child elements of slices and referenced elements of pointers
+* `min`, `max` validators: works with scalar types (numbers, strings), aliased types, maps, and slices
+* `one_of` validator: works with with scalar types (numbers, strings) and aliased types
+* `empty` validator: works with strings, maps, and slices
+* `nil` validator: works with pointers
+* `>` deep modifier: works with slices and pointers
 
 ## Installation
 
@@ -46,9 +46,9 @@ go get github.com/dealancer/validate
 ```go
 type Connection struct {
 	Name      string   `validate:"empty=false"`
-	Hosts     []string `validate:"empty=false,child_empty=false"`
-	Username  string   `validate:"one_of=joe|ivan|li"`
-	Password  *string  `validate:"child_min=12"`
+	Hosts     []string `validate:"empty=false > empty=false"`
+	Username  string   `validate:"one_of=joe,ivan,li"`
+	Password  *string  `validate:"> min=12"`
 	Ssl       *bool    `validate:"nil=false"`
 	SslVerify *bool    `validate:"nil=false"`
 	Version   int      `validate:"min=5,max=8"`

@@ -3,6 +3,7 @@ package validate
 import (
 	"errors"
 	"reflect"
+	"regexp"
 	"strings"
 )
 
@@ -14,12 +15,6 @@ const (
 	valTypeEmpty = "empty"
 	valTypeNil   = "nil"
 	valTypeOneOf = "one_of"
-
-	valTypeChildMin   = "child_min"
-	valTypeChildMax   = "child_max"
-	valTypeChildEmpty = "child_empty"
-	valTypeChildNil   = "child_nil"
-	valTypeChildOneOf = "child_one_of"
 )
 
 // Validate validates members of a struct
@@ -41,7 +36,9 @@ func Validate(element interface{}) error {
 func validateStruct(value reflect.Value) error {
 	typ := value.Type()
 	for i := 0; i < typ.NumField(); i++ {
-		if err := validateField(value.Field(i), typ.Field(i), false); err != nil {
+		validators := getValidators(typ.Field(i).Tag)
+		fieldName := typ.Field(i).Name
+		if err := validateField(value.Field(i), fieldName, validators); err != nil {
 			return err
 		}
 	}
@@ -50,27 +47,27 @@ func validateStruct(value reflect.Value) error {
 }
 
 // validateField validates a struct field
-func validateField(value reflect.Value, field reflect.StructField, isChild bool) error {
+func validateField(value reflect.Value, fieldName string, validators string) error {
 	kind := value.Kind()
-	tag := field.Tag
 
 	// Perform validators
-	valMap := parseValidateTag(tag)
-	for valType, validator := range valMap {
-		valType := getValidatorType(valType, isChild)
+	_, valValidators, validators := splitValidators(validators)
+	valValidatorsMap := parseValidators(valValidators)
+
+	for valType, validator := range valValidatorsMap {
 		var err error
 
 		switch valType {
 		case valTypeMin:
-			err = validateMin(value, field, validator)
+			err = validateMin(value, fieldName, validator)
 		case valTypeMax:
-			err = validateMax(value, field, validator)
+			err = validateMax(value, fieldName, validator)
 		case valTypeEmpty:
-			err = validateEmpty(value, field, validator)
+			err = validateEmpty(value, fieldName, validator)
 		case valTypeNil:
-			err = validateNil(value, field, validator)
+			err = validateNil(value, fieldName, validator)
 		case valTypeOneOf:
-			err = validateOneOf(value, field, validator)
+			err = validateOneOf(value, fieldName, validator)
 		}
 
 		if err != nil {
@@ -81,16 +78,14 @@ func validateField(value reflect.Value, field reflect.StructField, isChild bool)
 	// Dive one level deep into arrays and pointers
 	switch kind {
 	case reflect.Slice:
-		if !isChild {
-			for i := 0; i < value.Len(); i++ {
-				if err := validateField(value.Index(i), field, true); err != nil {
-					return err
-				}
+		for i := 0; i < value.Len(); i++ {
+			if err := validateField(value.Index(i), fieldName, validators); err != nil {
+				return err
 			}
 		}
 	case reflect.Ptr:
-		if !value.IsNil() && !isChild {
-			if err := validateField(value.Elem(), field, true); err != nil {
+		if !value.IsNil() {
+			if err := validateField(value.Elem(), fieldName, validators); err != nil {
 				return err
 			}
 		}
@@ -99,56 +94,90 @@ func validateField(value reflect.Value, field reflect.StructField, isChild bool)
 	return nil
 }
 
-// parseValidateTag parses validate tag into hash map of validators
-func parseValidateTag(tag reflect.StructTag) map[string]string {
-	valMap := make(map[string]string)
-	entries := strings.Split(tag.Get(masterTag), ",")
-	for _, e := range entries {
-		parts := strings.Split(e, "=")
+// getValidators gets validators
+func getValidators(tag reflect.StructTag) string {
+	return tag.Get(masterTag)
+}
 
-		if len(parts) == 2 {
-			n := strings.TrimSpace(parts[0])
-			v := strings.TrimSpace(parts[1])
+// splitValidators splits validators into key validators, value validators and remaning validators of the next level
+func splitValidators(validators string) (keyValidators string, valValidators string, remaningValidators string) {
+	bracket := 0
+	bracketStart := 0
+	bracketEnd := -1
 
-			if n != "" {
-				valMap[n] = v
+	i := 0
+loop:
+	for ; i < len(validators); i++ {
+		switch validators[i] {
+		case '>':
+			if bracket == 0 {
+				break loop
 			}
+		case '[':
+			if bracket == 0 {
+				bracketStart = i
+			}
+			bracket++
+		case ']':
+			bracket--
+			if bracket == 0 {
+				bracketEnd = i
+			}
+		}
+	}
+
+	if bracketStart <= len(validators) {
+		valValidators += validators[:bracketStart]
+	}
+	if bracketEnd+1 <= len(validators) {
+		if valValidators != "" {
+			valValidators += " "
+		}
+		valValidators += validators[bracketEnd+1 : i]
+	}
+	if bracketStart+1 <= len(validators) && bracketEnd >= 0 && bracketStart+1 <= bracketEnd {
+		keyValidators = validators[bracketStart+1 : bracketEnd]
+	}
+	if i+1 <= len(validators) {
+		remaningValidators = validators[i+1:]
+	}
+
+	return
+}
+
+// parseValidators parses validators into the hash map
+func parseValidators(validators string) (valMap map[string]string) {
+	valMap = make(map[string]string)
+
+	r, err := regexp.Compile(`([[:alnum:]_\s]+)=?([^=;]*);?`)
+	if err != nil {
+		return
+	}
+
+	entries := r.FindAllStringSubmatch(validators, -1)
+
+	for _, e := range entries {
+		n := strings.TrimSpace(e[1])
+		v := strings.TrimSpace(e[2])
+
+		if n != "" {
+			valMap[n] = v
 		}
 	}
 
 	return valMap
 }
 
-// getValidatorType returns validator type
-func getValidatorType(valType string, child bool) string {
-	var valChildMap = map[string]string{
-		valTypeChildMin:   valTypeMin,
-		valTypeChildMax:   valTypeMax,
-		valTypeChildEmpty: valTypeEmpty,
-		valTypeChildNil:   valTypeNil,
-		valTypeChildOneOf: valTypeOneOf,
-	}
-
-	if child {
-		if valType, ok := valChildMap[valType]; ok {
-			return valType
-		}
-		return ""
-	}
-
-	return valType
-}
-
-// parseTokens splits validator value into tokens
+// parseTokens parses tokens into array
 func parseTokens(str string) []interface{} {
-	if strings.TrimSpace(str) == "" {
-		return nil
-	}
+	tokenStrings := strings.Split(str, ",")
+	tokens := make([]interface{}, 0, len(tokenStrings))
 
-	tokenStrings := strings.Split(str, "|")
-	tokens := make([]interface{}, len(tokenStrings))
 	for i := range tokenStrings {
-		tokens[i] = strings.TrimSpace(tokenStrings[i])
+		token := strings.TrimSpace(tokenStrings[i])
+		if token != "" {
+			tokens = append(tokens, token)
+		}
 	}
 
 	return tokens

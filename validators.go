@@ -8,10 +8,9 @@ import (
 	"time"
 )
 
-func validateMin(value reflect.Value, field reflect.StructField, validator string) error {
+func validateMin(value reflect.Value, name string, validator string) error {
 	kind := value.Kind()
 	typ := value.Type()
-	name := field.Name
 
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
@@ -45,10 +44,9 @@ func validateMin(value reflect.Value, field reflect.StructField, validator strin
 	return nil
 }
 
-func validateMax(value reflect.Value, field reflect.StructField, validator string) error {
+func validateMax(value reflect.Value, name string, validator string) error {
 	kind := value.Kind()
 	typ := value.Type()
-	name := field.Name
 
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
@@ -82,9 +80,8 @@ func validateMax(value reflect.Value, field reflect.StructField, validator strin
 	return nil
 }
 
-func validateEmpty(value reflect.Value, field reflect.StructField, validator string) error {
+func validateEmpty(value reflect.Value, name string, validator string) error {
 	kind := value.Kind()
-	name := field.Name
 
 	switch kind {
 	case reflect.String, reflect.Map, reflect.Slice:
@@ -100,9 +97,8 @@ func validateEmpty(value reflect.Value, field reflect.StructField, validator str
 	return nil
 }
 
-func validateNil(value reflect.Value, field reflect.StructField, validator string) error {
+func validateNil(value reflect.Value, name string, validator string) error {
 	kind := value.Kind()
-	name := field.Name
 
 	switch kind {
 	case reflect.Ptr:
@@ -118,10 +114,9 @@ func validateNil(value reflect.Value, field reflect.StructField, validator strin
 	return nil
 }
 
-func validateOneOf(value reflect.Value, field reflect.StructField, validator string) error {
+func validateOneOf(value reflect.Value, name string, validator string) error {
 	kind := value.Kind()
 	typ := value.Type()
-	name := field.Name
 
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:

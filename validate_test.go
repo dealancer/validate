@@ -1,9 +1,98 @@
 package validate
 
 import (
+	"reflect"
 	"testing"
 	"time"
 )
+
+func TestSplitValidators(t *testing.T) {
+	key, val, validators := "", "", ""
+
+	key, val, validators = splitValidators("")
+	if key != "" || val != "" || validators != "" {
+		t.Errorf("splitValidators incorrectly splits validators")
+	}
+
+	key, val, validators = splitValidators("[]>")
+	if key != "" || val != "" || validators != "" {
+		t.Errorf("splitValidators incorrectly splits validators")
+	}
+
+	key, val, validators = splitValidators(" [ ] > ")
+	if key != " " || val != "   " || validators != " " {
+		t.Errorf("splitValidators incorrectly splits validators")
+	}
+
+	key, val, validators = splitValidators("[[>]]>>")
+	if key != "[>]" || val != "" || validators != ">" {
+		t.Errorf("splitValidators incorrectly splits validators")
+	}
+
+	key, val, validators = splitValidators("val_a=a val_b=b")
+	if key != "" || val != "val_a=a val_b=b" || validators != "" {
+		t.Errorf("splitValidators incorrectly splits validators")
+	}
+
+	key, val, validators = splitValidators("val_a=a val_b=b [[val_c=c] > val_d=d] val_e=e > val_f=f [val_g=g] > val_h=h")
+	if key != "[val_c=c] > val_d=d" || val != "val_a=a val_b=b   val_e=e " || validators != " val_f=f [val_g=g] > val_h=h" {
+		t.Errorf("splitValidators incorrectly splits validators")
+	}
+}
+
+func TestParseValidators(t *testing.T) {
+	var valMap map[string]string
+
+	valMap = parseValidators(";,;,;")
+	if !reflect.DeepEqual(valMap, map[string]string{}) {
+		t.Errorf("parseValidators incorrectly parses validators")
+	}
+
+	valMap = parseValidators("")
+	if !reflect.DeepEqual(valMap, map[string]string{}) {
+		t.Errorf("parseValidators incorrectly parses validators")
+	}
+
+	valMap = parseValidators("val_a=a")
+	if !reflect.DeepEqual(valMap, map[string]string{
+		"val_a": "a",
+	}) {
+		t.Errorf("parseValidators incorrectly parses validators")
+	}
+
+	valMap = parseValidators(" val  ;val_a=a;val_1 = 1  ;  val_b = b , c_d_ , 1.0 ")
+	if !reflect.DeepEqual(valMap, map[string]string{
+		"val":   "",
+		"val_a": "a",
+		"val_1": "1",
+		"val_b": "b , c_d_ , 1.0",
+	}) {
+		t.Errorf("parseValidators incorrectly parses validators")
+	}
+}
+
+func TestParseTokens(t *testing.T) {
+	var tokens, res []interface{}
+
+	tokens = parseTokens("")
+	if !reflect.DeepEqual(tokens, make([]interface{}, 0)) {
+		t.Errorf("parseTokens incorrectly parses validators")
+	}
+
+	tokens = parseTokens(" ,,  , ")
+	if !reflect.DeepEqual(tokens, make([]interface{}, 0)) {
+		t.Errorf("parseTokens incorrectly parses validators")
+	}
+
+	tokens = parseTokens("a, b, c")
+	res = make([]interface{}, 3)
+	res[0] = "a"
+	res[1] = "b"
+	res[2] = "c"
+	if !reflect.DeepEqual(tokens, res) {
+		t.Errorf("parseTokens incorrectly parses validators")
+	}
+}
 
 func TestBasic(t *testing.T) {
 	v := 1
@@ -85,7 +174,7 @@ func TestBasic(t *testing.T) {
 
 func TestMultiVal(t *testing.T) {
 	if nil == Validate(struct {
-		field int `validate:"min=0,max=10"`
+		field int `validate:"min=0;max=10"`
 	}{
 		field: -1,
 	}) {
@@ -93,7 +182,7 @@ func TestMultiVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field int `validate:"min=0,max=10"`
+		field int `validate:"min=0;max=10"`
 	}{
 		field: 11,
 	}) {
@@ -101,7 +190,7 @@ func TestMultiVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:"min=0,max=10"`
+		field int `validate:"min=0;max=10"`
 	}{
 		field: 5,
 	}) {
@@ -109,7 +198,7 @@ func TestMultiVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field int `validate:"min=1,max=-1"`
+		field int `validate:"min=1;max=-1"`
 	}{
 		field: 0,
 	}) {
@@ -119,7 +208,7 @@ func TestMultiVal(t *testing.T) {
 
 func TestFormatVal(t *testing.T) {
 	if nil == Validate(struct {
-		field int `validate:" min = 0 , max = 10 , bla= "`
+		field int `validate:" min = 0 ; max = 10 ; bla= "`
 	}{
 		field: -1,
 	}) {
@@ -127,7 +216,7 @@ func TestFormatVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:" min = 0 , max = 10 , bla = "`
+		field int `validate:" min = 0 ; max = 10 ; bla = "`
 	}{
 		field: 5,
 	}) {
@@ -151,7 +240,7 @@ func TestFormatVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field int `validate:" one_of = 1 | 2 | 3 "`
+		field int `validate:" one_of = 1 , 2 , 3 "`
 	}{
 		field: 4,
 	}) {
@@ -159,7 +248,7 @@ func TestFormatVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:" one_of = 1 | 2 | 3 "`
+		field int `validate:" one_of = 1 , 2 , 3 "`
 	}{
 		field: 2,
 	}) {
@@ -966,7 +1055,7 @@ func TestNilValForPtr(t *testing.T) {
 
 func TestOneOfValForDuration(t *testing.T) {
 	if nil == Validate(struct {
-		field time.Duration `validate:"one_of=1s|2s|3s"`
+		field time.Duration `validate:"one_of=1s,2s,3s"`
 	}{
 		field: 4 * time.Second,
 	}) {
@@ -974,7 +1063,7 @@ func TestOneOfValForDuration(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field time.Duration `validate:"one_of=1s|2s|3s"`
+		field time.Duration `validate:"one_of=1s,2s,3s"`
 	}{
 		field: 2 * time.Second,
 	}) {
@@ -984,7 +1073,7 @@ func TestOneOfValForDuration(t *testing.T) {
 
 func TestOneOfValForInt(t *testing.T) {
 	if nil == Validate(struct {
-		field int `validate:"one_of=1|2|3"`
+		field int `validate:"one_of=1,2,3"`
 	}{
 		field: 4,
 	}) {
@@ -992,7 +1081,7 @@ func TestOneOfValForInt(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:"one_of=1|2|3"`
+		field int `validate:"one_of=1,2,3"`
 	}{
 		field: 2,
 	}) {
@@ -1000,7 +1089,7 @@ func TestOneOfValForInt(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field int8 `validate:"one_of=1|2|3"`
+		field int8 `validate:"one_of=1,2,3"`
 	}{
 		field: 4,
 	}) {
@@ -1008,7 +1097,7 @@ func TestOneOfValForInt(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int8 `validate:"one_of=1|2|3"`
+		field int8 `validate:"one_of=1,2,3"`
 	}{
 		field: 2,
 	}) {
@@ -1016,7 +1105,7 @@ func TestOneOfValForInt(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field int16 `validate:"one_of=1|2|3"`
+		field int16 `validate:"one_of=1,2,3"`
 	}{
 		field: 4,
 	}) {
@@ -1024,7 +1113,7 @@ func TestOneOfValForInt(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int16 `validate:"one_of=1|2|3"`
+		field int16 `validate:"one_of=1,2,3"`
 	}{
 		field: 2,
 	}) {
@@ -1032,7 +1121,7 @@ func TestOneOfValForInt(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field int32 `validate:"one_of=1|2|3"`
+		field int32 `validate:"one_of=1,2,3"`
 	}{
 		field: 4,
 	}) {
@@ -1040,7 +1129,7 @@ func TestOneOfValForInt(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int32 `validate:"one_of=1|2|3"`
+		field int32 `validate:"one_of=1,2,3"`
 	}{
 		field: 2,
 	}) {
@@ -1048,7 +1137,7 @@ func TestOneOfValForInt(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field int64 `validate:"one_of=1|2|3"`
+		field int64 `validate:"one_of=1,2,3"`
 	}{
 		field: 4,
 	}) {
@@ -1056,7 +1145,7 @@ func TestOneOfValForInt(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int64 `validate:"one_of=1|2|3"`
+		field int64 `validate:"one_of=1,2,3"`
 	}{
 		field: 2,
 	}) {
@@ -1066,7 +1155,7 @@ func TestOneOfValForInt(t *testing.T) {
 
 func TestOneOfValForUint(t *testing.T) {
 	if nil == Validate(struct {
-		field uint `validate:"one_of=1|2|3"`
+		field uint `validate:"one_of=1,2,3"`
 	}{
 		field: 4,
 	}) {
@@ -1074,7 +1163,7 @@ func TestOneOfValForUint(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field uint `validate:"one_of=1|2|3"`
+		field uint `validate:"one_of=1,2,3"`
 	}{
 		field: 2,
 	}) {
@@ -1082,7 +1171,7 @@ func TestOneOfValForUint(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field uint8 `validate:"one_of=1|2|3"`
+		field uint8 `validate:"one_of=1,2,3"`
 	}{
 		field: 4,
 	}) {
@@ -1090,7 +1179,7 @@ func TestOneOfValForUint(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field uint8 `validate:"one_of=1|2|3"`
+		field uint8 `validate:"one_of=1,2,3"`
 	}{
 		field: 2,
 	}) {
@@ -1098,7 +1187,7 @@ func TestOneOfValForUint(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field uint16 `validate:"one_of=1|2|3"`
+		field uint16 `validate:"one_of=1,2,3"`
 	}{
 		field: 4,
 	}) {
@@ -1106,7 +1195,7 @@ func TestOneOfValForUint(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field uint16 `validate:"one_of=1|2|3"`
+		field uint16 `validate:"one_of=1,2,3"`
 	}{
 		field: 2,
 	}) {
@@ -1114,7 +1203,7 @@ func TestOneOfValForUint(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field uint32 `validate:"one_of=1|2|3"`
+		field uint32 `validate:"one_of=1,2,3"`
 	}{
 		field: 4,
 	}) {
@@ -1122,7 +1211,7 @@ func TestOneOfValForUint(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field uint32 `validate:"one_of=1|2|3"`
+		field uint32 `validate:"one_of=1,2,3"`
 	}{
 		field: 2,
 	}) {
@@ -1130,7 +1219,7 @@ func TestOneOfValForUint(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field uint64 `validate:"one_of=1|2|3"`
+		field uint64 `validate:"one_of=1,2,3"`
 	}{
 		field: 4,
 	}) {
@@ -1138,7 +1227,7 @@ func TestOneOfValForUint(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field uint64 `validate:"one_of=1|2|3"`
+		field uint64 `validate:"one_of=1,2,3"`
 	}{
 		field: 2,
 	}) {
@@ -1148,7 +1237,7 @@ func TestOneOfValForUint(t *testing.T) {
 
 func TestOneOfValForFloat(t *testing.T) {
 	if nil == Validate(struct {
-		field float32 `validate:"one_of=1.0|2.0|3.0"`
+		field float32 `validate:"one_of=1.0,2.0,3.0"`
 	}{
 		field: 4.0,
 	}) {
@@ -1156,7 +1245,7 @@ func TestOneOfValForFloat(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field float32 `validate:"one_of=1.0|2.0|3.0"`
+		field float32 `validate:"one_of=1.0,2.0,3.0"`
 	}{
 		field: 2.0,
 	}) {
@@ -1164,7 +1253,7 @@ func TestOneOfValForFloat(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field float64 `validate:"one_of=1.0|2.0|3.0"`
+		field float64 `validate:"one_of=1.0,2.0,3.0"`
 	}{
 		field: 4.0,
 	}) {
@@ -1172,7 +1261,7 @@ func TestOneOfValForFloat(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field float64 `validate:"one_of=1.0|2.0|3.0"`
+		field float64 `validate:"one_of=1.0,2.0,3.0"`
 	}{
 		field: 2.0,
 	}) {
@@ -1182,7 +1271,7 @@ func TestOneOfValForFloat(t *testing.T) {
 
 func TestOneOfValForString(t *testing.T) {
 	if nil == Validate(struct {
-		field string `validate:"one_of=one|two|three"`
+		field string `validate:"one_of=one,two,three"`
 	}{
 		field: "four",
 	}) {
@@ -1190,7 +1279,7 @@ func TestOneOfValForString(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field string `validate:"one_of=one|two|three"`
+		field string `validate:"one_of=one,two,three"`
 	}{
 		field: "two",
 	}) {
@@ -1198,131 +1287,131 @@ func TestOneOfValForString(t *testing.T) {
 	}
 }
 
-func TestChildValsForSlice(t *testing.T) {
+func TestDeepValsForSlice(t *testing.T) {
 	if nil == Validate(struct {
-		field []int `validate:"child_min=0"`
+		field []int `validate:">min=0"`
 	}{
 		field: []int{0, -1},
 	}) {
-		t.Errorf("child_min validator does not validate for slice")
+		t.Errorf(">min validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []int `validate:"child_min=0"`
+		field []int `validate:">min=0"`
 	}{
 		field: []int{0, 0},
 	}) {
-		t.Errorf("child_min validator does not validate for slice")
+		t.Errorf(">min validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field []int `validate:"child_max=0"`
+		field []int `validate:">max=0"`
 	}{
 		field: []int{0, 1},
 	}) {
-		t.Errorf("child_max validator does not validate for slice")
+		t.Errorf(">max validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []int `validate:"child_max=0"`
+		field []int `validate:">max=0"`
 	}{
 		field: []int{0, 0},
 	}) {
-		t.Errorf("child_max validator does not validate for slice")
+		t.Errorf(">max validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field [][]int `validate:"child_empty=true"`
+		field [][]int `validate:">empty=true"`
 	}{
 		field: [][]int{
 			[]int{0},
 		},
 	}) {
-		t.Errorf("child_empty validator does not validate for slice")
+		t.Errorf(">empty validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field [][]int `validate:"child_empty=true"`
+		field [][]int `validate:">empty=true"`
 	}{
 		field: [][]int{
 			[]int{},
 		},
 	}) {
-		t.Errorf("child_empty validator does not validate for slice")
+		t.Errorf(">empty validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field [][]int `validate:"child_empty=false"`
+		field [][]int `validate:">empty=false"`
 	}{
 		field: [][]int{
 			[]int{},
 		},
 	}) {
-		t.Errorf("child_empty validator does not validate for slice")
+		t.Errorf(">empty validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field [][]int `validate:"child_empty=false"`
+		field [][]int `validate:">empty=false"`
 	}{
 		field: [][]int{
 			[]int{0},
 		},
 	}) {
-		t.Errorf("child_empty validator does not validate for slice")
+		t.Errorf(">empty validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field []*int `validate:"child_nil=true"`
+		field []*int `validate:">nil=true"`
 	}{
 		field: []*int{
 			new(int),
 		},
 	}) {
-		t.Errorf("child_nil validator does not validate for slice")
+		t.Errorf(">nil validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []*int `validate:"child_nil=true"`
+		field []*int `validate:">nil=true"`
 	}{
 		field: []*int{nil},
 	}) {
-		t.Errorf("child_nil validator does not validate for slice")
+		t.Errorf(">nil validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field []*int `validate:"child_nil=false"`
+		field []*int `validate:">nil=false"`
 	}{
 		field: []*int{nil},
 	}) {
-		t.Errorf("child_nil validator does not validate for slice")
+		t.Errorf(">nil validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []*int `validate:"child_nil=false"`
+		field []*int `validate:">nil=false"`
 	}{
 		field: []*int{new(int)},
 	}) {
-		t.Errorf("child_nil validator does not validate for slice")
+		t.Errorf(">nil validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field []int `validate:"child_one_of=1|2|3"`
+		field []int `validate:">one_of=1|2|3"`
 	}{
 		field: []int{4},
 	}) {
-		t.Errorf("child_one_of validator does not validate for slice")
+		t.Errorf(">one_of validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []int `validate:"child_one_of=1|2|3"`
+		field []int `validate:">one_of=1,2,3"`
 	}{
 		field: []int{1, 2, 3},
 	}) {
-		t.Errorf("child_one_of validator does not validate for slice")
+		t.Errorf(">one_of validator does not validate for slice")
 	}
 }
 
-func TestChildValsForPtr(t *testing.T) {
+func TestDeepValsForPtr(t *testing.T) {
 	minusOne := -1
 	zero := 0
 	one := 1
@@ -1333,119 +1422,119 @@ func TestChildValsForPtr(t *testing.T) {
 	var nilPtr *int
 
 	if nil == Validate(struct {
-		field *int `validate:"child_min=0"`
+		field *int `validate:">min=0"`
 	}{
 		field: &minusOne,
 	}) {
-		t.Errorf("child_min validator does not validate for pointer")
+		t.Errorf(">min validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *int `validate:"child_min=0"`
+		field *int `validate:">min=0"`
 	}{
 		field: &zero,
 	}) {
-		t.Errorf("child_min validator does not validate for pointer")
+		t.Errorf(">min validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field *int `validate:"child_max=0"`
+		field *int `validate:">max=0"`
 	}{
 		field: &one,
 	}) {
-		t.Errorf("child_max validator does not validate for pointer")
+		t.Errorf(">max validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *int `validate:"child_max=0"`
+		field *int `validate:">max=0"`
 	}{
 		field: &zero,
 	}) {
-		t.Errorf("child_max validator does not validate for pointer")
+		t.Errorf(">max validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field *string `validate:"child_empty=true"`
+		field *string `validate:">empty=true"`
 	}{
 		field: &notEmpty,
 	}) {
-		t.Errorf("child_empty validator does not validate for pointer")
+		t.Errorf(">empty validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *string `validate:"child_empty=true"`
+		field *string `validate:">empty=true"`
 	}{
 		field: &empty,
 	}) {
-		t.Errorf("child_empty validator does not validate for pointer")
+		t.Errorf(">empty validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field *string `validate:"child_empty=false"`
+		field *string `validate:">empty=false"`
 	}{
 		field: &empty,
 	}) {
-		t.Errorf("child_empty validator does not validate for pointer")
+		t.Errorf(">empty validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *string `validate:"child_empty=false"`
+		field *string `validate:">empty=false"`
 	}{
 		field: &notEmpty,
 	}) {
-		t.Errorf("child_empty validator does not validate for pointer")
+		t.Errorf(">empty validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field **int `validate:"child_nil=true"`
+		field **int `validate:">nil=true"`
 	}{
 		field: &onePtr,
 	}) {
-		t.Errorf("child_nil validator does not validate for pointer")
+		t.Errorf(">nil validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field **int `validate:"child_nil=true"`
+		field **int `validate:">nil=true"`
 	}{
 		field: &nilPtr,
 	}) {
-		t.Errorf("child_nil validator does not validate for pointer")
+		t.Errorf(">nil validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field **int `validate:"child_nil=false"`
+		field **int `validate:">nil=false"`
 	}{
 		field: &nilPtr,
 	}) {
-		t.Errorf("child_nil validator does not validate for pointer")
+		t.Errorf(">nil validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field **int `validate:"child_nil=false"`
+		field **int `validate:">nil=false"`
 	}{
 		field: &onePtr,
 	}) {
-		t.Errorf("child_nil validator does not validate for pointer")
+		t.Errorf(">nil validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field *int `validate:"child_one_of=1|2|3"`
+		field *int `validate:">one_of=1,2,3"`
 	}{
 		field: &four,
 	}) {
-		t.Errorf("child_one_of validator does not validate for pointer")
+		t.Errorf(">one_of validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *int `validate:"child_one_of=1|2|3"`
+		field *int `validate:">one_of=1,2,3"`
 	}{
 		field: &one,
 	}) {
-		t.Errorf("child_one_of validator does not validate for pointer")
+		t.Errorf(">one_of validator does not validate for pointer")
 	}
 }
 
-func TestOneLevelDeep(t *testing.T) {
+func TestDeepVal(t *testing.T) {
 	// Should not validate one level deep
 
 	if nil != Validate(struct {
@@ -1463,30 +1552,5 @@ func TestOneLevelDeep(t *testing.T) {
 		field: &one,
 	}) {
 		t.Errorf("max validator validates one level deep for pointer")
-	}
-}
-
-func TestTwoLevelDeep(t *testing.T) {
-	// Should not validate two level deep
-
-	if nil != Validate(struct {
-		field [][]int `validate:"child_min=0"`
-	}{
-		field: [][]int{
-			[]int{-1},
-		},
-	}) {
-		t.Errorf("child_min validator validates two level deep for slice")
-	}
-
-	one := 1
-	onePtr := &one
-
-	if nil != Validate(struct {
-		field **int `validate:"child_max=0"`
-	}{
-		field: &onePtr,
-	}) {
-		t.Errorf("child_max validator validates two level deep for pointer")
 	}
 }
