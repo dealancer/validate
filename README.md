@@ -51,7 +51,7 @@ type Connection struct {
 	Password  *string  `validate:"> min=12"`
 	Ssl       *bool    `validate:"nil=false"`
 	SslVerify *bool    `validate:"nil=false"`
-	Version   int      `validate:"min=5,max=8"`
+	Version   int      `validate:"min=5; max=8"`
 
 	XXX map[string]interface{} `validate:"empty=true"`
 }
