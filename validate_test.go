@@ -1997,7 +1997,7 @@ func TestDeepValsForPtr(t *testing.T) {
 
 func TestDeepDeepVal(t *testing.T) {
 	str := " "
-	empty_str := ""
+	emptyStr := ""
 	zero := 0
 	minus_one := -1
 
@@ -2006,7 +2006,7 @@ func TestDeepDeepVal(t *testing.T) {
 	}{
 		field: []map[*string]*int{
 			map[*string]*int{
-				&empty_str: &zero,
+				&emptyStr: &zero,
 			},
 		},
 	}) {
@@ -2018,7 +2018,7 @@ func TestDeepDeepVal(t *testing.T) {
 	}{
 		field: []map[*string]*int{
 			map[*string]*int{
-				&empty_str: &minus_one,
+				&emptyStr: &minus_one,
 			},
 		},
 	}) {
@@ -2030,7 +2030,7 @@ func TestDeepDeepVal(t *testing.T) {
 	}{
 		field: []map[*string]*int{
 			map[*string]*int{
-				&empty_str: nil,
+				&emptyStr: nil,
 			},
 		},
 	}) {
@@ -2075,6 +2075,62 @@ func TestDeepDeepVal(t *testing.T) {
 		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
 	}{
 		field: []map[*string]*int{},
+	}) {
+		t.Errorf("complex validator does not validate")
+	}
+}
+
+func TestDeepDeepStructVal(t *testing.T) {
+	emptyStr := ""
+
+	type SubStr struct {
+		field int `validate:"min=0"`
+	}
+
+	if nil != Validate(struct {
+		field []map[*string]*SubStr `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false"`
+	}{
+		field: []map[*string]*SubStr{
+			map[*string]*SubStr{
+				&emptyStr: &SubStr{field: 0},
+			},
+		},
+	}) {
+		t.Errorf("complex validator does not validate")
+	}
+
+	if nil == Validate(struct {
+		field []map[*string]*SubStr `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false"`
+	}{
+		field: []map[*string]*SubStr{
+			map[*string]*SubStr{
+				&emptyStr: &SubStr{field: -1},
+			},
+		},
+	}) {
+		t.Errorf("complex validator does not validate")
+	}
+
+	if nil != Validate(struct {
+		field []map[*string]*SubStr
+	}{
+		field: []map[*string]*SubStr{
+			map[*string]*SubStr{
+				&emptyStr: &SubStr{field: 0},
+			},
+		},
+	}) {
+		t.Errorf("complex validator does not validate")
+	}
+
+	if nil == Validate(struct {
+		field []map[*string]*SubStr
+	}{
+		field: []map[*string]*SubStr{
+			map[*string]*SubStr{
+				&emptyStr: &SubStr{field: -1},
+			},
+		},
 	}) {
 		t.Errorf("complex validator does not validate")
 	}
