@@ -1287,6 +1287,190 @@ func TestOneOfValForString(t *testing.T) {
 	}
 }
 
+func TestDeepValsForStruct(t *testing.T) {
+	s := " "
+
+	if nil == Validate(struct {
+		field struct {
+			field int `validate:"min=0"`
+		}
+	}{
+		field: struct {
+			field int `validate:"min=0"`
+		}{field: -1},
+	}) {
+		t.Errorf("min validator does not validate for struct field")
+	}
+
+	if nil != Validate(struct {
+		field struct {
+			field int `validate:"min=0"`
+		}
+	}{
+		field: struct {
+			field int `validate:"min=0"`
+		}{field: 0},
+	}) {
+		t.Errorf("min validator does not validate for struct field")
+	}
+
+	if nil == Validate(struct {
+		field struct {
+			field int `validate:"max=0"`
+		}
+	}{
+		field: struct {
+			field int `validate:"max=0"`
+		}{field: 1},
+	}) {
+		t.Errorf("max validator does not validate for struct field")
+	}
+
+	if nil != Validate(struct {
+		field struct {
+			field int `validate:"max=0"`
+		}
+	}{
+		field: struct {
+			field int `validate:"max=0"`
+		}{field: 0},
+	}) {
+		t.Errorf("max validator does not validate for struct field")
+	}
+
+	if nil == Validate(struct {
+		field struct {
+			field string `validate:"empty=true"`
+		}
+	}{
+		field: struct {
+			field string `validate:"empty=true"`
+		}{field: " "},
+	}) {
+		t.Errorf("empty validator does not validate for struct field")
+	}
+
+	if nil != Validate(struct {
+		field struct {
+			field string `validate:"empty=true"`
+		}
+	}{
+		field: struct {
+			field string `validate:"empty=true"`
+		}{field: ""},
+	}) {
+		t.Errorf("empty validator does not validate for struct field")
+	}
+
+	if nil == Validate(struct {
+		field struct {
+			field string `validate:"empty=false"`
+		}
+	}{
+		field: struct {
+			field string `validate:"empty=false"`
+		}{field: ""},
+	}) {
+		t.Errorf("empty validator does not validate for struct field")
+	}
+
+	if nil != Validate(struct {
+		field struct {
+			field string `validate:"empty=false"`
+		}
+	}{
+		field: struct {
+			field string `validate:"empty=false"`
+		}{field: " "},
+	}) {
+		t.Errorf("empty validator does not validate for struct field")
+	}
+
+	if nil != Validate(struct {
+		field struct {
+			field int `validate:"max=0"`
+		}
+	}{
+		field: struct {
+			field int `validate:"max=0"`
+		}{field: 0},
+	}) {
+		t.Errorf("max validator does not validate for struct field")
+	}
+
+	if nil == Validate(struct {
+		field struct {
+			field *string `validate:"nil=true"`
+		}
+	}{
+		field: struct {
+			field *string `validate:"nil=true"`
+		}{field: &s},
+	}) {
+		t.Errorf("nil validator does not validate for struct field")
+	}
+
+	if nil != Validate(struct {
+		field struct {
+			field *string `validate:"nil=true"`
+		}
+	}{
+		field: struct {
+			field *string `validate:"nil=true"`
+		}{field: nil},
+	}) {
+		t.Errorf("nil validator does not validate for struct field")
+	}
+
+	if nil == Validate(struct {
+		field struct {
+			field *string `validate:"nil=false"`
+		}
+	}{
+		field: struct {
+			field *string `validate:"nil=false"`
+		}{field: nil},
+	}) {
+		t.Errorf("nil validator does not validate for struct field")
+	}
+
+	if nil != Validate(struct {
+		field struct {
+			field *string `validate:"nil=false"`
+		}
+	}{
+		field: struct {
+			field *string `validate:"nil=false"`
+		}{field: &s},
+	}) {
+		t.Errorf("nil validator does not validate for struct field")
+	}
+
+	if nil == Validate(struct {
+		field struct {
+			field int `validate:"one_of=1,2,3"`
+		}
+	}{
+		field: struct {
+			field int `validate:"one_of=1,2,3"`
+		}{field: 4},
+	}) {
+		t.Errorf("nil validator does not validate for struct field")
+	}
+
+	if nil != Validate(struct {
+		field struct {
+			field int `validate:"one_of=1,2,3"`
+		}
+	}{
+		field: struct {
+			field int `validate:"one_of=1,2,3"`
+		}{field: 1},
+	}) {
+		t.Errorf("nil validator does not validate for struct field")
+	}
+}
+
 func TestDeepValsForMapKeys(t *testing.T) {
 	s := " "
 
