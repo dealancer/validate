@@ -1,3 +1,3 @@
-module github.com/dealancer/validate
+module github.com/dealancer/validate/v1
 
 go 1.11
