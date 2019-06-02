@@ -6,34 +6,45 @@
 [![GitHub release](https://img.shields.io/github/release/dealancer/validate.svg)](https://github.com/dealancer/validate/releases)
 [![License](https://img.shields.io/github/license/dealancer/validate.svg)](./LICENSE)
 
-**Validate** validates members of a Go struct.
+Package **validate** validates fields of the Go struct recursively based on tags.
+It provides powerful syntax to perform validation for substructs, maps, slices, arrays, and pointers.
+
+Use this package to make sure that the content of the struct is in the format you need.
+For example, **validate** package is useful when unmarshalling YAML or JSON.
 
 ## Types
 
-This package supports a wide variety of types:
+This package supports a wide variety of types.
 
-* Scalar types:
-  * `int/8/16/32/64`, `uint/8/16/32/64`, `float32/64`
+* Most of the built-in types:
+  * `int`, `int8` `int16`, `int32`, `int64`
+  * `uint` `uint8`, `uint16`, `uint32`, `uint64`
+  * `float32` `float64`
   * `uintptr`
   * `string`
-* Complex types:
-  * `map`
-  * `slice`
 * Aliased types:
   * `time.Duration`
-  * e.g. `rune`, `type Enum string`
-* Pointer types:
-  * e.g, `*string`, `*int`
-  
+  * `byte`
+  * `rune`
+  * e.g. `type Enum string`
+* Complex types:
+  * Struct
+  * Map
+  * Slice
+  * Array
+  * Pointer
+
 ## Validators
 
-This package supports following syntax:
+This package provides the following validators.
 
-* `min`, `max` validators: works with scalar types (numbers, strings), aliased types, maps, and slices
-* `one_of` validator: works with with scalar types (numbers, strings) and aliased types
-* `empty` validator: works with strings, maps, and slices
-* `nil` validator: works with pointers
-* `>` deep modifier: works with slices and pointers
+* `min` validator compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
+* `max` validator compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
+* `empty` validator checks if a string, a map, a slice, or an array is (not) empty.
+* `nil` validator checks if a pointer is (not) nil.
+* `one_of` validator checks if a number or a string contains any of the given elements.
+* `[]` (brackets) are used to validate map keys.
+* `>` (arrow) is used to validate values of maps, slices, arrays or to dereference a pointer.
 
 ## Installation
 
@@ -45,47 +56,32 @@ go get github.com/dealancer/validate
 
 ```go
 type Connection struct {
-	Name      string   `validate:"empty=false"`
-	Hosts     []string `validate:"empty=false > empty=false"`
-	Username  string   `validate:"one_of=joe,ivan,li"`
-	Password  *string  `validate:"> min=12"`
-	Ssl       *bool    `validate:"nil=false"`
-	SslVerify *bool    `validate:"nil=false"`
-	Version   int      `validate:"min=5; max=8"`
+	Name      string   `validate:"empty=false"`               // Name should not be empty
+	Hosts     []string `validate:"empty=false > empty=false"` // Hosts should not be empty, Hosts values should not be empty
+	Username  string   `validate:"one_of=joe,ivan,li"`        // Username should be one of "joe", "ivan", or "li"
+	Password  *string  `validate:"> min=12"`                  // Password should ne more than twelve characters
+	Ssl       *bool    `validate:"nil=false"`                 // Ssl (pointer) should not be nil
+	SslVerify *bool    `validate:"nil=false"`                 // SslVerify (pointer) should not be nil
+	Version   int      `validate:"min=5; max=8"`              // Version should be between 5 and 8
+}
 
-	XXX map[string]interface{} `validate:"empty=true"`
+type Connections struct {
+	Connections []Connection   `validate:"min=2"` // There should be at least two connections given
 }
 ```
 
 ```go
-connection := Connection{
-	Username: "admin",
+connections := Connections{
+	Connections: []Connection{
+		Connection{
+			Username: "admin",
+		},
+	},
 }
 
-if err := validate.Validate(&connection); err != nil {
+if err := validate.Validate(&connections); err != nil {
 	panic(err)
 }
 ```
 
-## Unmarshalling YAML/JSON
-
-This package can be used together with [github.com/creasty/defaults](http://github.com/creasty/defaults) for validating and providing default values for complex structs coming from YAML and JSON. This can be conveniently done by implementing `UnmarshalYAML` or `UnmarshalJSON` interfaces.
-
-```go
-func (this *Connection) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	if err := defaults.Set(this); err != nil {
-		return err
-	}
-
-	type plain Connection
-	if err := unmarshal((*plain)(this)); err != nil {
-		return err
-	}
-
-	if err := validate.Validate(this); err != nil {
-		return err
-	}
-
-	return nil
-}
-```
+See [GoDoc](https://godoc.org/github.com/dealancer/validate) for the complete documentation.
