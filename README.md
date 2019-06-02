@@ -18,14 +18,14 @@ This package supports a wide variety of types.
 
 * Most of the built-in types:
   * `int`, `int8` `int16`, `int32`, `int64`
-  * `uint` `uint8`, `uint16`, `uint32`, `uint64`
-  * `float32` `float64`
+  * `uint`, `uint8`, `uint16`, `uint32`, `uint64`
+  * `float32`, `float64`
   * `uintptr`
   * `string`
 * Aliased types:
   * `time.Duration`
-  * `byte`
-  * `rune`
+  * `byte` (`uint8`)
+  * `rune` (`int32`)
   * e.g. `type Enum string`
 * Complex types:
   * Struct
@@ -38,8 +38,7 @@ This package supports a wide variety of types.
 
 This package provides the following validators.
 
-* `min` validator compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
-* `max` validator compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
+* `min` and `max` validators compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
 * `empty` validator checks if a string, a map, a slice, or an array is (not) empty.
 * `nil` validator checks if a pointer is (not) nil.
 * `one_of` validator checks if a number or a string contains any of the given elements.
@@ -59,14 +58,14 @@ type Connection struct {
 	Name      string   `validate:"empty=false"`               // Name should not be empty
 	Hosts     []string `validate:"empty=false > empty=false"` // Hosts should not be empty, Hosts values should not be empty
 	Username  string   `validate:"one_of=joe,ivan,li"`        // Username should be one of "joe", "ivan", or "li"
-	Password  *string  `validate:"> min=12"`                  // Password should ne more than twelve characters
+	Password  *string  `validate:"> min=12"`                  // Password should be more than twelve characters
 	Ssl       *bool    `validate:"nil=false"`                 // Ssl (pointer) should not be nil
 	SslVerify *bool    `validate:"nil=false"`                 // SslVerify (pointer) should not be nil
 	Version   int      `validate:"min=5; max=8"`              // Version should be between 5 and 8
 }
 
 type Connections struct {
-	Connections []Connection   `validate:"min=2"` // There should be at least two connections given
+	Connections []Connection `validate:"min=2"` // There should be at least two connections
 }
 ```
 
@@ -84,4 +83,4 @@ if err := validate.Validate(&connections); err != nil {
 }
 ```
 
-See [GoDoc](https://godoc.org/github.com/dealancer/validate) for the complete documentation.
+See [GoDoc](https://godoc.org/github.com/dealancer/validate) for the complete reference.
