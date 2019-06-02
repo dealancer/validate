@@ -1,6 +1,9 @@
 // Package validate validates fields of the Go struct recursively based on tags.
 // It provides powerful syntax to perform validation for substructs, maps, slices, arrays, and pointers.
 //
+// Use this package to make sure that the content of the struct is in the format you need.
+// For example, **validate** package is useful when unmarshalling YAML or JSON.
+//
 // This package supports most of the built-in types: int8, uint8, int16, uint16, int32,
 // uint32, int64, uint64, int, uint, uintptr, float32, float64 and aliased types:
 // time.Duration, byte (uint8), rune (int32).
