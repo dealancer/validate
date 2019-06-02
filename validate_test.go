@@ -131,6 +131,16 @@ func TestBasic(t *testing.T) {
 		t.Errorf("validate validates slice type")
 	}
 
+	a := [2]string{
+		"a", "b",
+	}
+	if nil == Validate(a) {
+		t.Errorf("validate validates array type")
+	}
+	if nil == Validate(&a) {
+		t.Errorf("validate validates array type")
+	}
+
 	st := struct {
 		field int
 	}{
@@ -1539,6 +1549,44 @@ func TestDeepValsForStruct(t *testing.T) {
 		}{field: 1},
 	}) {
 		t.Errorf("nil validator does not validate for struct field")
+	}
+}
+
+func TestDeepValsForNestedStruct(t *testing.T) {
+	type A struct {
+		field int `validate:"min=0"`
+	}
+
+	type B struct {
+		A
+		field int `validate:"min=0"`
+	}
+
+	if nil == Validate(B{
+		A: A{
+			field: -1,
+		},
+		field: 0,
+	}) {
+		t.Errorf("validator does not validate for nested struct")
+	}
+
+	if nil == Validate(B{
+		A: A{
+			field: 0,
+		},
+		field: -1,
+	}) {
+		t.Errorf("validator does not validate for nested struct")
+	}
+
+	if nil != Validate(B{
+		A: A{
+			field: 0,
+		},
+		field: 0,
+	}) {
+		t.Errorf("validator does not validate for nested struct")
 	}
 }
 
