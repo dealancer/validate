@@ -62,8 +62,6 @@ const (
 	FormatHostnameRFC952       FormatType = "hostname"         // RFC 952
 	FormatHostnameRFC1123      FormatType = "hostname_rfc1123" // RFC 1123
 	FormatFQDN                 FormatType = "fqdn"
-	FormatHTML                 FormatType = "html"
-	FormatHTMLEncoded          FormatType = "html_encoded"
 	FormatURLEncoded           FormatType = "url_encoded"
 	FormatDir                  FormatType = "dir"
 )
