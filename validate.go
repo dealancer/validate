@@ -125,41 +125,6 @@ import (
 // MasterTag is the main validation tag.
 const MasterTag = "validate"
 
-// Following validators are available.
-const (
-	// ValidatorMin compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
-	// E.g. `validate:"min=0"`
-	ValidatorMin = "min"
-
-	// ValidatorMax compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
-	// E.g. `validate:"max=10"`
-	ValidatorMax = "max"
-
-	// ValidatorEmpty checks if a string, a map, a slice, or an array is (not) empty.
-	// E.g. `validate:"empty=false"`
-	ValidatorEmpty = "empty"
-
-	// ValidatorNil checks if a pointer is (not) nil.
-	// E.g. `validate:"nil=false"`
-	ValidatorNil = "nil"
-
-	// ValidatorOneOf checks if a number or a string contains any of the given elements.
-	// E.g. `validate:"one_of=1,2,3"`
-	ValidatorOneOf = "one_of"
-)
-
-type validatorFunc func(value reflect.Value, name string, validator string) error
-
-func getValidatorTypeMap() map[string]validatorFunc {
-	return map[string]validatorFunc{
-		ValidatorMin:   validateMin,
-		ValidatorMax:   validateMax,
-		ValidatorEmpty: validateEmpty,
-		ValidatorNil:   validateNil,
-		ValidatorOneOf: validateOneOf,
-	}
-}
-
 // Validate validates fields of a struct.
 // It accepts a struct or a struct pointer as a parameter.
 // It returns an error if a struct does not validate or nil if there are no validation errors.
@@ -304,10 +269,7 @@ loop:
 func parseValidators(validators string) (validatorMap map[string]string) {
 	validatorMap = make(map[string]string)
 
-	r, err := regexp.Compile(`([[:alnum:]_\s]+)=?([^=;]*);?`)
-	if err != nil {
-		return
-	}
+	r := regexp.MustCompile(`([[:alnum:]_\s]+)=?([^=;]*);?`)
 
 	entries := r.FindAllStringSubmatch(validators, -1)
 
@@ -338,8 +300,8 @@ func parseTokens(str string) []interface{} {
 	return tokens
 }
 
-// isOneOf check if a token is one of tokens
-func isOneOf(token interface{}, tokens []interface{}) bool {
+// tokenOneOf check if a token is one of tokens
+func tokenOneOf(token interface{}, tokens []interface{}) bool {
 	for _, t := range tokens {
 		if t == token {
 			return true

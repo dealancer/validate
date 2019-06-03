@@ -8,6 +8,46 @@ import (
 	"time"
 )
 
+// Following validators are available.
+const (
+	// ValidatorMin compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
+	// E.g. `validate:"min=0"`
+	ValidatorMin = "min"
+
+	// ValidatorMax compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
+	// E.g. `validate:"max=10"`
+	ValidatorMax = "max"
+
+	// ValidatorEmpty checks if a string, a map, a slice, or an array is (not) empty.
+	// E.g. `validate:"empty=false"`
+	ValidatorEmpty = "empty"
+
+	// ValidatorNil checks if a pointer is (not) nil.
+	// E.g. `validate:"nil=false"`
+	ValidatorNil = "nil"
+
+	// ValidatorOneOf checks if a number or a string contains any of the given elements.
+	// E.g. `validate:"one_of=1,2,3"`
+	ValidatorOneOf = "one_of"
+
+	// ValidatorFormat checks if a string of a given format.
+	// E.g. `validate:"format=email"`
+	ValidatorFormat = "format"
+)
+
+type validatorFunc func(value reflect.Value, name string, validator string) error
+
+func getValidatorTypeMap() map[string]validatorFunc {
+	return map[string]validatorFunc{
+		ValidatorMin:    validateMin,
+		ValidatorMax:    validateMax,
+		ValidatorEmpty:  validateEmpty,
+		ValidatorNil:    validateNil,
+		ValidatorOneOf:  validateOneOf,
+		ValidatorFormat: validateFormat,
+	}
+}
+
 func validateMin(value reflect.Value, name string, validator string) error {
 	kind := value.Kind()
 	typ := value.Type()
@@ -128,7 +168,7 @@ func validateOneOf(value reflect.Value, name string, validator string) error {
 						tokens[i] = token
 					}
 				}
-				if !isOneOf(time.Duration(value.Int()), tokens) {
+				if !tokenOneOf(time.Duration(value.Int()), tokens) {
 					return errors.New(fmt.Sprint(name, " must be one of ", validator))
 				}
 			}
@@ -140,7 +180,7 @@ func validateOneOf(value reflect.Value, name string, validator string) error {
 						tokens[i] = token
 					}
 				}
-				if !isOneOf(value.Int(), tokens) {
+				if !tokenOneOf(value.Int(), tokens) {
 					return errors.New(fmt.Sprint(name, " must be one of ", validator))
 				}
 			}
@@ -153,7 +193,7 @@ func validateOneOf(value reflect.Value, name string, validator string) error {
 					tokens[i] = token
 				}
 			}
-			if !isOneOf(value.Uint(), tokens) {
+			if !tokenOneOf(value.Uint(), tokens) {
 				return errors.New(fmt.Sprint(name, " must be one of ", validator))
 			}
 		}
@@ -165,14 +205,30 @@ func validateOneOf(value reflect.Value, name string, validator string) error {
 					tokens[i] = token
 				}
 			}
-			if !isOneOf(value.Float(), tokens) {
+			if !tokenOneOf(value.Float(), tokens) {
 				return errors.New(fmt.Sprint(name, " must be one of ", validator))
 			}
 		}
 	case reflect.String:
 		if tokens := parseTokens(validator); len(tokens) > 0 {
-			if !isOneOf(value.String(), tokens) {
+			if !tokenOneOf(value.String(), tokens) {
 				return errors.New(fmt.Sprint(name, " must be one of ", validator))
+			}
+		}
+	}
+
+	return nil
+}
+
+func validateFormat(value reflect.Value, name string, validator string) error {
+	kind := value.Kind()
+
+	switch kind {
+	case reflect.String:
+		formatTypeMap := getFormatTypeMap()
+		if formatFunc, ok := formatTypeMap[validator]; ok {
+			if !formatFunc(value.String()) {
+				return errors.New(fmt.Sprint(name, " is not valid ", validator))
 			}
 		}
 	}

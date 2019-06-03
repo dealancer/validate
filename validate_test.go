@@ -1368,6 +1368,24 @@ func TestOneOfValForString(t *testing.T) {
 	}
 }
 
+func TestFormatValForString(t *testing.T) {
+	if nil == Validate(struct {
+		field string `validate:"format=email"`
+	}{
+		field: "abc",
+	}) {
+		t.Errorf("format validator does not validate for string")
+	}
+
+	if nil != Validate(struct {
+		field string `validate:"format=email"`
+	}{
+		field: "abc@example.com",
+	}) {
+		t.Errorf("format validator does not validate for string")
+	}
+}
+
 func TestDeepValsForStruct(t *testing.T) {
 	s := " "
 
@@ -1536,7 +1554,7 @@ func TestDeepValsForStruct(t *testing.T) {
 			field int `validate:"one_of=1,2,3"`
 		}{field: 4},
 	}) {
-		t.Errorf("nil validator does not validate for struct field")
+		t.Errorf("one_of validator does not validate for struct field")
 	}
 
 	if nil != Validate(struct {
@@ -1548,7 +1566,31 @@ func TestDeepValsForStruct(t *testing.T) {
 			field int `validate:"one_of=1,2,3"`
 		}{field: 1},
 	}) {
-		t.Errorf("nil validator does not validate for struct field")
+		t.Errorf("one_of validator does not validate for struct field")
+	}
+
+	if nil == Validate(struct {
+		field struct {
+			field string `validate:"format=email"`
+		}
+	}{
+		field: struct {
+			field string `validate:"format=email"`
+		}{field: "abc"},
+	}) {
+		t.Errorf("format validator does not validate for struct field")
+	}
+
+	if nil != Validate(struct {
+		field struct {
+			field string `validate:"format=email"`
+		}
+	}{
+		field: struct {
+			field string `validate:"format=email"`
+		}{field: "abc@example.com"},
+	}) {
+		t.Errorf("format validator does not validate for struct field")
 	}
 }
 
@@ -1726,6 +1768,26 @@ func TestDeepValsForMapKeys(t *testing.T) {
 	}) {
 		t.Errorf("[one_of] validator does not validate for map key")
 	}
+
+	if nil == Validate(struct {
+		field map[string]int `validate:"[format=email]"`
+	}{
+		field: map[string]int{
+			"abc": 0,
+		},
+	}) {
+		t.Errorf("[format] validator does not validate for map key")
+	}
+
+	if nil != Validate(struct {
+		field map[string]int `validate:"[format=email]"`
+	}{
+		field: map[string]int{
+			"abc@example.com": 0,
+		},
+	}) {
+		t.Errorf("[format] validator does not validate for map key")
+	}
 }
 
 func TestDeepValsForMapValues(t *testing.T) {
@@ -1865,6 +1927,25 @@ func TestDeepValsForMapValues(t *testing.T) {
 		t.Errorf(">one_of validator does not validate for map values")
 	}
 
+	if nil == Validate(struct {
+		field map[int]string `validate:"> format=email"`
+	}{
+		field: map[int]string{
+			0: "abc",
+		},
+	}) {
+		t.Errorf(">format validator does not validate for map values")
+	}
+
+	if nil != Validate(struct {
+		field map[int]string `validate:"> format=email"`
+	}{
+		field: map[int]string{
+			0: "abc@example.com",
+		},
+	}) {
+		t.Errorf(">format validator does not validate for map values")
+	}
 }
 
 func TestDeepValsForSlice(t *testing.T) {
@@ -1988,6 +2069,22 @@ func TestDeepValsForSlice(t *testing.T) {
 		field: []int{1, 2, 3},
 	}) {
 		t.Errorf(">one_of validator does not validate for slice")
+	}
+
+	if nil == Validate(struct {
+		field []string `validate:">format=email"`
+	}{
+		field: []string{"abc"},
+	}) {
+		t.Errorf(">foormat validator does not validate for slice")
+	}
+
+	if nil != Validate(struct {
+		field []string `validate:">format=email"`
+	}{
+		field: []string{"abc@example.com"},
+	}) {
+		t.Errorf(">foormat validator does not validate for slice")
 	}
 }
 
@@ -2113,6 +2210,22 @@ func TestDeepValsForArray(t *testing.T) {
 	}) {
 		t.Errorf(">one_of validator does not validate for array")
 	}
+
+	if nil == Validate(struct {
+		field [1]string `validate:">format=email"`
+	}{
+		field: [1]string{"abc"},
+	}) {
+		t.Errorf(">foormat validator does not validate for array")
+	}
+
+	if nil != Validate(struct {
+		field [1]string `validate:">format=email"`
+	}{
+		field: [1]string{"abc@example.com"},
+	}) {
+		t.Errorf(">foormat validator does not validate for array")
+	}
 }
 
 func TestDeepValsForPtr(t *testing.T) {
@@ -2122,6 +2235,8 @@ func TestDeepValsForPtr(t *testing.T) {
 	four := 4
 	empty := ""
 	notEmpty := "a"
+	abc := "abc"
+	email := "abc@example.com"
 	onePtr := &one
 	var nilPtr *int
 
@@ -2235,6 +2350,22 @@ func TestDeepValsForPtr(t *testing.T) {
 		field: &one,
 	}) {
 		t.Errorf(">one_of validator does not validate for pointer")
+	}
+
+	if nil == Validate(struct {
+		field *string `validate:">format=email"`
+	}{
+		field: &abc,
+	}) {
+		t.Errorf(">format validator does not validate for pointer")
+	}
+
+	if nil != Validate(struct {
+		field *string `validate:">format=email"`
+	}{
+		field: &email,
+	}) {
+		t.Errorf(">format validator does not validate for pointer")
 	}
 }
 
