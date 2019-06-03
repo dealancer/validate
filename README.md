@@ -71,7 +71,7 @@ type Connection struct {
     // Username should be one of "joe", "ivan", or "li"
     Username string `validate:"one_of=joe,ivan,li"`
 
-    // Password should be more than twelve characters
+    // Password should be more than or equal to twelve characters
     Password *string `validate:"> min=12"`
 
     // Ssl (pointer) should not be nil
