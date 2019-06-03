@@ -18,9 +18,9 @@ type FormatType string
 // E.g. `validate:"format=email"`
 const (
 	FormatAlpha                FormatType = "alpha"
-	FormatAlphanum             FormatType = "alphanum"
-	FormatAlphaUnicode         FormatType = "alphaunicode"
-	FormatAlphanumUnicode      FormatType = "alphanumunicode"
+	FormatAlnum                FormatType = "alnum"
+	FormatAlphaUnicode         FormatType = "alpha_unicode"
+	FormatAlnumUnicode         FormatType = "alnum_unicode"
 	FormatNumeric              FormatType = "numeric"
 	FormatNumber               FormatType = "number"
 	FormatHexadecimal          FormatType = "hexadecimal"
@@ -47,7 +47,7 @@ const (
 	FormatUUID4                FormatType = "uuid4"
 	FormatUUID5                FormatType = "uuid5"
 	FormatASCII                FormatType = "ascii"
-	FormatPrintableASCII       FormatType = "printascii"
+	FormatPrintableASCII       FormatType = "ascii_print"
 	FormatDataURI              FormatType = "datauri"
 	FormatLatitude             FormatType = "latitude"
 	FormatLongitude            FormatType = "longitude"
@@ -74,9 +74,9 @@ type FormatFunc func(value string) bool
 func getFormatTypeMap() map[FormatType]FormatFunc {
 	return map[FormatType]FormatFunc{
 		FormatAlpha:                formatAlpha,
-		FormatAlphanum:             formatAlphanum,
+		FormatAlnum:                formatAlnum,
 		FormatAlphaUnicode:         formatAlphaUnicode,
-		FormatAlphanumUnicode:      formatAlphanumUnicode,
+		FormatAlnumUnicode:         formatAlnumUnicode,
 		FormatNumeric:              formatNumeric,
 		FormatNumber:               formatNumber,
 		FormatHexadecimal:          formatHexadecimal,
@@ -118,8 +118,6 @@ func getFormatTypeMap() map[FormatType]FormatFunc {
 		FormatHostnameRFC952:       formatHostnameRFC952,
 		FormatHostnameRFC1123:      formatHostnameRFC1123,
 		FormatFQDN:                 formatFQDN,
-		FormatHTML:                 formatHTML,
-		FormatHTMLEncoded:          formatHTMLEncoded,
 		FormatURLEncoded:           formatURLEncoded,
 		FormatDir:                  formatDir,
 	}
@@ -127,14 +125,6 @@ func getFormatTypeMap() map[FormatType]FormatFunc {
 
 func formatURLEncoded(value string) bool {
 	return uRLEncodedRegex.MatchString(value)
-}
-
-func formatHTMLEncoded(value string) bool {
-	return hTMLEncodedRegex.MatchString(value)
-}
-
-func formatHTML(value string) bool {
-	return hTMLRegex.MatchString(value)
 }
 
 // formatMAC is the validation function for validating if the field's value is a valid MAC address.
@@ -547,9 +537,9 @@ func formatNumeric(value string) bool {
 	return numericRegex.MatchString(value)
 }
 
-// formatAlphanum is the validation function for validating if the current field's value is a valid alphanumeric value.
-func formatAlphanum(value string) bool {
-	return alphaNumericRegex.MatchString(value)
+// formatAlnum is the validation function for validating if the current field's value is a valid alphanumeric value.
+func formatAlnum(value string) bool {
+	return alnumRegex.MatchString(value)
 }
 
 // formatAlpha is the validation function for validating if the current field's value is a valid alpha value.
@@ -557,40 +547,14 @@ func formatAlpha(value string) bool {
 	return alphaRegex.MatchString(value)
 }
 
-// formatAlphanumUnicode is the validation function for validating if the current field's value is a valid alphanumeric unicode value.
-func formatAlphanumUnicode(value string) bool {
-	return alphaUnicodeNumericRegex.MatchString(value)
+// formatAlnumUnicode is the validation function for validating if the current field's value is a valid alphanumeric unicode value.
+func formatAlnumUnicode(value string) bool {
+	return alnumUnicodeRegex.MatchString(value)
 }
 
 // formatAlphaUnicode is the validation function for validating if the current field's value is a valid alpha unicode value.
 func formatAlphaUnicode(value string) bool {
 	return alphaUnicodeRegex.MatchString(value)
-}
-
-func formatIP4Addr(value string) bool {
-	val := value
-
-	if idx := strings.LastIndex(val, ":"); idx != -1 {
-		val = val[0:idx]
-	}
-
-	ip := net.ParseIP(val)
-
-	return ip != nil && ip.To4() != nil
-}
-
-func formatIP6Addr(value string) bool {
-	val := value
-
-	if idx := strings.LastIndex(val, ":"); idx != -1 {
-		if idx != 0 && val[idx-1:idx] == "]" {
-			val = val[1 : idx-1]
-		}
-	}
-
-	ip := net.ParseIP(val)
-
-	return ip != nil && ip.To4() == nil
 }
 
 func formatHostnameRFC952(value string) bool {

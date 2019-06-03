@@ -4,11 +4,11 @@ import "regexp"
 
 const (
 	alphaRegexString                 = "^[a-zA-Z]+$"
-	alphaNumericRegexString          = "^[a-zA-Z0-9]+$"
+	alnumRegexString                 = "^[a-zA-Z0-9]+$"
 	alphaUnicodeRegexString          = "^[\\p{L}]+$"
-	alphaUnicodeNumericRegexString   = "^[\\p{L}\\p{N}]+$"
-	numericRegexString               = "^[-+]?[0-9]+(?:\\.[0-9]+)?$"
-	numberRegexString                = "^[0-9]+$"
+	alnumUnicodeRegexString          = "^[\\p{L}\\p{N}]+$"
+	numericRegexString               = "^[0-9]+$"
+	numberRegexString                = "^[-+]?[0-9]+(?:\\.[0-9]+)?$"
 	hexadecimalRegexString           = "^[0-9a-fA-F]+$"
 	hexcolorRegexString              = "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
 	rgbRegexString                   = "^rgb\\(\\s*(?:(?:0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(?:0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(?:0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])|(?:0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])%\\s*,\\s*(?:0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])%\\s*,\\s*(?:0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])%)\\s*\\)$"
@@ -39,15 +39,13 @@ const (
 	ethAddressUpperRegexString       = `^0x[0-9A-F]{40}$`
 	ethAddressLowerRegexString       = `^0x[0-9a-f]{40}$`
 	uRLEncodedRegexString            = `(%[A-Fa-f0-9]{2})`
-	hTMLEncodedRegexString           = `&#[x]?([0-9a-fA-F]{2})|(&gt)|(&lt)|(&quot)|(&amp)+[;]?`
-	hTMLRegexString                  = `<[/]?([a-zA-Z]+).*?>`
 )
 
 var (
 	alphaRegex                 = regexp.MustCompile(alphaRegexString)
-	alphaNumericRegex          = regexp.MustCompile(alphaNumericRegexString)
+	alnumRegex                 = regexp.MustCompile(alnumRegexString)
 	alphaUnicodeRegex          = regexp.MustCompile(alphaUnicodeRegexString)
-	alphaUnicodeNumericRegex   = regexp.MustCompile(alphaUnicodeNumericRegexString)
+	alnumUnicodeRegex          = regexp.MustCompile(alnumUnicodeRegexString)
 	numericRegex               = regexp.MustCompile(numericRegexString)
 	numberRegex                = regexp.MustCompile(numberRegexString)
 	hexadecimalRegex           = regexp.MustCompile(hexadecimalRegexString)
@@ -80,6 +78,4 @@ var (
 	ethAddressRegexUpper       = regexp.MustCompile(ethAddressUpperRegexString)
 	ethAddressRegexLower       = regexp.MustCompile(ethAddressLowerRegexString)
 	uRLEncodedRegex            = regexp.MustCompile(uRLEncodedRegexString)
-	hTMLEncodedRegex           = regexp.MustCompile(hTMLEncodedRegexString)
-	hTMLRegex                  = regexp.MustCompile(hTMLRegexString)
 )
