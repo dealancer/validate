@@ -8,7 +8,7 @@
 // uint32, int64, uint64, int, uint, uintptr, float32, float64 and aliased types:
 // time.Duration, byte (uint8), rune (int32).
 //
-// Following validators are available: min, max, empty, nil, one_of.
+// Following validators are available: min, max, empty, nil, one_of, format.
 //
 // Basic usage
 //
@@ -16,9 +16,9 @@
 // If any of validators fail, validate.Validate returns an error.
 //
 //  type S struct {
-//  	i int    `validate:"min=0"`       // Should be greater than or equal to 0
-//  	s string `validate:"empty=false"` // Should not be empty
-//  	b *bool  `validate:"nil=false"`   // Should not be nil
+//  	i int    `validate:"min=0"`        // Should be greater than or equal to 0
+//  	s string `validate:"format=email"` // Should be in the email format
+//  	b *bool  `validate:"nil=false"`    // Should not be nil
 //  }
 //
 //  err := validate.Validate(S{

@@ -42,8 +42,10 @@ This package provides the following validators.
 * `empty` validator checks if a string, a map, a slice, or an array is (not) empty.
 * `nil` validator checks if a pointer is (not) nil.
 * `one_of` validator checks if a number or a string contains any of the given elements.
+* `format` validator checks if a string in one of the following formats: `alpha`, `alnum`, `alpha_unicode`, `alnum_unicode`, `numeric`, `number`, `hexadecimal`, `hexcolor`, `rgb`, `rgba`, `hsl`, `hsla`, `email`, `url`, `uri`, `urn_rfc2141`, `file`, `base64`, `base64url`, `isbn`, `isbn10`, `isbn13`, `eth_addr`, `btc_addr`, `btc_addr_bech32`, `uuid`, `uuid3`, `uuid4`, `uuid5`, `ascii`, `ascii_print`, `datauri`, `latitude`, `longitude`, `ssn`, `ipv4`, `ipv6`, `ip`, `cidrv4`, `cidrv6`, `cidr`, `mac`, `hostname`, `hostname_rfc1123`, `fqdn`, `html`, `html_encoded`, `url_encoded`, `dir`, `alpha`, `alnum`, `alpha_unicode`, `alnum_unicode`, `numeric`, `number`, `hexadecimal`, `hexcolor`, `rgb`, `rgba`, `hsl`, `hsla`, `email`, `url`, `uri`, `urn_rfc2141`, `file`, `base64`, `base64url`, `isbn`, `isbn10`, `isbn13`, `eth_addr`, `btc_addr`, `btc_addr_bech32`, `uuid`, `uuid3`, `uuid4`, `uuid5`, `ascii`, `ascii_print`, `datauri`, `latitude`, `longitude`, `ssn`, `ipv4`, `ipv6`, `ip`, `cidrv4`, `cidrv6`, `cidr`, `mac`, `hostname`, `hostname_rfc1123`, `fqdn`, `html`, `html_encoded`, `url_encoded`, `dir`.
 * `[]` (brackets) are used to validate map keys.
 * `>` (arrow) is used to validate values of maps, slices, arrays or to dereference a pointer.
+
 
 ## Installation
 
@@ -60,13 +62,26 @@ This package provides the following validators.
 
 ```go
 type Connection struct {
-	Name      string   `validate:"empty=false"`               // Name should not be empty
-	Hosts     []string `validate:"empty=false > empty=false"` // Hosts should not be empty, Hosts values should not be empty
-	Username  string   `validate:"one_of=joe,ivan,li"`        // Username should be one of "joe", "ivan", or "li"
-	Password  *string  `validate:"> min=12"`                  // Password should be more than twelve characters
-	Ssl       *bool    `validate:"nil=false"`                 // Ssl (pointer) should not be nil
-	SslVerify *bool    `validate:"nil=false"`                 // SslVerify (pointer) should not be nil
-	Version   int      `validate:"min=5; max=8"`              // Version should be between 5 and 8
+    // Name should not be empty
+    Name string `validate:"empty=false"`
+
+    // Hosts should not be empty, Hosts values should be in the right format
+    Hosts []string `validate:"empty=false > format=hostname"`
+
+    // Username should be one of "joe", "ivan", or "li"
+    Username string `validate:"one_of=joe,ivan,li"`
+
+    // Password should be more than twelve characters
+    Password *string `validate:"> min=12"`
+
+    // Ssl (pointer) should not be nil
+    Ssl *bool `validate:"nil=false"`
+
+    // SslVerify (pointer) should not be nil
+    SslVerify *bool `validate:"nil=false"`
+
+    // Version should be between 5 and 8
+    Version int `validate:"min=5; max=8"`
 }
 
 type Connections struct {

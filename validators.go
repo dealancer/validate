@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// ValidatorType defines validator type
+// ValidatorType is used for validator type definitions.
 type ValidatorType string
 
 // Following validators are available.
@@ -38,11 +38,11 @@ const (
 	ValidatorFormat ValidatorType = "format"
 )
 
-// ValidatorFunc is an interface for validator func
-type ValidatorFunc func(value reflect.Value, name string, validator string) error
+// validatorFunc is an interface for validator func
+type validatorFunc func(value reflect.Value, name string, validator string) error
 
-func getValidatorTypeMap() map[ValidatorType]ValidatorFunc {
-	return map[ValidatorType]ValidatorFunc{
+func getValidatorTypeMap() map[ValidatorType]validatorFunc {
+	return map[ValidatorType]validatorFunc{
 		ValidatorMin:    validateMin,
 		ValidatorMax:    validateMax,
 		ValidatorEmpty:  validateEmpty,

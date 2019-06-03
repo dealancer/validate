@@ -11,7 +11,7 @@ import (
 	urn "github.com/leodido/go-urn"
 )
 
-// FormatType defines format validator types
+// FormatType is used for format validator type definitions.
 type FormatType string
 
 // Following string formats are available.
@@ -68,11 +68,11 @@ const (
 	FormatDir                  FormatType = "dir"
 )
 
-// FormatFunc is an interface for format validator func
-type FormatFunc func(value string) bool
+// formatFunc is an interface for format validator func
+type formatFunc func(value string) bool
 
-func getFormatTypeMap() map[FormatType]FormatFunc {
-	return map[FormatType]FormatFunc{
+func getFormatTypeMap() map[FormatType]formatFunc {
+	return map[FormatType]formatFunc{
 		FormatAlpha:                formatAlpha,
 		FormatAlnum:                formatAlnum,
 		FormatAlphaUnicode:         formatAlphaUnicode,
