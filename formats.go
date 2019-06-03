@@ -11,79 +11,68 @@ import (
 	urn "github.com/leodido/go-urn"
 )
 
+// FormatType defines format validator types
+type FormatType string
+
 // Following string formats are available.
 // E.g. `validate:"format=email"`
 const (
-	FormatAlpha                = "alpha"
-	FormatAlphanum             = "alphanum"
-	FormatAlphaUnicode         = "alphaunicode"
-	FormatAlphanumUnicode      = "alphanumunicode"
-	FormatNumeric              = "numeric"
-	FormatNumber               = "number"
-	FormatHexadecimal          = "hexadecimal"
-	FormatHEXColor             = "hexcolor"
-	FormatRGB                  = "rgb"
-	FormatRGBA                 = "rgba"
-	FormatHSL                  = "hsl"
-	FormatHSLA                 = "hsla"
-	FormatEmail                = "email"
-	FormatURL                  = "url"
-	FormatURI                  = "uri"
-	FormatUrnRFC2141           = "urn_rfc2141" // RFC 214
-	FormatFile                 = "file"
-	FormatBase64               = "base64"
-	FormatBase64URL            = "base64url"
-	FormatISBN                 = "isbn"
-	FormatISBN10               = "isbn10"
-	FormatISBN13               = "isbn13"
-	FormatEthereumAddress      = "eth_addr"
-	FormatBitcoinAddress       = "btc_addr"
-	FormatBitcoinBech32Address = "btc_addr_bech32"
-	FormatUUID                 = "uuid"
-	FormatUUID3                = "uuid3"
-	FormatUUID4                = "uuid4"
-	FormatUUID5                = "uuid5"
-	FormatUUIDRFC4122          = "uuid_rfc4122"
-	FormatUUID3RFC4122         = "uuid3_rfc4122"
-	FormatUUID4RFC4122         = "uuid4_rfc4122"
-	FormatUUID5RFC4122         = "uuid5_rfc4122"
-	FormatASCII                = "ascii"
-	FormatPrintableASCII       = "printascii"
-	FormatsMultiByteCharacter  = "multibyte"
-	FormatDataURI              = "datauri"
-	FormatLatitude             = "latitude"
-	FormatLongitude            = "longitude"
-	FormatSSN                  = "ssn"
-	FormatIPv4                 = "ipv4"
-	FormatIPv6                 = "ipv6"
-	FormatIP                   = "ip"
-	FormatCIDRv4               = "cidrv4"
-	FormatCIDRv6               = "cidrv6"
-	FormatCIDR                 = "cidr"
-	FormatTCP4AddrResolvable   = "tcp4_addr"
-	FormatTCP6AddrResolvable   = "tcp6_addr"
-	FormatTCPAddrResolvable    = "tcp_addr"
-	FormatUDP4AddrResolvable   = "udp4_addr"
-	FormatUDP6AddrResolvable   = "udp6_addr"
-	FormatUDPAddrResolvable    = "udp_addr"
-	FormatIP4AddrResolvable    = "ip4_addr"
-	FormatIP6AddrResolvable    = "ip6_addr"
-	FormatIPAddrResolvable     = "ip_addr"
-	FormatUnixAddrResolvable   = "unix_addr"
-	FormatMAC                  = "mac"
-	FormatHostnameRFC952       = "hostname"         // RFC 95
-	FormatHostnameRFC1123      = "hostname_rfc1123" // RFC 112
-	FormatFQDN                 = "fqdn"
-	FormatHTML                 = "html"
-	FormatHTMLEncoded          = "html_encoded"
-	FormatURLEncoded           = "url_encoded"
-	FormatDir                  = "dir"
+	FormatAlpha                FormatType = "alpha"
+	FormatAlphanum             FormatType = "alphanum"
+	FormatAlphaUnicode         FormatType = "alphaunicode"
+	FormatAlphanumUnicode      FormatType = "alphanumunicode"
+	FormatNumeric              FormatType = "numeric"
+	FormatNumber               FormatType = "number"
+	FormatHexadecimal          FormatType = "hexadecimal"
+	FormatHEXColor             FormatType = "hexcolor"
+	FormatRGB                  FormatType = "rgb"
+	FormatRGBA                 FormatType = "rgba"
+	FormatHSL                  FormatType = "hsl"
+	FormatHSLA                 FormatType = "hsla"
+	FormatEmail                FormatType = "email"
+	FormatURL                  FormatType = "url"
+	FormatURI                  FormatType = "uri"
+	FormatUrnRFC2141           FormatType = "urn_rfc2141" // RFC 2141
+	FormatFile                 FormatType = "file"
+	FormatBase64               FormatType = "base64"
+	FormatBase64URL            FormatType = "base64url"
+	FormatISBN                 FormatType = "isbn"
+	FormatISBN10               FormatType = "isbn10"
+	FormatISBN13               FormatType = "isbn13"
+	FormatEthereumAddress      FormatType = "eth_addr"
+	FormatBitcoinAddress       FormatType = "btc_addr"
+	FormatBitcoinBech32Address FormatType = "btc_addr_bech32"
+	FormatUUID                 FormatType = "uuid"
+	FormatUUID3                FormatType = "uuid3"
+	FormatUUID4                FormatType = "uuid4"
+	FormatUUID5                FormatType = "uuid5"
+	FormatASCII                FormatType = "ascii"
+	FormatPrintableASCII       FormatType = "printascii"
+	FormatDataURI              FormatType = "datauri"
+	FormatLatitude             FormatType = "latitude"
+	FormatLongitude            FormatType = "longitude"
+	FormatSSN                  FormatType = "ssn"
+	FormatIPv4                 FormatType = "ipv4"
+	FormatIPv6                 FormatType = "ipv6"
+	FormatIP                   FormatType = "ip"
+	FormatCIDRv4               FormatType = "cidrv4"
+	FormatCIDRv6               FormatType = "cidrv6"
+	FormatCIDR                 FormatType = "cidr"
+	FormatMAC                  FormatType = "mac"
+	FormatHostnameRFC952       FormatType = "hostname"         // RFC 952
+	FormatHostnameRFC1123      FormatType = "hostname_rfc1123" // RFC 1123
+	FormatFQDN                 FormatType = "fqdn"
+	FormatHTML                 FormatType = "html"
+	FormatHTMLEncoded          FormatType = "html_encoded"
+	FormatURLEncoded           FormatType = "url_encoded"
+	FormatDir                  FormatType = "dir"
 )
 
-type formatFunc func(value string) bool
+// FormatFunc is an interface for format validator func
+type FormatFunc func(value string) bool
 
-func getFormatTypeMap() map[string]formatFunc {
-	return map[string]formatFunc{
+func getFormatTypeMap() map[FormatType]FormatFunc {
+	return map[FormatType]FormatFunc{
 		FormatAlpha:                formatAlpha,
 		FormatAlphanum:             formatAlphanum,
 		FormatAlphaUnicode:         formatAlphaUnicode,
@@ -113,10 +102,6 @@ func getFormatTypeMap() map[string]formatFunc {
 		FormatUUID3:                formatUUID3,
 		FormatUUID4:                formatUUID4,
 		FormatUUID5:                formatUUID5,
-		FormatUUIDRFC4122:          formatUUIDRFC4122,
-		FormatUUID3RFC4122:         formatUUID3RFC4122,
-		FormatUUID4RFC4122:         formatUUID4RFC4122,
-		FormatUUID5RFC4122:         formatUUID5RFC4122,
 		FormatASCII:                formatASCII,
 		FormatPrintableASCII:       formatPrintableASCII,
 		FormatDataURI:              formatDataURI,
@@ -129,16 +114,6 @@ func getFormatTypeMap() map[string]formatFunc {
 		FormatCIDRv4:               formatCIDRv4,
 		FormatCIDRv6:               formatCIDRv6,
 		FormatCIDR:                 formatCIDR,
-		FormatTCP4AddrResolvable:   formatTCP4AddrResolvable,
-		FormatTCP6AddrResolvable:   formatTCP6AddrResolvable,
-		FormatTCPAddrResolvable:    formatTCPAddrResolvable,
-		FormatUDP4AddrResolvable:   formatUDP4AddrResolvable,
-		FormatUDP6AddrResolvable:   formatUDP6AddrResolvable,
-		FormatUDPAddrResolvable:    formatUDPAddrResolvable,
-		FormatIP4AddrResolvable:    formatIP4AddrResolvable,
-		FormatIP6AddrResolvable:    formatIP6AddrResolvable,
-		FormatIPAddrResolvable:     formatIPAddrResolvable,
-		FormatUnixAddrResolvable:   formatUnixAddrResolvable,
 		FormatMAC:                  formatMAC,
 		FormatHostnameRFC952:       formatHostnameRFC952,
 		FormatHostnameRFC1123:      formatHostnameRFC1123,
@@ -274,26 +249,6 @@ func formatUUID3(value string) bool {
 // formatUUID is the validation function for validating if the field's value is a valid UUID of any version.
 func formatUUID(value string) bool {
 	return uUIDRegex.MatchString(value)
-}
-
-// formatUUID5RFC4122 is the validation function for validating if the field's value is a valid RFC4122 v5 UUID.
-func formatUUID5RFC4122(value string) bool {
-	return uUID5RFC4122Regex.MatchString(value)
-}
-
-// formatUUID4RFC4122 is the validation function for validating if the field's value is a valid RFC4122 v4 UUID.
-func formatUUID4RFC4122(value string) bool {
-	return uUID4RFC4122Regex.MatchString(value)
-}
-
-// formatUUID3RFC4122 is the validation function for validating if the field's value is a valid RFC4122 v3 UUID.
-func formatUUID3RFC4122(value string) bool {
-	return uUID3RFC4122Regex.MatchString(value)
-}
-
-// formatUUIDRFC4122 is the validation function for validating if the field's value is a valid RFC4122 UUID of any version.
-func formatUUIDRFC4122(value string) bool {
-	return uUIDRFC4122Regex.MatchString(value)
 }
 
 // formatISBN is the validation function for validating if the field's value is a valid v10 or v13 ISBN.
@@ -610,113 +565,6 @@ func formatAlphanumUnicode(value string) bool {
 // formatAlphaUnicode is the validation function for validating if the current field's value is a valid alpha unicode value.
 func formatAlphaUnicode(value string) bool {
 	return alphaUnicodeRegex.MatchString(value)
-}
-
-// formatTCP4AddrResolvable is the validation function for validating if the field's value is a resolvable tcp4 address.
-func formatTCP4AddrResolvable(value string) bool {
-	if !formatIP4Addr(value) {
-		return false
-	}
-
-	_, err := net.ResolveTCPAddr("tcp4", value)
-
-	return err == nil
-}
-
-// formatTCP6AddrResolvable is the validation function for validating if the field's value is a resolvable tcp6 address.
-func formatTCP6AddrResolvable(value string) bool {
-	if !formatIP6Addr(value) {
-		return false
-	}
-
-	_, err := net.ResolveTCPAddr("tcp6", value)
-
-	return err == nil
-}
-
-// formatTCPAddrResolvable is the validation function for validating if the field's value is a resolvable tcp address.
-func formatTCPAddrResolvable(value string) bool {
-	if !formatIP4Addr(value) && !formatIP6Addr(value) {
-		return false
-	}
-
-	_, err := net.ResolveTCPAddr("tcp", value)
-
-	return err == nil
-}
-
-// formatUDP4AddrResolvable is the validation function for validating if the field's value is a resolvable udp4 address.
-func formatUDP4AddrResolvable(value string) bool {
-	if !formatIP4Addr(value) {
-		return false
-	}
-
-	_, err := net.ResolveUDPAddr("udp4", value)
-
-	return err == nil
-}
-
-// formatUDP6AddrResolvable is the validation function for validating if the field's value is a resolvable udp6 address.
-func formatUDP6AddrResolvable(value string) bool {
-	if !formatIP6Addr(value) {
-		return false
-	}
-
-	_, err := net.ResolveUDPAddr("udp6", value)
-
-	return err == nil
-}
-
-// formatUDPAddrResolvable is the validation function for validating if the field's value is a resolvable udp address.
-func formatUDPAddrResolvable(value string) bool {
-
-	if !formatIP4Addr(value) && !formatIP6Addr(value) {
-		return false
-	}
-
-	_, err := net.ResolveUDPAddr("udp", value)
-
-	return err == nil
-}
-
-// formatIP4AddrResolvable is the validation function for validating if the field's value is a resolvable ip4 address.
-func formatIP4AddrResolvable(value string) bool {
-	if !formatIPv4(value) {
-		return false
-	}
-
-	_, err := net.ResolveIPAddr("ip4", value)
-
-	return err == nil
-}
-
-// formatIP6AddrResolvable is the validation function for validating if the field's value is a resolvable ip6 address.
-func formatIP6AddrResolvable(value string) bool {
-	if !formatIPv6(value) {
-		return false
-	}
-
-	_, err := net.ResolveIPAddr("ip6", value)
-
-	return err == nil
-}
-
-// formatIPAddrResolvable is the validation function for validating if the field's value is a resolvable ip address.
-func formatIPAddrResolvable(value string) bool {
-	if !formatIP(value) {
-		return false
-	}
-
-	_, err := net.ResolveIPAddr("ip", value)
-
-	return err == nil
-}
-
-// formatUnixAddrResolvable is the validation function for validating if the field's value is a resolvable unix address.
-func formatUnixAddrResolvable(value string) bool {
-	_, err := net.ResolveUnixAddr("unix", value)
-
-	return err == nil
 }
 
 func formatIP4Addr(value string) bool {

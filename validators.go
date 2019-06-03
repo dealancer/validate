@@ -8,37 +8,41 @@ import (
 	"time"
 )
 
+// ValidatorType defines validator type
+type ValidatorType string
+
 // Following validators are available.
 const (
 	// ValidatorMin compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
 	// E.g. `validate:"min=0"`
-	ValidatorMin = "min"
+	ValidatorMin ValidatorType = "min"
 
 	// ValidatorMax compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
 	// E.g. `validate:"max=10"`
-	ValidatorMax = "max"
+	ValidatorMax ValidatorType = "max"
 
 	// ValidatorEmpty checks if a string, a map, a slice, or an array is (not) empty.
 	// E.g. `validate:"empty=false"`
-	ValidatorEmpty = "empty"
+	ValidatorEmpty ValidatorType = "empty"
 
 	// ValidatorNil checks if a pointer is (not) nil.
 	// E.g. `validate:"nil=false"`
-	ValidatorNil = "nil"
+	ValidatorNil ValidatorType = "nil"
 
 	// ValidatorOneOf checks if a number or a string contains any of the given elements.
 	// E.g. `validate:"one_of=1,2,3"`
-	ValidatorOneOf = "one_of"
+	ValidatorOneOf ValidatorType = "one_of"
 
 	// ValidatorFormat checks if a string of a given format.
 	// E.g. `validate:"format=email"`
-	ValidatorFormat = "format"
+	ValidatorFormat ValidatorType = "format"
 )
 
-type validatorFunc func(value reflect.Value, name string, validator string) error
+// ValidatorFunc is an interface for validator func
+type ValidatorFunc func(value reflect.Value, name string, validator string) error
 
-func getValidatorTypeMap() map[string]validatorFunc {
-	return map[string]validatorFunc{
+func getValidatorTypeMap() map[ValidatorType]ValidatorFunc {
+	return map[ValidatorType]ValidatorFunc{
 		ValidatorMin:    validateMin,
 		ValidatorMax:    validateMax,
 		ValidatorEmpty:  validateEmpty,
@@ -226,7 +230,7 @@ func validateFormat(value reflect.Value, name string, validator string) error {
 	switch kind {
 	case reflect.String:
 		formatTypeMap := getFormatTypeMap()
-		if formatFunc, ok := formatTypeMap[validator]; ok {
+		if formatFunc, ok := formatTypeMap[FormatType(validator)]; ok {
 			if !formatFunc(value.String()) {
 				return errors.New(fmt.Sprint(name, " is not valid ", validator))
 			}

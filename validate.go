@@ -266,8 +266,8 @@ loop:
 }
 
 // parseValidators parses validators into the hash map
-func parseValidators(validators string) (validatorMap map[string]string) {
-	validatorMap = make(map[string]string)
+func parseValidators(validators string) (validatorMap map[ValidatorType]string) {
+	validatorMap = make(map[ValidatorType]string)
 
 	r := regexp.MustCompile(`([[:alnum:]_\s]+)=?([^=;]*);?`)
 
@@ -278,7 +278,7 @@ func parseValidators(validators string) (validatorMap map[string]string) {
 		v := strings.TrimSpace(e[2])
 
 		if n != "" {
-			validatorMap[n] = v
+			validatorMap[ValidatorType(n)] = v
 		}
 	}
 

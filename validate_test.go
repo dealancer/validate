@@ -41,27 +41,27 @@ func TestSplitValidators(t *testing.T) {
 }
 
 func TestParseValidators(t *testing.T) {
-	var valMap map[string]string
+	var valMap map[ValidatorType]string
 
 	valMap = parseValidators(";,;,;")
-	if !reflect.DeepEqual(valMap, map[string]string{}) {
+	if !reflect.DeepEqual(valMap, map[ValidatorType]string{}) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
 	valMap = parseValidators("")
-	if !reflect.DeepEqual(valMap, map[string]string{}) {
+	if !reflect.DeepEqual(valMap, map[ValidatorType]string{}) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
 	valMap = parseValidators("val_a=a")
-	if !reflect.DeepEqual(valMap, map[string]string{
+	if !reflect.DeepEqual(valMap, map[ValidatorType]string{
 		"val_a": "a",
 	}) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
 	valMap = parseValidators(" val  ;val_a=a;val_1 = 1  ;  val_b = b , c_d_ , 1.0 ")
-	if !reflect.DeepEqual(valMap, map[string]string{
+	if !reflect.DeepEqual(valMap, map[ValidatorType]string{
 		"val":   "",
 		"val_a": "a",
 		"val_1": "1",
