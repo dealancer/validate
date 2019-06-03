@@ -45,6 +45,8 @@ This package provides the following validators.
 * `format` validator checks if a string in one of the following formats: `alpha`, `alnum`, `alpha_unicode`, `alnum_unicode`, `numeric`, `number`, `hexadecimal`, `hexcolor`, `rgb`, `rgba`, `hsl`, `hsla`, `email`, `url`, `uri`, `urn_rfc2141`, `file`, `base64`, `base64url`, `isbn`, `isbn10`, `isbn13`, `eth_addr`, `btc_addr`, `btc_addr_bech32`, `uuid`, `uuid3`, `uuid4`, `uuid5`, `ascii`, `ascii_print`, `datauri`, `latitude`, `longitude`, `ssn`, `ipv4`, `ipv6`, `ip`, `cidrv4`, `cidrv6`, `cidr`, `mac`, `hostname`, `hostname_rfc1123`, `fqdn`, `url_encoded`, `dir`.
 * `[]` (brackets) are used to validate map keys.
 * `>` (arrow) is used to validate values of maps, slices, arrays or to dereference a pointer.
+* `;` (semicolon) is used to perform multiple validators using AND logic.
+* `,` (commna) is used to specify multiple tokens for `one_of` validator.
 
 
 ## Installation
