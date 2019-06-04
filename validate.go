@@ -8,7 +8,7 @@
 // uint32, int64, uint64, int, uint, uintptr, float32, float64 and aliased types:
 // time.Duration, byte (uint8), rune (int32).
 //
-// Following validators are available: min, max, empty, nil, one_of, format.
+// Following validators are available: gte, lte, empty, nil, one_of, format.
 //
 // Basic usage
 //
@@ -16,7 +16,7 @@
 // If any of validators fail, validate.Validate returns an error.
 //
 //  type S struct {
-//  	i int    `validate:"min=0"`        // Should be greater than or equal to 0
+//  	i int    `validate:"gte=0"`        // Should be greater than or equal to 0
 //  	s string `validate:"format=email"` // Should be in the email format
 //  	b *bool  `validate:"nil=false"`    // Should not be nil
 //  }
@@ -34,7 +34,7 @@
 // It is possible to specify multiple validators using a semicolon character.
 //
 //  type S struct {
-//  	field int `validate:"min=0 & max=10"`
+//  	field int `validate:"gte=0 & lte=10"`
 //  }
 //
 // Slice and array validation
@@ -53,7 +53,7 @@
 //
 //  type S struct {
 //  	// Check that the map contains at least two elements, map keys are not empty, and map values are between 0 and 10
-//  	field map[string]int `validate:"min=2 [empty=false] > min=0 & max=10"`
+//  	field map[string]int `validate:"gte=2 [empty=false] > gte=0 & lte=10"`
 //  }
 //
 // Pointer validation
@@ -62,7 +62,7 @@
 //
 //  type S struct {
 //  	// Check that the pointer is not nil and the number is between 0 and 10
-//  	field *int `validate:"nil=false > min=0 & max=10"`
+//  	field *int `validate:"nil=false > gte=0 & lte=10"`
 //  }
 //
 // Nested struct validation
@@ -71,13 +71,13 @@
 //
 //  type A struct {
 //  	// Check that the number is greater than or equal to 0
-//  	a int `validate:"min=0"`
+//  	a int `validate:"gte=0"`
 //  }
 //
 //  type B struct {
 //  	A
 //  	// Check that the number is greater than or equal to 0
-//  	b int `validate:"min=0"`
+//  	b int `validate:"gte=0"`
 //  }
 //
 // Substruct validation
@@ -86,13 +86,13 @@
 //
 //  type A struct {
 //  	// Check that the number is greater than or equal to 0
-//  	field int `validate:"min=0"`
+//  	field int `validate:"gte=0"`
 //  }
 //
 //  type B struct {
 //  	a A
 //  	// Check that the number is greater than or equal to 0
-//  	field int `validate:"min=0"`
+//  	field int `validate:"gte=0"`
 //  }
 //
 // Deep validation
@@ -100,18 +100,18 @@
 // You can use brackets and arrow syntax to deep to as many levels as you need.
 //
 //  type A struct {
-//  	field int `validate:"min=0 & max=10"`
+//  	field int `validate:"gte=0 & lte=10"`
 //  }
 //
 //  type B struct {
-//  	field []map[*string]*A `validate:"min=1 & max=2 > empty=false [nil=false > empty=false] > nil=false"`
+//  	field []map[*string]*A `validate:"gte=1 & lte=2 > empty=false [nil=false > empty=false] > nil=false"`
 //  }
 //
-//  // min=1, max=2 will be applied to the array
+//  // gte=1 & lte=2 will be applied to the array
 //  // empty=false will be applied to the map
 //  // nil=false > empty=false will be applied to the map key (pointer and string)
 //  // nil=false will be applied to the map value
-//  // min=0, max=10 will be applied to the A.field
+//  // gte=0 & lte=10 will be applied to the A.field
 //
 package validate
 
@@ -130,7 +130,7 @@ const MasterTag = "validate"
 // It returns an error if a struct does not validate or nil if there are no validation errors.
 //
 //  err := validate.Validate(struct {
-//  	field time.Duration `validate:"min=0s"`
+//  	field time.Duration `validate:"gte=0s"`
 //  }{
 //  	field: -time.Second,
 //  })

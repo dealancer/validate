@@ -13,13 +13,13 @@ type ValidatorType string
 
 // Following validators are available.
 const (
-	// ValidatorMin compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
-	// E.g. `validate:"min=0"`
-	ValidatorMin ValidatorType = "min"
+	// ValidatorGte compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
+	// E.g. `validate:"gte=0"`
+	ValidatorGte ValidatorType = "gte"
 
-	// ValidatorMax compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
-	// E.g. `validate:"max=10"`
-	ValidatorMax ValidatorType = "max"
+	// ValidatorLte compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
+	// E.g. `validate:"lte=10"`
+	ValidatorLte ValidatorType = "lte"
 
 	// ValidatorEmpty checks if a string, a map, a slice, or an array is (not) empty.
 	// E.g. `validate:"empty=false"`
@@ -43,8 +43,8 @@ type validatorFunc func(value reflect.Value, name string, validator string) erro
 
 func getValidatorTypeMap() map[ValidatorType]validatorFunc {
 	return map[ValidatorType]validatorFunc{
-		ValidatorMin:    validateMin,
-		ValidatorMax:    validateMax,
+		ValidatorGte:    validateGte,
+		ValidatorLte:    validateLte,
 		ValidatorEmpty:  validateEmpty,
 		ValidatorNil:    validateNil,
 		ValidatorOneOf:  validateOneOf,
@@ -57,72 +57,72 @@ type validator struct {
 	Value string
 }
 
-func validateMin(value reflect.Value, name string, validator string) error {
+func validateGte(value reflect.Value, name string, validator string) error {
 	kind := value.Kind()
 	typ := value.Type()
 
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if typ == reflect.TypeOf((time.Duration)(0)) {
-			if min, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) < min {
-				return errors.New(fmt.Sprint(name, " must not be less than ", min))
+			if gte, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) < gte {
+				return errors.New(fmt.Sprint(name, " must not be less than ", gte))
 			}
 		} else {
-			if min, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() < min {
-				return errors.New(fmt.Sprint(name, " must not be less than ", min))
+			if gte, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() < gte {
+				return errors.New(fmt.Sprint(name, " must not be less than ", gte))
 			}
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		if min, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() < min {
-			return errors.New(fmt.Sprint(name, " must not be less than ", min))
+		if gte, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() < gte {
+			return errors.New(fmt.Sprint(name, " must not be less than ", gte))
 		}
 	case reflect.Float32, reflect.Float64:
-		if min, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() < min {
-			return errors.New(fmt.Sprint(name, " must not be less than ", min))
+		if gte, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() < gte {
+			return errors.New(fmt.Sprint(name, " must not be less than ", gte))
 		}
 	case reflect.String:
-		if min, err := strconv.Atoi(validator); err == nil && value.Len() < min {
-			return errors.New(fmt.Sprint(name, " must not contain less than ", min, " characters"))
+		if gte, err := strconv.Atoi(validator); err == nil && value.Len() < gte {
+			return errors.New(fmt.Sprint(name, " must not contain less than ", gte, " characters"))
 		}
 	case reflect.Map, reflect.Slice, reflect.Array:
-		if min, err := strconv.Atoi(validator); err == nil && value.Len() < min {
-			return errors.New(fmt.Sprint(name, " must not contain less than ", min, " elements"))
+		if gte, err := strconv.Atoi(validator); err == nil && value.Len() < gte {
+			return errors.New(fmt.Sprint(name, " must not contain less than ", gte, " elements"))
 		}
 	}
 
 	return nil
 }
 
-func validateMax(value reflect.Value, name string, validator string) error {
+func validateLte(value reflect.Value, name string, validator string) error {
 	kind := value.Kind()
 	typ := value.Type()
 
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if typ == reflect.TypeOf((time.Duration)(0)) {
-			if max, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) > max {
-				return errors.New(fmt.Sprint(name, " must not be greater than ", max))
+			if lte, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) > lte {
+				return errors.New(fmt.Sprint(name, " must not be greater than ", lte))
 			}
 		} else {
-			if max, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() > max {
-				return errors.New(fmt.Sprint(name, " must not be greater than ", max))
+			if lte, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() > lte {
+				return errors.New(fmt.Sprint(name, " must not be greater than ", lte))
 			}
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		if max, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() > max {
-			return errors.New(fmt.Sprint(name, " must not be greater than ", max))
+		if lte, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() > lte {
+			return errors.New(fmt.Sprint(name, " must not be greater than ", lte))
 		}
 	case reflect.Float32, reflect.Float64:
-		if max, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() > max {
-			return errors.New(fmt.Sprint(name, " must not be greater than ", max))
+		if lte, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() > lte {
+			return errors.New(fmt.Sprint(name, " must not be greater than ", lte))
 		}
 	case reflect.String:
-		if max, err := strconv.Atoi(validator); err == nil && value.Len() > max {
-			return errors.New(fmt.Sprint(name, " must not contain more than ", max, " characters"))
+		if lte, err := strconv.Atoi(validator); err == nil && value.Len() > lte {
+			return errors.New(fmt.Sprint(name, " must not contain more than ", lte, " characters"))
 		}
 	case reflect.Map, reflect.Slice, reflect.Array:
-		if max, err := strconv.Atoi(validator); err == nil && value.Len() > max {
-			return errors.New(fmt.Sprint(name, " must not contain more than ", max, " elements"))
+		if lte, err := strconv.Atoi(validator); err == nil && value.Len() > lte {
+			return errors.New(fmt.Sprint(name, " must not contain more than ", lte, " elements"))
 		}
 	}
 

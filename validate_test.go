@@ -216,7 +216,7 @@ func TestBasic(t *testing.T) {
 	}
 
 	stFail := struct {
-		field int `validate:"max=0"`
+		field int `validate:"lte=0"`
 	}{
 		field: 1,
 	}
@@ -230,7 +230,7 @@ func TestBasic(t *testing.T) {
 	stAnotherFail := struct {
 		a     int
 		b     int
-		field int `validate:"max=0"`
+		field int `validate:"lte=0"`
 		c     int
 		d     int
 	}{
@@ -246,7 +246,7 @@ func TestBasic(t *testing.T) {
 
 func TestAndVal(t *testing.T) {
 	if nil == Validate(struct {
-		field int `validate:"min=0&max=10"`
+		field int `validate:"gte=0&lte=10"`
 	}{
 		field: -1,
 	}) {
@@ -254,7 +254,7 @@ func TestAndVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field int `validate:"min=0&max=10"`
+		field int `validate:"gte=0&lte=10"`
 	}{
 		field: 11,
 	}) {
@@ -262,7 +262,7 @@ func TestAndVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:"min=0&max=10"`
+		field int `validate:"gte=0&lte=10"`
 	}{
 		field: 5,
 	}) {
@@ -270,7 +270,7 @@ func TestAndVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field int `validate:"min=1&max=-1"`
+		field int `validate:"gte=1&lte=-1"`
 	}{
 		field: 0,
 	}) {
@@ -280,7 +280,7 @@ func TestAndVal(t *testing.T) {
 
 func TestOrVal(t *testing.T) {
 	if nil == Validate(struct {
-		field int `validate:"max=0|min=10"`
+		field int `validate:"lte=0|gte=10"`
 	}{
 		field: 5,
 	}) {
@@ -288,7 +288,7 @@ func TestOrVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:"max=0|min=10"`
+		field int `validate:"lte=0|gte=10"`
 	}{
 		field: -1,
 	}) {
@@ -296,7 +296,7 @@ func TestOrVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:"max=0|min=10"`
+		field int `validate:"lte=0|gte=10"`
 	}{
 		field: 11,
 	}) {
@@ -304,7 +304,7 @@ func TestOrVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:"min=0|max=10"`
+		field int `validate:"gte=0|lte=10"`
 	}{
 		field: 5,
 	}) {
@@ -312,7 +312,7 @@ func TestOrVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:"min=0|max=10"`
+		field int `validate:"gte=0|lte=10"`
 	}{
 		field: -1,
 	}) {
@@ -320,7 +320,7 @@ func TestOrVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:"min=0|max=10"`
+		field int `validate:"gte=0|lte=10"`
 	}{
 		field: 11,
 	}) {
@@ -330,7 +330,7 @@ func TestOrVal(t *testing.T) {
 
 func TestAndOrVal(t *testing.T) {
 	if nil == Validate(struct {
-		field int `validate:"min=0 & max=5 | min=10 & max=15"`
+		field int `validate:"gte=0 & lte=5 | gte=10 & lte=15"`
 	}{
 		field: -1,
 	}) {
@@ -338,7 +338,7 @@ func TestAndOrVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field int `validate:"min=0 & max=5 | min=10 & max=15"`
+		field int `validate:"gte=0 & lte=5 | gte=10 & lte=15"`
 	}{
 		field: 6,
 	}) {
@@ -346,7 +346,7 @@ func TestAndOrVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field int `validate:"min=0 & max=5 | min=10 & max=15"`
+		field int `validate:"gte=0 & lte=5 | gte=10 & lte=15"`
 	}{
 		field: 16,
 	}) {
@@ -354,7 +354,7 @@ func TestAndOrVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:"min=0 & max=5 | min=10 & max=15"`
+		field int `validate:"gte=0 & lte=5 | gte=10 & lte=15"`
 	}{
 		field: 1,
 	}) {
@@ -362,7 +362,7 @@ func TestAndOrVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:"min=0 & max=5 | min=10 & max=15"`
+		field int `validate:"gte=0 & lte=5 | gte=10 & lte=15"`
 	}{
 		field: 11,
 	}) {
@@ -372,7 +372,7 @@ func TestAndOrVal(t *testing.T) {
 
 func TestFormatVal(t *testing.T) {
 	if nil == Validate(struct {
-		field int `validate:" min = 0 & max = 10 & bla= "`
+		field int `validate:" gte = 0 & lte = 10 & bla= "`
 	}{
 		field: -1,
 	}) {
@@ -380,7 +380,7 @@ func TestFormatVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:" min = 0 & max = 10 & bla = "`
+		field int `validate:" gte = 0 & lte = 10 & bla = "`
 	}{
 		field: 5,
 	}) {
@@ -427,600 +427,600 @@ func TestFormatVal(t *testing.T) {
 		t.Errorf("empty one_of validate should not validate")
 	}
 }
-func TestMinValForDuration(t *testing.T) {
+func TestGteValForDuration(t *testing.T) {
 	if nil == Validate(struct {
-		field time.Duration `validate:"min=0s"`
+		field time.Duration `validate:"gte=0s"`
 	}{
 		field: -time.Second,
 	}) {
-		t.Errorf("min validator does not validate for time.Duratuon")
+		t.Errorf("gte validator does not validate for time.Duratuon")
 	}
 
 	if nil == Validate(struct {
-		field time.Duration `validate:"min=-1s"`
+		field time.Duration `validate:"gte=-1s"`
 	}{
 		field: -time.Minute,
 	}) {
-		t.Errorf("min validator does not validate for time.Duratuon")
+		t.Errorf("gte validator does not validate for time.Duratuon")
 	}
 
 	if nil != Validate(struct {
-		field time.Duration `validate:"min=0s"`
+		field time.Duration `validate:"gte=0s"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min validator does not validate for time.Duratuon")
+		t.Errorf("gte validator does not validate for time.Duratuon")
 	}
 
 	if nil != Validate(struct {
-		field time.Duration `validate:"min=-1s"`
+		field time.Duration `validate:"gte=-1s"`
 	}{
 		field: -time.Millisecond,
 	}) {
-		t.Errorf("min validator does not validate for time.Duratuon")
+		t.Errorf("gte validator does not validate for time.Duratuon")
 	}
 }
 
-func TestMaxValForDuration(t *testing.T) {
+func TestLteValForDuration(t *testing.T) {
 	if nil == Validate(struct {
-		field time.Duration `validate:"max=0s"`
+		field time.Duration `validate:"lte=0s"`
 	}{
 		field: time.Second,
 	}) {
-		t.Errorf("max validator does not validate for time.Duratuon")
+		t.Errorf("lte validator does not validate for time.Duratuon")
 	}
 
 	if nil == Validate(struct {
-		field time.Duration `validate:"max=1s"`
+		field time.Duration `validate:"lte=1s"`
 	}{
 		field: time.Minute,
 	}) {
-		t.Errorf("max validator does not validate for time.Duratuon")
+		t.Errorf("lte validator does not validate for time.Duratuon")
 	}
 
 	if nil != Validate(struct {
-		field time.Duration `validate:"max=0s"`
+		field time.Duration `validate:"lte=0s"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for time.Duratuon")
+		t.Errorf("lte validator does not validate for time.Duratuon")
 	}
 
 	if nil != Validate(struct {
-		field time.Duration `validate:"max=1s"`
+		field time.Duration `validate:"lte=1s"`
 	}{
 		field: time.Millisecond,
 	}) {
-		t.Errorf("max validator does not validate for time.Duratuon")
+		t.Errorf("lte validator does not validate for time.Duratuon")
 	}
 }
 
-func TestMinValForInt(t *testing.T) {
+func TestGteValForInt(t *testing.T) {
 	if nil == Validate(struct {
-		field int `validate:"min=0"`
+		field int `validate:"gte=0"`
 	}{
 		field: -1,
 	}) {
-		t.Errorf("min validator does not validate for int")
+		t.Errorf("gte validator does not validate for int")
 	}
 
 	if nil == Validate(struct {
-		field int8 `validate:"min=0"`
+		field int8 `validate:"gte=0"`
 	}{
 		field: -1,
 	}) {
-		t.Errorf("min validator does not validate for int8")
+		t.Errorf("gte validator does not validate for int8")
 	}
 
 	if nil == Validate(struct {
-		field int16 `validate:"min=0"`
+		field int16 `validate:"gte=0"`
 	}{
 		field: -1,
 	}) {
-		t.Errorf("min validator does not validate for int16")
+		t.Errorf("gte validator does not validate for int16")
 	}
 
 	if nil == Validate(struct {
-		field int32 `validate:"min=0"`
+		field int32 `validate:"gte=0"`
 	}{
 		field: -1,
 	}) {
-		t.Errorf("min validator does not validate for int32")
+		t.Errorf("gte validator does not validate for int32")
 	}
 
 	if nil == Validate(struct {
-		field int64 `validate:"min=0"`
+		field int64 `validate:"gte=0"`
 	}{
 		field: -1,
 	}) {
-		t.Errorf("min validator does not validate for int64")
+		t.Errorf("gte validator does not validate for int64")
 	}
 
 	if nil != Validate(struct {
-		field int `validate:"min=0"`
+		field int `validate:"gte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min validator does not validate for int")
+		t.Errorf("gte validator does not validate for int")
 	}
 
 	if nil != Validate(struct {
-		field int8 `validate:"min=0"`
+		field int8 `validate:"gte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min validator does not validate for int8")
+		t.Errorf("gte validator does not validate for int8")
 	}
 
 	if nil != Validate(struct {
-		field int16 `validate:"min=0"`
+		field int16 `validate:"gte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min validator does not validate for int16")
+		t.Errorf("gte validator does not validate for int16")
 	}
 
 	if nil != Validate(struct {
-		field int32 `validate:"min=0"`
+		field int32 `validate:"gte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min validator does not validate for int32")
+		t.Errorf("gte validator does not validate for int32")
 	}
 
 	if nil != Validate(struct {
-		field int64 `validate:"min=0"`
+		field int64 `validate:"gte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min validator does not validate for int64")
+		t.Errorf("gte validator does not validate for int64")
 	}
 }
 
-func TestMaxValForInt(t *testing.T) {
+func TestLteValForInt(t *testing.T) {
 	if nil == Validate(struct {
-		field int `validate:"max=0"`
+		field int `validate:"lte=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max validator does not validate for int")
+		t.Errorf("lte validator does not validate for int")
 	}
 
 	if nil == Validate(struct {
-		field int8 `validate:"max=0"`
+		field int8 `validate:"lte=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max validator does not validate for int8")
+		t.Errorf("lte validator does not validate for int8")
 	}
 
 	if nil == Validate(struct {
-		field int16 `validate:"max=0"`
+		field int16 `validate:"lte=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max validator does not validate for int16")
+		t.Errorf("lte validator does not validate for int16")
 	}
 
 	if nil == Validate(struct {
-		field int32 `validate:"max=0"`
+		field int32 `validate:"lte=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max validator does not validate for int32")
+		t.Errorf("lte validator does not validate for int32")
 	}
 
 	if nil == Validate(struct {
-		field int64 `validate:"max=0"`
+		field int64 `validate:"lte=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max validator does not validate for int64")
+		t.Errorf("lte validator does not validate for int64")
 	}
 
 	if nil != Validate(struct {
-		field int `validate:"max=0"`
+		field int `validate:"lte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for int")
+		t.Errorf("lte validator does not validate for int")
 	}
 
 	if nil != Validate(struct {
-		field int8 `validate:"max=0"`
+		field int8 `validate:"lte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for int8")
+		t.Errorf("lte validator does not validate for int8")
 	}
 
 	if nil != Validate(struct {
-		field int16 `validate:"max=0"`
+		field int16 `validate:"lte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for int16")
+		t.Errorf("lte validator does not validate for int16")
 	}
 
 	if nil != Validate(struct {
-		field int32 `validate:"max=0"`
+		field int32 `validate:"lte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for int32")
+		t.Errorf("lte validator does not validate for int32")
 	}
 
 	if nil != Validate(struct {
-		field int64 `validate:"max=0"`
+		field int64 `validate:"lte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for int64")
+		t.Errorf("lte validator does not validate for int64")
 	}
 }
 
-func TestMinValForRune(t *testing.T) {
+func TestGteValForRune(t *testing.T) {
 	if nil == Validate(struct {
-		field rune `validate:"min=0"`
+		field rune `validate:"gte=0"`
 	}{
 		field: -1,
 	}) {
-		t.Errorf("min validator does not validate for rune")
+		t.Errorf("gte validator does not validate for rune")
 	}
 
 	if nil != Validate(struct {
-		field rune `validate:"min=0"`
+		field rune `validate:"gte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min validator does not validate for rune")
+		t.Errorf("gte validator does not validate for rune")
 	}
 }
 
-func TestMaxValForRune(t *testing.T) {
+func TestLteValForRune(t *testing.T) {
 	if nil == Validate(struct {
-		field rune `validate:"max=0"`
+		field rune `validate:"lte=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max validator does not validate for rune")
+		t.Errorf("lte validator does not validate for rune")
 	}
 
 	if nil != Validate(struct {
-		field rune `validate:"max=0"`
+		field rune `validate:"lte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for rune")
+		t.Errorf("lte validator does not validate for rune")
 	}
 }
 
-func TestMinValForUint(t *testing.T) {
+func TestGteValForUint(t *testing.T) {
 	if nil == Validate(struct {
-		field uint `validate:"min=10"`
+		field uint `validate:"gte=10"`
 	}{
 		field: 9,
 	}) {
-		t.Errorf("min validator does not validate for uint")
+		t.Errorf("gte validator does not validate for uint")
 	}
 
 	if nil == Validate(struct {
-		field uint8 `validate:"min=10"`
+		field uint8 `validate:"gte=10"`
 	}{
 		field: 9,
 	}) {
-		t.Errorf("min validator does not validate for uint8")
+		t.Errorf("gte validator does not validate for uint8")
 	}
 
 	if nil == Validate(struct {
-		field uint16 `validate:"min=10"`
+		field uint16 `validate:"gte=10"`
 	}{
 		field: 9,
 	}) {
-		t.Errorf("min validator does not validate for uint16")
+		t.Errorf("gte validator does not validate for uint16")
 	}
 
 	if nil == Validate(struct {
-		field uint32 `validate:"min=10"`
+		field uint32 `validate:"gte=10"`
 	}{
 		field: 9,
 	}) {
-		t.Errorf("min validator does not validate for uint32")
+		t.Errorf("gte validator does not validate for uint32")
 	}
 
 	if nil == Validate(struct {
-		field uint64 `validate:"min=10"`
+		field uint64 `validate:"gte=10"`
 	}{
 		field: 9,
 	}) {
-		t.Errorf("min validator does not validate for uint64")
+		t.Errorf("gte validator does not validate for uint64")
 	}
 
 	if nil == Validate(struct {
-		field uintptr `validate:"min=10"`
+		field uintptr `validate:"gte=10"`
 	}{
 		field: 9,
 	}) {
-		t.Errorf("min validator does not validate for uintptr")
+		t.Errorf("gte validator does not validate for uintptr")
 	}
 
 	if nil != Validate(struct {
-		field uint `validate:"min=10"`
+		field uint `validate:"gte=10"`
 	}{
 		field: 10,
 	}) {
-		t.Errorf("min validator does not validate for uint")
+		t.Errorf("gte validator does not validate for uint")
 	}
 
 	if nil != Validate(struct {
-		field uint8 `validate:"min=10"`
+		field uint8 `validate:"gte=10"`
 	}{
 		field: 10,
 	}) {
-		t.Errorf("min validator does not validate for uint8")
+		t.Errorf("gte validator does not validate for uint8")
 	}
 
 	if nil != Validate(struct {
-		field uint16 `validate:"min=10"`
+		field uint16 `validate:"gte=10"`
 	}{
 		field: 10,
 	}) {
-		t.Errorf("min validator does not validate for uint16")
+		t.Errorf("gte validator does not validate for uint16")
 	}
 
 	if nil != Validate(struct {
-		field uint32 `validate:"min=10"`
+		field uint32 `validate:"gte=10"`
 	}{
 		field: 10,
 	}) {
-		t.Errorf("min validator does not validate for uint32")
+		t.Errorf("gte validator does not validate for uint32")
 	}
 
 	if nil != Validate(struct {
-		field uint64 `validate:"min=10"`
+		field uint64 `validate:"gte=10"`
 	}{
 		field: 10,
 	}) {
-		t.Errorf("min validator does not validate for uint64")
+		t.Errorf("gte validator does not validate for uint64")
 	}
 
 	if nil != Validate(struct {
-		field uintptr `validate:"min=10"`
+		field uintptr `validate:"gte=10"`
 	}{
 		field: 10,
 	}) {
-		t.Errorf("min validator does not validate for uintptr")
+		t.Errorf("gte validator does not validate for uintptr")
 	}
 }
 
-func TestMaxValForUint(t *testing.T) {
+func TestLteValForUint(t *testing.T) {
 	if nil == Validate(struct {
-		field uint `validate:"max=0"`
+		field uint `validate:"lte=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max validator does not validate for uint")
+		t.Errorf("lte validator does not validate for uint")
 	}
 
 	if nil == Validate(struct {
-		field uint8 `validate:"max=0"`
+		field uint8 `validate:"lte=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max validator does not validate for uint8")
+		t.Errorf("lte validator does not validate for uint8")
 	}
 
 	if nil == Validate(struct {
-		field uint16 `validate:"max=0"`
+		field uint16 `validate:"lte=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max validator does not validate for uint16")
+		t.Errorf("lte validator does not validate for uint16")
 	}
 
 	if nil == Validate(struct {
-		field uint32 `validate:"max=0"`
+		field uint32 `validate:"lte=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max validator does not validate for uint32")
+		t.Errorf("lte validator does not validate for uint32")
 	}
 
 	if nil == Validate(struct {
-		field uint64 `validate:"max=0"`
+		field uint64 `validate:"lte=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max validator does not validate for uint64")
+		t.Errorf("lte validator does not validate for uint64")
 	}
 
 	if nil == Validate(struct {
-		field uintptr `validate:"max=0"`
+		field uintptr `validate:"lte=0"`
 	}{
 		field: 1,
 	}) {
-		t.Errorf("max validator does not validate for uintptr")
+		t.Errorf("lte validator does not validate for uintptr")
 	}
 
 	if nil != Validate(struct {
-		field uint `validate:"max=0"`
+		field uint `validate:"lte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for uint")
+		t.Errorf("lte validator does not validate for uint")
 	}
 
 	if nil != Validate(struct {
-		field uint8 `validate:"max=0"`
+		field uint8 `validate:"lte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for uint8")
+		t.Errorf("lte validator does not validate for uint8")
 	}
 
 	if nil != Validate(struct {
-		field uint16 `validate:"max=0"`
+		field uint16 `validate:"lte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for uint16")
+		t.Errorf("lte validator does not validate for uint16")
 	}
 
 	if nil != Validate(struct {
-		field uint32 `validate:"max=0"`
+		field uint32 `validate:"lte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for uint32")
+		t.Errorf("lte validator does not validate for uint32")
 	}
 
 	if nil != Validate(struct {
-		field uint64 `validate:"max=0"`
+		field uint64 `validate:"lte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for uint64")
+		t.Errorf("lte validator does not validate for uint64")
 	}
 
 	if nil != Validate(struct {
-		field uint64 `validate:"max=0"`
+		field uint64 `validate:"lte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for uintptr")
+		t.Errorf("lte validator does not validate for uintptr")
 	}
 }
 
-func TestMinValForFloat(t *testing.T) {
+func TestGteValForFloat(t *testing.T) {
 	if nil == Validate(struct {
-		field float32 `validate:"min=0"`
+		field float32 `validate:"gte=0"`
 	}{
 		field: -0.1,
 	}) {
-		t.Errorf("min validator does not validate for flaot32")
+		t.Errorf("gte validator does not validate for flaot32")
 	}
 
 	if nil == Validate(struct {
-		field float64 `validate:"min=0"`
+		field float64 `validate:"gte=0"`
 	}{
 		field: -0.1,
 	}) {
-		t.Errorf("min validator does not validate for flaot64")
+		t.Errorf("gte validator does not validate for flaot64")
 	}
 
 	if nil != Validate(struct {
-		field float32 `validate:"min=0"`
+		field float32 `validate:"gte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min validator does not validate for flaot32")
+		t.Errorf("gte validator does not validate for flaot32")
 	}
 
 	if nil != Validate(struct {
-		field float64 `validate:"min=0"`
+		field float64 `validate:"gte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("min validator does not validate for flaot64")
+		t.Errorf("gte validator does not validate for flaot64")
 	}
 }
 
-func TestMaxValForFloat(t *testing.T) {
+func TestLteValForFloat(t *testing.T) {
 	if nil == Validate(struct {
-		field float32 `validate:"max=0"`
+		field float32 `validate:"lte=0"`
 	}{
 		field: 0.1,
 	}) {
-		t.Errorf("max validator does not validate for flaot32")
+		t.Errorf("lte validator does not validate for flaot32")
 	}
 
 	if nil == Validate(struct {
-		field float64 `validate:"max=0"`
+		field float64 `validate:"lte=0"`
 	}{
 		field: 0.1,
 	}) {
-		t.Errorf("max validator does not validate for flaot64")
+		t.Errorf("lte validator does not validate for flaot64")
 	}
 
 	if nil != Validate(struct {
-		field float32 `validate:"max=0"`
+		field float32 `validate:"lte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for flaot32")
+		t.Errorf("lte validator does not validate for flaot32")
 	}
 
 	if nil != Validate(struct {
-		field float64 `validate:"max=0"`
+		field float64 `validate:"lte=0"`
 	}{
 		field: 0,
 	}) {
-		t.Errorf("max validator does not validate for flaot64")
+		t.Errorf("lte validator does not validate for flaot64")
 	}
 }
 
-func TestMinValForString(t *testing.T) {
+func TestGteValForString(t *testing.T) {
 	if nil == Validate(struct {
-		field string `validate:"min=2"`
+		field string `validate:"gte=2"`
 	}{
 		field: "a",
 	}) {
-		t.Errorf("min validator does not validate for string")
+		t.Errorf("gte validator does not validate for string")
 	}
 
 	if nil != Validate(struct {
-		field string `validate:"min=2"`
+		field string `validate:"gte=2"`
 	}{
 		field: "ab",
 	}) {
-		t.Errorf("min validator does not validate for string")
+		t.Errorf("gte validator does not validate for string")
 	}
 }
 
-func TestMaxValForString(t *testing.T) {
+func TestLteValForString(t *testing.T) {
 	if nil == Validate(struct {
-		field string `validate:"max=2"`
+		field string `validate:"lte=2"`
 	}{
 		field: "abc",
 	}) {
-		t.Errorf("max validator does not validate for string")
+		t.Errorf("lte validator does not validate for string")
 	}
 
 	if nil != Validate(struct {
-		field string `validate:"max=2"`
+		field string `validate:"lte=2"`
 	}{
 		field: "ab",
 	}) {
-		t.Errorf("max validator does not validate for string")
+		t.Errorf("lte validator does not validate for string")
 	}
 }
 
-func TestMinValForMap(t *testing.T) {
+func TestGteValForMap(t *testing.T) {
 	if nil == Validate(struct {
-		field map[string]string `validate:"min=2"`
+		field map[string]string `validate:"gte=2"`
 	}{
 		field: map[string]string{
 			"a": "a",
 		},
 	}) {
-		t.Errorf("min validator does not validate for map")
+		t.Errorf("gte validator does not validate for map")
 	}
 
 	if nil != Validate(struct {
-		field map[string]string `validate:"min=2"`
+		field map[string]string `validate:"gte=2"`
 	}{
 		field: map[string]string{
 			"a": "a",
 			"b": "b",
 		},
 	}) {
-		t.Errorf("min validator does not validate for map")
+		t.Errorf("gte validator does not validate for map")
 	}
 }
 
-func TestMaxForMap(t *testing.T) {
+func TestLteForMap(t *testing.T) {
 	if nil == Validate(struct {
-		field map[string]string `validate:"max=2"`
+		field map[string]string `validate:"lte=2"`
 	}{
 		field: map[string]string{
 			"a": "a",
@@ -1028,90 +1028,90 @@ func TestMaxForMap(t *testing.T) {
 			"c": "c",
 		},
 	}) {
-		t.Errorf("max validator does not validate for map")
+		t.Errorf("lte validator does not validate for map")
 	}
 
 	if nil != Validate(struct {
-		field map[string]string `validate:"max=2"`
+		field map[string]string `validate:"lte=2"`
 	}{
 		field: map[string]string{
 			"a": "a",
 			"b": "b",
 		},
 	}) {
-		t.Errorf("max validator does not validate for map")
+		t.Errorf("lte validator does not validate for map")
 	}
 }
 
-func TestMinValForSlice(t *testing.T) {
+func TestGteValForSlice(t *testing.T) {
 	if nil == Validate(struct {
-		field []string `validate:"min=2"`
+		field []string `validate:"gte=2"`
 	}{
 		field: []string{"a"},
 	}) {
-		t.Errorf("min validator does not validate for slice")
+		t.Errorf("gte validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []string `validate:"min=2"`
+		field []string `validate:"gte=2"`
 	}{
 		field: []string{"a", "b"},
 	}) {
-		t.Errorf("min validator does not validate for slice")
+		t.Errorf("gte validator does not validate for slice")
 	}
 }
 
-func TestMaxValForSlice(t *testing.T) {
+func TestLteValForSlice(t *testing.T) {
 	if nil == Validate(struct {
-		field []string `validate:"max=2"`
+		field []string `validate:"lte=2"`
 	}{
 		field: []string{"a", "b", "c"},
 	}) {
-		t.Errorf("min validator does not validate for slice")
+		t.Errorf("gte validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []string `validate:"max=2"`
+		field []string `validate:"lte=2"`
 	}{
 		field: []string{"a", "b"},
 	}) {
-		t.Errorf("min validator does not validate for slice")
+		t.Errorf("gte validator does not validate for slice")
 	}
 }
 
-func TestMinValForArray(t *testing.T) {
+func TestGteValForArray(t *testing.T) {
 	if nil == Validate(struct {
-		field [1]string `validate:"min=2"`
+		field [1]string `validate:"gte=2"`
 	}{
 		field: [1]string{"a"},
 	}) {
-		t.Errorf("min validator does not validate for string")
+		t.Errorf("gte validator does not validate for string")
 	}
 
 	if nil != Validate(struct {
-		field [2]string `validate:"min=2"`
+		field [2]string `validate:"gte=2"`
 	}{
 		field: [2]string{"a", "b"},
 	}) {
-		t.Errorf("min validator does not validate for string")
+		t.Errorf("gte validator does not validate for string")
 	}
 }
 
-func TestMaxValForArray(t *testing.T) {
+func TestLteValForArray(t *testing.T) {
 	if nil == Validate(struct {
-		field [3]string `validate:"max=2"`
+		field [3]string `validate:"lte=2"`
 	}{
 		field: [3]string{"a", "b", "c"},
 	}) {
-		t.Errorf("min validator does not validate for array")
+		t.Errorf("gte validator does not validate for array")
 	}
 
 	if nil != Validate(struct {
-		field [2]string `validate:"max=2"`
+		field [2]string `validate:"lte=2"`
 	}{
 		field: [2]string{"a", "b"},
 	}) {
-		t.Errorf("min validator does not validate for array")
+		t.Errorf("gte validator does not validate for array")
 	}
 }
 func TestEmptyValForString(t *testing.T) {
@@ -1545,50 +1545,50 @@ func TestDeepValsForStruct(t *testing.T) {
 
 	if nil == Validate(struct {
 		field struct {
-			field int `validate:"min=0"`
+			field int `validate:"gte=0"`
 		}
 	}{
 		field: struct {
-			field int `validate:"min=0"`
+			field int `validate:"gte=0"`
 		}{field: -1},
 	}) {
-		t.Errorf("min validator does not validate for struct field")
+		t.Errorf("gte validator does not validate for struct field")
 	}
 
 	if nil != Validate(struct {
 		field struct {
-			field int `validate:"min=0"`
+			field int `validate:"gte=0"`
 		}
 	}{
 		field: struct {
-			field int `validate:"min=0"`
+			field int `validate:"gte=0"`
 		}{field: 0},
 	}) {
-		t.Errorf("min validator does not validate for struct field")
+		t.Errorf("gte validator does not validate for struct field")
 	}
 
 	if nil == Validate(struct {
 		field struct {
-			field int `validate:"max=0"`
+			field int `validate:"lte=0"`
 		}
 	}{
 		field: struct {
-			field int `validate:"max=0"`
+			field int `validate:"lte=0"`
 		}{field: 1},
 	}) {
-		t.Errorf("max validator does not validate for struct field")
+		t.Errorf("lte validator does not validate for struct field")
 	}
 
 	if nil != Validate(struct {
 		field struct {
-			field int `validate:"max=0"`
+			field int `validate:"lte=0"`
 		}
 	}{
 		field: struct {
-			field int `validate:"max=0"`
+			field int `validate:"lte=0"`
 		}{field: 0},
 	}) {
-		t.Errorf("max validator does not validate for struct field")
+		t.Errorf("lte validator does not validate for struct field")
 	}
 
 	if nil == Validate(struct {
@@ -1641,14 +1641,14 @@ func TestDeepValsForStruct(t *testing.T) {
 
 	if nil != Validate(struct {
 		field struct {
-			field int `validate:"max=0"`
+			field int `validate:"lte=0"`
 		}
 	}{
 		field: struct {
-			field int `validate:"max=0"`
+			field int `validate:"lte=0"`
 		}{field: 0},
 	}) {
-		t.Errorf("max validator does not validate for struct field")
+		t.Errorf("lte validator does not validate for struct field")
 	}
 
 	if nil == Validate(struct {
@@ -1750,12 +1750,12 @@ func TestDeepValsForStruct(t *testing.T) {
 
 func TestDeepValsForNestedStruct(t *testing.T) {
 	type A struct {
-		field int `validate:"min=0"`
+		field int `validate:"gte=0"`
 	}
 
 	type B struct {
 		A
-		field int `validate:"min=0"`
+		field int `validate:"gte=0"`
 	}
 
 	if nil == Validate(B{
@@ -1790,35 +1790,35 @@ func TestDeepValsForMapKeys(t *testing.T) {
 	s := " "
 
 	if nil == Validate(struct {
-		field map[int]int `validate:"[min=0]"`
+		field map[int]int `validate:"[gte=0]"`
 	}{
 		field: map[int]int{0: 0, -1: 0},
 	}) {
-		t.Errorf("[min] validator does not validate for map key")
+		t.Errorf("[gte] validator does not validate for map key")
 	}
 
 	if nil != Validate(struct {
-		field map[int]int `validate:"[min=0]"`
+		field map[int]int `validate:"[gte=0]"`
 	}{
 		field: map[int]int{0: 0},
 	}) {
-		t.Errorf("[min] validator does not validate map key")
+		t.Errorf("[gte] validator does not validate map key")
 	}
 
 	if nil == Validate(struct {
-		field map[int]int `validate:"[max=0]"`
+		field map[int]int `validate:"[lte=0]"`
 	}{
 		field: map[int]int{0: 0, 1: 0},
 	}) {
-		t.Errorf("[max] validator does not validate for map key")
+		t.Errorf("[lte] validator does not validate for map key")
 	}
 
 	if nil != Validate(struct {
-		field map[int]int `validate:"[max=0]"`
+		field map[int]int `validate:"[lte=0]"`
 	}{
 		field: map[int]int{0: 0},
 	}) {
-		t.Errorf("[max] validator does not validate for map key")
+		t.Errorf("[lte] validator does not validate for map key")
 	}
 
 	if nil == Validate(struct {
@@ -1948,35 +1948,35 @@ func TestDeepValsForMapValues(t *testing.T) {
 	s := " "
 
 	if nil == Validate(struct {
-		field map[int]int `validate:"> min=0"`
+		field map[int]int `validate:"> gte=0"`
 	}{
 		field: map[int]int{0: 0, 1: -1},
 	}) {
-		t.Errorf(">min validator does not validate for map values")
+		t.Errorf(">gte validator does not validate for map values")
 	}
 
 	if nil != Validate(struct {
-		field map[int]int `validate:"> min=0"`
+		field map[int]int `validate:"> gte=0"`
 	}{
 		field: map[int]int{0: 0},
 	}) {
-		t.Errorf(">min validator does not validate map values")
+		t.Errorf(">gte validator does not validate map values")
 	}
 
 	if nil == Validate(struct {
-		field map[int]int `validate:"> max=0"`
+		field map[int]int `validate:"> lte=0"`
 	}{
 		field: map[int]int{0: 0, -1: 1},
 	}) {
-		t.Errorf(">max validator does not validate for map values")
+		t.Errorf(">lte validator does not validate for map values")
 	}
 
 	if nil != Validate(struct {
-		field map[int]int `validate:"> max=0"`
+		field map[int]int `validate:"> lte=0"`
 	}{
 		field: map[int]int{0: 0},
 	}) {
-		t.Errorf(">max validator does not validate for map values")
+		t.Errorf(">lte validator does not validate for map values")
 	}
 
 	if nil == Validate(struct {
@@ -2104,35 +2104,35 @@ func TestDeepValsForMapValues(t *testing.T) {
 
 func TestDeepValsForSlice(t *testing.T) {
 	if nil == Validate(struct {
-		field []int `validate:">min=0"`
+		field []int `validate:">gte=0"`
 	}{
 		field: []int{0, -1},
 	}) {
-		t.Errorf(">min validator does not validate for slice")
+		t.Errorf(">gte validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []int `validate:">min=0"`
+		field []int `validate:">gte=0"`
 	}{
 		field: []int{0, 0},
 	}) {
-		t.Errorf(">min validator does not validate for slice")
+		t.Errorf(">gte validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
-		field []int `validate:">max=0"`
+		field []int `validate:">lte=0"`
 	}{
 		field: []int{0, 1},
 	}) {
-		t.Errorf(">max validator does not validate for slice")
+		t.Errorf(">lte validator does not validate for slice")
 	}
 
 	if nil != Validate(struct {
-		field []int `validate:">max=0"`
+		field []int `validate:">lte=0"`
 	}{
 		field: []int{0, 0},
 	}) {
-		t.Errorf(">max validator does not validate for slice")
+		t.Errorf(">lte validator does not validate for slice")
 	}
 
 	if nil == Validate(struct {
@@ -2244,35 +2244,35 @@ func TestDeepValsForSlice(t *testing.T) {
 
 func TestDeepValsForArray(t *testing.T) {
 	if nil == Validate(struct {
-		field [2]int `validate:">min=0"`
+		field [2]int `validate:">gte=0"`
 	}{
 		field: [2]int{0, -1},
 	}) {
-		t.Errorf(">min validator does not validate for array")
+		t.Errorf(">gte validator does not validate for array")
 	}
 
 	if nil != Validate(struct {
-		field [2]int `validate:">min=0"`
+		field [2]int `validate:">gte=0"`
 	}{
 		field: [2]int{0, 0},
 	}) {
-		t.Errorf(">min validator does not validate for array")
+		t.Errorf(">gte validator does not validate for array")
 	}
 
 	if nil == Validate(struct {
-		field [2]int `validate:">max=0"`
+		field [2]int `validate:">lte=0"`
 	}{
 		field: [2]int{0, 1},
 	}) {
-		t.Errorf(">max validator does not validate for array")
+		t.Errorf(">lte validator does not validate for array")
 	}
 
 	if nil != Validate(struct {
-		field [2]int `validate:">max=0"`
+		field [2]int `validate:">lte=0"`
 	}{
 		field: [2]int{0, 0},
 	}) {
-		t.Errorf(">max validator does not validate for array")
+		t.Errorf(">lte validator does not validate for array")
 	}
 
 	if nil == Validate(struct {
@@ -2383,7 +2383,7 @@ func TestDeepValsForArray(t *testing.T) {
 }
 
 func TestDeepValsForPtr(t *testing.T) {
-	minusOne := -1
+	gteusOne := -1
 	zero := 0
 	one := 1
 	four := 4
@@ -2395,35 +2395,35 @@ func TestDeepValsForPtr(t *testing.T) {
 	var nilPtr *int
 
 	if nil == Validate(struct {
-		field *int `validate:">min=0"`
+		field *int `validate:">gte=0"`
 	}{
-		field: &minusOne,
+		field: &gteusOne,
 	}) {
-		t.Errorf(">min validator does not validate for pointer")
+		t.Errorf(">gte validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *int `validate:">min=0"`
+		field *int `validate:">gte=0"`
 	}{
 		field: &zero,
 	}) {
-		t.Errorf(">min validator does not validate for pointer")
+		t.Errorf(">gte validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
-		field *int `validate:">max=0"`
+		field *int `validate:">lte=0"`
 	}{
 		field: &one,
 	}) {
-		t.Errorf(">max validator does not validate for pointer")
+		t.Errorf(">lte validator does not validate for pointer")
 	}
 
 	if nil != Validate(struct {
-		field *int `validate:">max=0"`
+		field *int `validate:">lte=0"`
 	}{
 		field: &zero,
 	}) {
-		t.Errorf(">max validator does not validate for pointer")
+		t.Errorf(">lte validator does not validate for pointer")
 	}
 
 	if nil == Validate(struct {
@@ -2527,10 +2527,10 @@ func TestDeepDeepVal(t *testing.T) {
 	str := " "
 	emptyStr := ""
 	zero := 0
-	minusOne := -1
+	gteusOne := -1
 
 	if nil != Validate(struct {
-		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
+		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > gte=0"`
 	}{
 		field: []map[*string]*int{
 			map[*string]*int{
@@ -2542,11 +2542,11 @@ func TestDeepDeepVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
+		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > gte=0"`
 	}{
 		field: []map[*string]*int{
 			map[*string]*int{
-				&emptyStr: &minusOne,
+				&emptyStr: &gteusOne,
 			},
 		},
 	}) {
@@ -2554,7 +2554,7 @@ func TestDeepDeepVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
+		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > gte=0"`
 	}{
 		field: []map[*string]*int{
 			map[*string]*int{
@@ -2566,7 +2566,7 @@ func TestDeepDeepVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
+		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > gte=0"`
 	}{
 		field: []map[*string]*int{
 			map[*string]*int{
@@ -2578,7 +2578,7 @@ func TestDeepDeepVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
+		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > gte=0"`
 	}{
 		field: []map[*string]*int{
 			map[*string]*int{
@@ -2590,7 +2590,7 @@ func TestDeepDeepVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
+		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > gte=0"`
 	}{
 		field: []map[*string]*int{
 			map[*string]*int{},
@@ -2600,7 +2600,7 @@ func TestDeepDeepVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > min=0"`
+		field []map[*string]*int `validate:"empty=false > empty=false [nil=false > empty=true] > nil=false > gte=0"`
 	}{
 		field: []map[*string]*int{},
 	}) {
@@ -2612,7 +2612,7 @@ func TestDeepDeepStructVal(t *testing.T) {
 	emptyStr := ""
 
 	type SubStr struct {
-		field int `validate:"min=0"`
+		field int `validate:"gte=0"`
 	}
 
 	if nil != Validate(struct {
@@ -2668,18 +2668,18 @@ func TestIncorrectDeepVal(t *testing.T) {
 	one := 1
 
 	if nil != Validate(struct {
-		field []int `validate:"min=0"`
+		field []int `validate:"gte=0"`
 	}{
 		field: []int{-1},
 	}) {
-		t.Errorf("min validator validates one level deep for slice")
+		t.Errorf("gte validator validates one level deep for slice")
 	}
 
 	if nil != Validate(struct {
-		field *int `validate:"max=0"`
+		field *int `validate:"lte=0"`
 	}{
 		field: &one,
 	}) {
-		t.Errorf("max validator validates one level deep for pointer")
+		t.Errorf("lte validator validates one level deep for pointer")
 	}
 }

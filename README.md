@@ -38,7 +38,8 @@ This package supports a wide variety of types.
 
 This package provides the following validators.
 
-* `min` and `max` validators compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
+* `gte` (greater than or equal) validator compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
+* `lte` (less than or equal) validators compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
 * `empty` validator checks if a string, a map, a slice, or an array is (not) empty.
 * `nil` validator checks if a pointer is (not) nil.
 * `one_of` validator checks if a number or a string contains any of the given elements.
@@ -80,7 +81,7 @@ type Connection struct {
     Username string `validate:"one_of=joe,ivan,li"`
 
     // Password should be more than or equal to twelve characters
-    Password *string `validate:"> min=12"`
+    Password *string `validate:"> gte=12"`
 
     // Ssl (pointer) should not be nil
     Ssl *bool `validate:"nil=false"`
@@ -89,11 +90,11 @@ type Connection struct {
     SslVerify *bool `validate:"nil=false"`
 
     // Version should be between 5 and 8
-    Version int `validate:"min=5 & max=8"`
+    Version int `validate:"gte=5 & lte=8"`
 }
 
 type Connections struct {
-	Connections []Connection `validate:"min=2"` // There should be at least two connections
+	Connections []Connection `validate:"gte=2"` // There should be at least two connections
 }
 ```
 
@@ -101,7 +102,7 @@ type Connections struct {
 connections := Connections{
 	Connections: []Connection{
 		Connection{
-			Username: "admin",
+			Username: "adgte",
 		},
 	},
 }
