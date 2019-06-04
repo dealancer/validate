@@ -1,6 +1,7 @@
 package validate
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 	"time"
@@ -157,55 +158,10 @@ func TestParseTokens(t *testing.T) {
 }
 
 func TestBasic(t *testing.T) {
-	v := 1
-	if nil == Validate(v) {
-		t.Errorf("validate validates int type")
-	}
-	if nil == Validate(&v) {
-		t.Errorf("validate validates &int type")
-	}
-
-	s := ""
-	if nil == Validate(s) {
-		t.Errorf("validate validates string type")
-	}
-	if nil == Validate(&s) {
-		t.Errorf("validate validates &string type")
-	}
-
-	m := map[string]string{
-		"a": "a",
-	}
-	if nil == Validate(m) {
-		t.Errorf("validate validates map type")
-	}
-	if nil == Validate(m) {
-		t.Errorf("validate validates &map type")
-	}
-
-	sl := []string{
-		"a", "b",
-	}
-	if nil == Validate(sl) {
-		t.Errorf("validate validates slice type")
-	}
-	if nil == Validate(&sl) {
-		t.Errorf("validate validates slice type")
-	}
-
-	a := [2]string{
-		"a", "b",
-	}
-	if nil == Validate(a) {
-		t.Errorf("validate validates array type")
-	}
-	if nil == Validate(&a) {
-		t.Errorf("validate validates array type")
-	}
-
-	st := struct {
+	type St struct {
 		field int
-	}{
+	}
+	st := St{
 		field: 1,
 	}
 	if nil != Validate(st) {
@@ -214,10 +170,31 @@ func TestBasic(t *testing.T) {
 	if nil != Validate(&st) {
 		t.Errorf("validate does not validate struct pointer type")
 	}
+	if nil != Validate(map[int]St{
+		0: st,
+	}) {
+		t.Errorf("validate does not validate map of struct type")
+	}
+	if nil != Validate(map[St]int{
+		st: 0,
+	}) {
+		t.Errorf("validate does not validate map of struct type")
+	}
+	if nil != Validate([]St{
+		st,
+	}) {
+		t.Errorf("validate does not validate slice of struct type")
+	}
+	if nil != Validate([1]St{
+		st,
+	}) {
+		t.Errorf("validate does not validate slice of struct type")
+	}
 
-	stFail := struct {
+	type StFail struct {
 		field int `validate:"lte=0"`
-	}{
+	}
+	stFail := StFail{
 		field: 1,
 	}
 	if nil == Validate(stFail) {
@@ -226,14 +203,35 @@ func TestBasic(t *testing.T) {
 	if nil == Validate(&stFail) {
 		t.Errorf("validate does not validate struct pointer type")
 	}
+	if nil == Validate(map[int]StFail{
+		0: stFail,
+	}) {
+		t.Errorf("validate does not validate map of struct type")
+	}
+	if nil == Validate(map[StFail]int{
+		stFail: 0,
+	}) {
+		t.Errorf("validate does not validate map of struct type")
+	}
+	if nil == Validate([]StFail{
+		stFail,
+	}) {
+		t.Errorf("validate does not validate slice of struct type")
+	}
+	if nil == Validate([1]StFail{
+		stFail,
+	}) {
+		t.Errorf("validate does not validate slice of struct type")
+	}
 
-	stAnotherFail := struct {
+	type StAnotherFail struct {
 		a     int
 		b     int
 		field int `validate:"lte=0"`
 		c     int
 		d     int
-	}{
+	}
+	stAnotherFail := StAnotherFail{
 		field: 1,
 	}
 	if nil == Validate(stAnotherFail) {
@@ -241,6 +239,133 @@ func TestBasic(t *testing.T) {
 	}
 	if nil == Validate(&stAnotherFail) {
 		t.Errorf("validate does not validate struct pointer type")
+	}
+	if nil == Validate(map[int]StAnotherFail{
+		0: stAnotherFail,
+	}) {
+		t.Errorf("validate does not validate map of struct type")
+	}
+	if nil == Validate(map[StAnotherFail]int{
+		stAnotherFail: 0,
+	}) {
+		t.Errorf("validate does not validate map of struct type")
+	}
+	if nil == Validate([]StAnotherFail{
+		stAnotherFail,
+	}) {
+		t.Errorf("validate does not validate slice of struct type")
+	}
+	if nil == Validate([1]StAnotherFail{
+		stAnotherFail,
+	}) {
+		t.Errorf("validate does not validate slice of struct type")
+	}
+}
+
+type StCustomValidator struct {
+	field int
+}
+
+func (st StCustomValidator) Validate() error {
+	if st.field <= 0 {
+		return errors.New("field should be positive")
+	}
+
+	return nil
+}
+
+type IntCustomValidator int
+
+func (i IntCustomValidator) Validate() error {
+	if i <= 0 {
+		return errors.New("field should be positive")
+	}
+
+	return nil
+}
+
+func TestCustomValidator(t *testing.T) {
+	if nil != Validate(StCustomValidator{
+		field: 1,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(StCustomValidator{
+		field: 0,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil != Validate(&StCustomValidator{
+		field: 1,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(&StCustomValidator{
+		field: 0,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil != Validate(struct {
+		field StCustomValidator
+	}{
+		field: StCustomValidator{
+			field: 1,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(struct {
+		Field StCustomValidator
+	}{
+		Field: StCustomValidator{
+			field: 0,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil != Validate(struct {
+		Field *StCustomValidator
+	}{
+		Field: &StCustomValidator{
+			field: 1,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(struct {
+		Field *StCustomValidator
+	}{
+		Field: &StCustomValidator{
+			field: 0,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	one := IntCustomValidator(1)
+	zero := IntCustomValidator(0)
+
+	if nil != Validate(one) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(zero) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil != Validate(&one) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(&zero) {
+		t.Errorf("custom validator does not validate")
 	}
 }
 

@@ -119,7 +119,6 @@
 package validate
 
 import (
-	"errors"
 	"reflect"
 	"regexp"
 	"strings"
@@ -127,6 +126,15 @@ import (
 
 // MasterTag is the main validation tag.
 const MasterTag = "validate"
+
+// CustomValidator is an interface for a validated struct.
+type CustomValidator interface {
+
+	// Validate is a custom validation function.
+	// Validate does not work when the reciever is a reference.
+	// Validate does not work for nested types obtained from unexported field.
+	Validate() error
+}
 
 // Validate validates fields of a struct.
 // It accepts a struct or a struct pointer as a parameter.
@@ -142,40 +150,29 @@ const MasterTag = "validate"
 func Validate(element interface{}) error {
 	value := reflect.ValueOf(element)
 
-	if value.Kind() == reflect.Ptr {
-		if value.Elem().Kind() == reflect.Struct {
-			return validateStruct(value.Elem())
-		}
-	} else if value.Kind() == reflect.Struct {
-		return validateStruct(value)
-	}
-
-	return errors.New("not a struct or a struct pointer")
-}
-
-// validateStruct iterates over struct fields
-func validateStruct(value reflect.Value) error {
-	typ := value.Type()
-	for i := 0; i < typ.NumField(); i++ {
-		validators := getValidators(typ.Field(i).Tag)
-		fieldName := typ.Field(i).Name
-		if err := validateField(value.Field(i), fieldName, validators); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return validateField(value, "", "")
 }
 
 // validateField validates a struct field
 func validateField(value reflect.Value, fieldName string, validators string) error {
 	kind := value.Kind()
 
+	// Get validator type Map
 	validatorTypeMap := getValidatorTypeMap()
 
 	// Get validators
 	keyValidators, valueValidators, validators := splitValidators(validators)
 	validatorsOr := parseValidators(valueValidators)
+
+	// Call a custom validator
+	if value.CanInterface() {
+		if customValidator, ok := value.Interface().(CustomValidator); ok {
+			err := customValidator.Validate()
+			if err != nil {
+				return err
+			}
+		}
+	}
 
 	// Perform validators
 	var err error
@@ -221,6 +218,22 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 			if err := validateField(value.Elem(), fieldName, validators); err != nil {
 				return err
 			}
+		}
+	}
+
+	return nil
+}
+
+// validateStruct validates a struct
+func validateStruct(value reflect.Value) error {
+	typ := value.Type()
+
+	// Iterate over struct fields
+	for i := 0; i < typ.NumField(); i++ {
+		validators := getValidators(typ.Field(i).Tag)
+		fieldName := typ.Field(i).Name
+		if err := validateField(value.Field(i), fieldName, validators); err != nil {
+			return err
 		}
 	}
 
