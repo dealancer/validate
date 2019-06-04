@@ -427,6 +427,695 @@ func TestFormatVal(t *testing.T) {
 		t.Errorf("empty one_of validate should not validate")
 	}
 }
+
+func TestGtValForDuration(t *testing.T) {
+	if nil == Validate(struct {
+		field time.Duration `validate:"gt=0s"`
+	}{
+		field: -time.Second,
+	}) {
+		t.Errorf("gt validator does not validate for time.Duratuon")
+	}
+
+	if nil == Validate(struct {
+		field time.Duration `validate:"gt=-1s"`
+	}{
+		field: -time.Minute,
+	}) {
+		t.Errorf("gt validator does not validate for time.Duratuon")
+	}
+
+	if nil == Validate(struct {
+		field time.Duration `validate:"gt=0s"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("gt validator does not validate for time.Duratuon")
+	}
+
+	if nil != Validate(struct {
+		field time.Duration `validate:"gt=-1s"`
+	}{
+		field: -time.Millisecond,
+	}) {
+		t.Errorf("gt validator does not validate for time.Duratuon")
+	}
+}
+
+func TestLtValForDuration(t *testing.T) {
+	if nil == Validate(struct {
+		field time.Duration `validate:"lt=0s"`
+	}{
+		field: time.Second,
+	}) {
+		t.Errorf("lt validator does not validate for time.Duratuon")
+	}
+
+	if nil == Validate(struct {
+		field time.Duration `validate:"lt=1s"`
+	}{
+		field: time.Minute,
+	}) {
+		t.Errorf("lt validator does not validate for time.Duratuon")
+	}
+
+	if nil == Validate(struct {
+		field time.Duration `validate:"lt=0s"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for time.Duratuon")
+	}
+
+	if nil != Validate(struct {
+		field time.Duration `validate:"lt=1s"`
+	}{
+		field: time.Millisecond,
+	}) {
+		t.Errorf("lt validator does not validate for time.Duratuon")
+	}
+}
+
+func TestGtValForInt(t *testing.T) {
+	if nil == Validate(struct {
+		field int `validate:"gt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("gt validator does not validate for int")
+	}
+
+	if nil == Validate(struct {
+		field int8 `validate:"gt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("gt validator does not validate for int8")
+	}
+
+	if nil == Validate(struct {
+		field int16 `validate:"gt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("gt validator does not validate for int16")
+	}
+
+	if nil == Validate(struct {
+		field int32 `validate:"gt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("gt validator does not validate for int32")
+	}
+
+	if nil == Validate(struct {
+		field int64 `validate:"gt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("gt validator does not validate for int64")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:"gt=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("gt validator does not validate for int")
+	}
+
+	if nil != Validate(struct {
+		field int8 `validate:"gt=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("gt validator does not validate for int8")
+	}
+
+	if nil != Validate(struct {
+		field int16 `validate:"gt=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("gt validator does not validate for int16")
+	}
+
+	if nil != Validate(struct {
+		field int32 `validate:"gt=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("gt validator does not validate for int32")
+	}
+
+	if nil != Validate(struct {
+		field int64 `validate:"gt=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("gt validator does not validate for int64")
+	}
+}
+
+func TestLtValForInt(t *testing.T) {
+	if nil == Validate(struct {
+		field int `validate:"lt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for int")
+	}
+
+	if nil == Validate(struct {
+		field int8 `validate:"lt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for int8")
+	}
+
+	if nil == Validate(struct {
+		field int16 `validate:"lt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for int16")
+	}
+
+	if nil == Validate(struct {
+		field int32 `validate:"lt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for int32")
+	}
+
+	if nil == Validate(struct {
+		field int64 `validate:"lt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for int64")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:"lt=0"`
+	}{
+		field: -1,
+	}) {
+		t.Errorf("lt validator does not validate for int")
+	}
+
+	if nil != Validate(struct {
+		field int8 `validate:"lt=0"`
+	}{
+		field: -1,
+	}) {
+		t.Errorf("lt validator does not validate for int8")
+	}
+
+	if nil != Validate(struct {
+		field int16 `validate:"lt=0"`
+	}{
+		field: -1,
+	}) {
+		t.Errorf("lt validator does not validate for int16")
+	}
+
+	if nil != Validate(struct {
+		field int32 `validate:"lt=0"`
+	}{
+		field: -1,
+	}) {
+		t.Errorf("lt validator does not validate for int32")
+	}
+
+	if nil != Validate(struct {
+		field int64 `validate:"lt=0"`
+	}{
+		field: -1,
+	}) {
+		t.Errorf("lt validator does not validate for int64")
+	}
+}
+
+func TestGtValForRune(t *testing.T) {
+	if nil == Validate(struct {
+		field rune `validate:"gt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("gt validator does not validate for rune")
+	}
+
+	if nil != Validate(struct {
+		field rune `validate:"gt=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("gt validator does not validate for rune")
+	}
+}
+
+func TestLtValForRune(t *testing.T) {
+	if nil == Validate(struct {
+		field rune `validate:"lt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for rune")
+	}
+
+	if nil != Validate(struct {
+		field rune `validate:"lt=0"`
+	}{
+		field: -1,
+	}) {
+		t.Errorf("lt validator does not validate for rune")
+	}
+}
+
+func TestGtValForUint(t *testing.T) {
+	if nil == Validate(struct {
+		field uint `validate:"gt=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("gt validator does not validate for uint")
+	}
+
+	if nil == Validate(struct {
+		field uint8 `validate:"gt=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("gt validator does not validate for uint8")
+	}
+
+	if nil == Validate(struct {
+		field uint16 `validate:"gt=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("gt validator does not validate for uint16")
+	}
+
+	if nil == Validate(struct {
+		field uint32 `validate:"gt=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("gt validator does not validate for uint32")
+	}
+
+	if nil == Validate(struct {
+		field uint64 `validate:"gt=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("gt validator does not validate for uint64")
+	}
+
+	if nil == Validate(struct {
+		field uintptr `validate:"gt=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("gt validator does not validate for uintptr")
+	}
+
+	if nil != Validate(struct {
+		field uint `validate:"gt=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("gt validator does not validate for uint")
+	}
+
+	if nil != Validate(struct {
+		field uint8 `validate:"gt=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("gt validator does not validate for uint8")
+	}
+
+	if nil != Validate(struct {
+		field uint16 `validate:"gt=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("gt validator does not validate for uint16")
+	}
+
+	if nil != Validate(struct {
+		field uint32 `validate:"gt=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("gt validator does not validate for uint32")
+	}
+
+	if nil != Validate(struct {
+		field uint64 `validate:"gt=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("gt validator does not validate for uint64")
+	}
+
+	if nil != Validate(struct {
+		field uintptr `validate:"gt=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("gt validator does not validate for uintptr")
+	}
+}
+
+func TestLtValForUint(t *testing.T) {
+	if nil == Validate(struct {
+		field uint `validate:"lt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for uint")
+	}
+
+	if nil == Validate(struct {
+		field uint8 `validate:"lt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for uint8")
+	}
+
+	if nil == Validate(struct {
+		field uint16 `validate:"lt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for uint16")
+	}
+
+	if nil == Validate(struct {
+		field uint32 `validate:"lt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for uint32")
+	}
+
+	if nil == Validate(struct {
+		field uint64 `validate:"lt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for uint64")
+	}
+
+	if nil == Validate(struct {
+		field uintptr `validate:"lt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for uintptr")
+	}
+
+	if nil != Validate(struct {
+		field uint `validate:"lt=1"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for uint")
+	}
+
+	if nil != Validate(struct {
+		field uint8 `validate:"lt=1"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for uint8")
+	}
+
+	if nil != Validate(struct {
+		field uint16 `validate:"lt=1"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for uint16")
+	}
+
+	if nil != Validate(struct {
+		field uint32 `validate:"lt=1"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for uint32")
+	}
+
+	if nil != Validate(struct {
+		field uint64 `validate:"lt=1"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for uint64")
+	}
+
+	if nil != Validate(struct {
+		field uint64 `validate:"lt=1"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for uintptr")
+	}
+}
+
+func TestGtValForFloat(t *testing.T) {
+	if nil == Validate(struct {
+		field float32 `validate:"gt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("gt validator does not validate for flaot32")
+	}
+
+	if nil == Validate(struct {
+		field float64 `validate:"gt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("gt validator does not validate for flaot64")
+	}
+
+	if nil != Validate(struct {
+		field float32 `validate:"gt=0"`
+	}{
+		field: 0.1,
+	}) {
+		t.Errorf("gt validator does not validate for flaot32")
+	}
+
+	if nil != Validate(struct {
+		field float64 `validate:"gt=0"`
+	}{
+		field: 0.1,
+	}) {
+		t.Errorf("gt validator does not validate for flaot64")
+	}
+}
+
+func TestLtValForFloat(t *testing.T) {
+	if nil == Validate(struct {
+		field float32 `validate:"lt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for flaot32")
+	}
+
+	if nil == Validate(struct {
+		field float64 `validate:"lt=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for flaot64")
+	}
+
+	if nil != Validate(struct {
+		field float32 `validate:"lt=0"`
+	}{
+		field: -0.1,
+	}) {
+		t.Errorf("lt validator does not validate for flaot32")
+	}
+
+	if nil != Validate(struct {
+		field float64 `validate:"lt=0"`
+	}{
+		field: -0.1,
+	}) {
+		t.Errorf("lt validator does not validate for flaot64")
+	}
+}
+
+func TestGtValForString(t *testing.T) {
+	if nil == Validate(struct {
+		field string `validate:"gt=2"`
+	}{
+		field: "aa",
+	}) {
+		t.Errorf("gt validator does not validate for string")
+	}
+
+	if nil != Validate(struct {
+		field string `validate:"gt=2"`
+	}{
+		field: "abc",
+	}) {
+		t.Errorf("gt validator does not validate for string")
+	}
+}
+
+func TestLtValForString(t *testing.T) {
+	if nil == Validate(struct {
+		field string `validate:"lt=2"`
+	}{
+		field: "ab",
+	}) {
+		t.Errorf("lt validator does not validate for string")
+	}
+
+	if nil != Validate(struct {
+		field string `validate:"lt=2"`
+	}{
+		field: "a",
+	}) {
+		t.Errorf("lt validator does not validate for string")
+	}
+}
+
+func TestGtValForMap(t *testing.T) {
+	if nil == Validate(struct {
+		field map[string]string `validate:"gt=2"`
+	}{
+		field: map[string]string{
+			"a": "a",
+			"b": "b",
+		},
+	}) {
+		t.Errorf("gt validator does not validate for map")
+	}
+
+	if nil != Validate(struct {
+		field map[string]string `validate:"gt=2"`
+	}{
+		field: map[string]string{
+			"a": "a",
+			"b": "b",
+			"c": "c",
+		},
+	}) {
+		t.Errorf("gt validator does not validate for map")
+	}
+}
+
+func TestLtForMap(t *testing.T) {
+	if nil == Validate(struct {
+		field map[string]string `validate:"lt=2"`
+	}{
+		field: map[string]string{
+			"a": "a",
+			"b": "b",
+		},
+	}) {
+		t.Errorf("lt validator does not validate for map")
+	}
+
+	if nil != Validate(struct {
+		field map[string]string `validate:"lt=2"`
+	}{
+		field: map[string]string{
+			"a": "a",
+		},
+	}) {
+		t.Errorf("lt validator does not validate for map")
+	}
+}
+
+func TestGtValForSlice(t *testing.T) {
+	if nil == Validate(struct {
+		field []string `validate:"gt=2"`
+	}{
+		field: []string{"a", "b"},
+	}) {
+		t.Errorf("gt validator does not validate for slice")
+	}
+
+	if nil != Validate(struct {
+		field []string `validate:"gt=2"`
+	}{
+		field: []string{"a", "b", "c"},
+	}) {
+		t.Errorf("gt validator does not validate for slice")
+	}
+}
+
+func TestLtValForSlice(t *testing.T) {
+	if nil == Validate(struct {
+		field []string `validate:"lt=2"`
+	}{
+		field: []string{"a", "b"},
+	}) {
+		t.Errorf("gt validator does not validate for slice")
+	}
+
+	if nil != Validate(struct {
+		field []string `validate:"lt=2"`
+	}{
+		field: []string{"a"},
+	}) {
+		t.Errorf("gt validator does not validate for slice")
+	}
+}
+
+func TestGtValForArray(t *testing.T) {
+	if nil == Validate(struct {
+		field [2]string `validate:"gt=2"`
+	}{
+		field: [2]string{"a", "b"},
+	}) {
+		t.Errorf("gt validator does not validate for string")
+	}
+
+	if nil != Validate(struct {
+		field [3]string `validate:"gt=2"`
+	}{
+		field: [3]string{"a", "b", "c"},
+	}) {
+		t.Errorf("gt validator does not validate for string")
+	}
+}
+
+func TestLtValForArray(t *testing.T) {
+	if nil == Validate(struct {
+		field [2]string `validate:"lt=2"`
+	}{
+		field: [2]string{"a", "b"},
+	}) {
+		t.Errorf("gt validator does not validate for array")
+	}
+
+	if nil != Validate(struct {
+		field [1]string `validate:"lt=2"`
+	}{
+		field: [1]string{"a"},
+	}) {
+		t.Errorf("gt validator does not validate for array")
+	}
+}
+
 func TestGteValForDuration(t *testing.T) {
 	if nil == Validate(struct {
 		field time.Duration `validate:"gte=0s"`
@@ -1114,6 +1803,7 @@ func TestLteValForArray(t *testing.T) {
 		t.Errorf("gte validator does not validate for array")
 	}
 }
+
 func TestEmptyValForString(t *testing.T) {
 	if nil == Validate(struct {
 		field string `validate:"empty=true"`
