@@ -38,8 +38,10 @@ This package supports a wide variety of types.
 
 This package provides the following validators.
 
-* `gte` (greater than or equal) validator compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
-* `lte` (less than or equal) validators compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
+* `gt` (greater than) validator compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
+* `lt` (less than) validators compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
+* `gte` (greater than or equal to) validator compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
+* `lte` (less than or equal to) validators compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
 * `empty` validator checks if a string, a map, a slice, or an array is (not) empty.
 * `nil` validator checks if a pointer is (not) nil.
 * `one_of` validator checks if a number or a string contains any of the given elements.

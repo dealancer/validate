@@ -8,7 +8,7 @@
 // uint32, int64, uint64, int, uint, uintptr, float32, float64 and aliased types:
 // time.Duration, byte (uint8), rune (int32).
 //
-// Following validators are available: gte, lte, empty, nil, one_of, format.
+// Following validators are available: gt, lt, gte, lte, empty, nil, one_of, format.
 //
 // Basic usage
 //

@@ -13,11 +13,19 @@ type ValidatorType string
 
 // Following validators are available.
 const (
-	// ValidatorGte compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
+	// ValidatorGt (greater than) compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
+	// E.g. `validate:"gte=0"`
+	ValidatorGt ValidatorType = "gt"
+
+	// ValidatorLt (less than) compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
+	// E.g. `validate:"lte=10"`
+	ValidatorLt ValidatorType = "lt"
+
+	// ValidatorGte (greater than or equal to) compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
 	// E.g. `validate:"gte=0"`
 	ValidatorGte ValidatorType = "gte"
 
-	// ValidatorLte compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
+	// ValidatorLte (less than or equal to) compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
 	// E.g. `validate:"lte=10"`
 	ValidatorLte ValidatorType = "lte"
 
@@ -43,6 +51,8 @@ type validatorFunc func(value reflect.Value, name string, validator string) erro
 
 func getValidatorTypeMap() map[ValidatorType]validatorFunc {
 	return map[ValidatorType]validatorFunc{
+		ValidatorGt:     validateGt,
+		ValidatorLt:     validateLt,
 		ValidatorGte:    validateGte,
 		ValidatorLte:    validateLte,
 		ValidatorEmpty:  validateEmpty,
@@ -57,6 +67,78 @@ type validator struct {
 	Value string
 }
 
+func validateGt(value reflect.Value, name string, validator string) error {
+	kind := value.Kind()
+	typ := value.Type()
+
+	switch kind {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		if typ == reflect.TypeOf((time.Duration)(0)) {
+			if token, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) <= token {
+				return errors.New(fmt.Sprint(name, " must be greater than ", token))
+			}
+		} else {
+			if token, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() <= token {
+				return errors.New(fmt.Sprint(name, " must be greater than ", token))
+			}
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		if token, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() <= token {
+			return errors.New(fmt.Sprint(name, " must be greater than ", token))
+		}
+	case reflect.Float32, reflect.Float64:
+		if token, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() <= token {
+			return errors.New(fmt.Sprint(name, " must be greater than ", token))
+		}
+	case reflect.String:
+		if token, err := strconv.Atoi(validator); err == nil && value.Len() <= token {
+			return errors.New(fmt.Sprint(name, " must contain greater than ", token, " characters"))
+		}
+	case reflect.Map, reflect.Slice, reflect.Array:
+		if token, err := strconv.Atoi(validator); err == nil && value.Len() <= token {
+			return errors.New(fmt.Sprint(name, " must contain greater than ", token, " elements"))
+		}
+	}
+
+	return nil
+}
+
+func validateLt(value reflect.Value, name string, validator string) error {
+	kind := value.Kind()
+	typ := value.Type()
+
+	switch kind {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		if typ == reflect.TypeOf((time.Duration)(0)) {
+			if token, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) >= token {
+				return errors.New(fmt.Sprint(name, " must be less than ", token))
+			}
+		} else {
+			if token, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() >= token {
+				return errors.New(fmt.Sprint(name, " must be less than ", token))
+			}
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		if token, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() >= token {
+			return errors.New(fmt.Sprint(name, " must be less than ", token))
+		}
+	case reflect.Float32, reflect.Float64:
+		if token, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() >= token {
+			return errors.New(fmt.Sprint(name, " must be less than ", token))
+		}
+	case reflect.String:
+		if token, err := strconv.Atoi(validator); err == nil && value.Len() >= token {
+			return errors.New(fmt.Sprint(name, " must contain less than ", token, " characters"))
+		}
+	case reflect.Map, reflect.Slice, reflect.Array:
+		if token, err := strconv.Atoi(validator); err == nil && value.Len() >= token {
+			return errors.New(fmt.Sprint(name, " must contain less than ", token, " elements"))
+		}
+	}
+
+	return nil
+}
+
 func validateGte(value reflect.Value, name string, validator string) error {
 	kind := value.Kind()
 	typ := value.Type()
@@ -64,29 +146,29 @@ func validateGte(value reflect.Value, name string, validator string) error {
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if typ == reflect.TypeOf((time.Duration)(0)) {
-			if gte, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) < gte {
-				return errors.New(fmt.Sprint(name, " must not be less than ", gte))
+			if token, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) < token {
+				return errors.New(fmt.Sprint(name, " must be greater than or equal to ", token))
 			}
 		} else {
-			if gte, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() < gte {
-				return errors.New(fmt.Sprint(name, " must not be less than ", gte))
+			if token, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() < token {
+				return errors.New(fmt.Sprint(name, " must be greater than or equal to ", token))
 			}
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		if gte, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() < gte {
-			return errors.New(fmt.Sprint(name, " must not be less than ", gte))
+		if token, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() < token {
+			return errors.New(fmt.Sprint(name, " must be greater than or equal to ", token))
 		}
 	case reflect.Float32, reflect.Float64:
-		if gte, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() < gte {
-			return errors.New(fmt.Sprint(name, " must not be less than ", gte))
+		if token, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() < token {
+			return errors.New(fmt.Sprint(name, " must be greater than or equal to ", token))
 		}
 	case reflect.String:
-		if gte, err := strconv.Atoi(validator); err == nil && value.Len() < gte {
-			return errors.New(fmt.Sprint(name, " must not contain less than ", gte, " characters"))
+		if token, err := strconv.Atoi(validator); err == nil && value.Len() < token {
+			return errors.New(fmt.Sprint(name, " must contain greater than or equal to ", token, " characters"))
 		}
 	case reflect.Map, reflect.Slice, reflect.Array:
-		if gte, err := strconv.Atoi(validator); err == nil && value.Len() < gte {
-			return errors.New(fmt.Sprint(name, " must not contain less than ", gte, " elements"))
+		if token, err := strconv.Atoi(validator); err == nil && value.Len() < token {
+			return errors.New(fmt.Sprint(name, " must contain greater than or equal to ", token, " elements"))
 		}
 	}
 
@@ -100,29 +182,29 @@ func validateLte(value reflect.Value, name string, validator string) error {
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if typ == reflect.TypeOf((time.Duration)(0)) {
-			if lte, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) > lte {
-				return errors.New(fmt.Sprint(name, " must not be greater than ", lte))
+			if token, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) > token {
+				return errors.New(fmt.Sprint(name, " must be less than or equal to ", token))
 			}
 		} else {
-			if lte, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() > lte {
-				return errors.New(fmt.Sprint(name, " must not be greater than ", lte))
+			if token, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() > token {
+				return errors.New(fmt.Sprint(name, " must be less than or equal to ", token))
 			}
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		if lte, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() > lte {
-			return errors.New(fmt.Sprint(name, " must not be greater than ", lte))
+		if token, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() > token {
+			return errors.New(fmt.Sprint(name, " must be less than or equal to ", token))
 		}
 	case reflect.Float32, reflect.Float64:
-		if lte, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() > lte {
-			return errors.New(fmt.Sprint(name, " must not be greater than ", lte))
+		if token, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() > token {
+			return errors.New(fmt.Sprint(name, " must be less than or equal to ", token))
 		}
 	case reflect.String:
-		if lte, err := strconv.Atoi(validator); err == nil && value.Len() > lte {
-			return errors.New(fmt.Sprint(name, " must not contain more than ", lte, " characters"))
+		if token, err := strconv.Atoi(validator); err == nil && value.Len() > token {
+			return errors.New(fmt.Sprint(name, " must contain less than or equal to ", token, " characters"))
 		}
 	case reflect.Map, reflect.Slice, reflect.Array:
-		if lte, err := strconv.Atoi(validator); err == nil && value.Len() > lte {
-			return errors.New(fmt.Sprint(name, " must not contain more than ", lte, " elements"))
+		if token, err := strconv.Atoi(validator); err == nil && value.Len() > token {
+			return errors.New(fmt.Sprint(name, " must contain less than or equal to ", token, " elements"))
 		}
 	}
 
