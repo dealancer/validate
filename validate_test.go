@@ -41,31 +41,93 @@ func TestSplitValidators(t *testing.T) {
 }
 
 func TestParseValidators(t *testing.T) {
-	var valMap map[ValidatorType]string
+	var validatorsAnd [][]validator
 
-	valMap = parseValidators(";,;,;")
-	if !reflect.DeepEqual(valMap, map[ValidatorType]string{}) {
+	validatorsAnd = parseValidators("")
+	temp := make([][]validator, 0)
+	if !reflect.DeepEqual(validatorsAnd, temp) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
-	valMap = parseValidators("")
-	if !reflect.DeepEqual(valMap, map[ValidatorType]string{}) {
+	validatorsAnd = parseValidators(";|;,;")
+	if !reflect.DeepEqual(validatorsAnd, temp) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
-	valMap = parseValidators("val_a=a")
-	if !reflect.DeepEqual(valMap, map[ValidatorType]string{
-		"val_a": "a",
+	validatorsAnd = parseValidators("val_a=a")
+	if !reflect.DeepEqual(validatorsAnd, [][]validator{
+		[]validator{
+			validator{
+				ValidatorType("val_a"),
+				"a",
+			},
+		},
 	}) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
-	valMap = parseValidators(" val  ;val_a=a;val_1 = 1  ;  val_b = b , c_d_ , 1.0 ")
-	if !reflect.DeepEqual(valMap, map[ValidatorType]string{
-		"val":   "",
-		"val_a": "a",
-		"val_1": "1",
-		"val_b": "b , c_d_ , 1.0",
+	validatorsAnd = parseValidators("  val  ;val_a=a;val_1 = 1  ;  val_b = b , c_d_ , 1.0  ;VAL = V A L U E ¶  ")
+	if !reflect.DeepEqual(validatorsAnd, [][]validator{
+		[]validator{
+			validator{
+				ValidatorType("val"),
+				"",
+			},
+		},
+		[]validator{
+			validator{
+				ValidatorType("val_a"),
+				"a",
+			},
+		},
+		[]validator{
+			validator{
+				ValidatorType("val_1"),
+				"1",
+			},
+		},
+		[]validator{
+			validator{
+				ValidatorType("val_b"),
+				"b , c_d_ , 1.0",
+			},
+		},
+		[]validator{
+			validator{
+				ValidatorType("VAL"),
+				"V A L U E ¶",
+			},
+		},
+	}) {
+		t.Errorf("parseValidators incorrectly parses validators")
+	}
+
+	validatorsAnd = parseValidators("  val  |val_a=a;val_1 = 1  |  val_b = b , c_d_ , 1.0  |VAL = V A L U E ¶  ")
+	if !reflect.DeepEqual(validatorsAnd, [][]validator{
+		[]validator{
+			validator{
+				ValidatorType("val"),
+				"",
+			},
+			validator{
+				ValidatorType("val_a"),
+				"a",
+			},
+		},
+		[]validator{
+			validator{
+				ValidatorType("val_1"),
+				"1",
+			},
+			validator{
+				ValidatorType("val_b"),
+				"b , c_d_ , 1.0",
+			},
+			validator{
+				ValidatorType("VAL"),
+				"V A L U E ¶",
+			},
+		},
 	}) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
@@ -182,13 +244,13 @@ func TestBasic(t *testing.T) {
 	}
 }
 
-func TestMultiVal(t *testing.T) {
+func TestAndVal(t *testing.T) {
 	if nil == Validate(struct {
 		field int `validate:"min=0;max=10"`
 	}{
 		field: -1,
 	}) {
-		t.Errorf("multiple validators does not validate")
+		t.Errorf("and validators does not validate")
 	}
 
 	if nil == Validate(struct {
@@ -196,7 +258,7 @@ func TestMultiVal(t *testing.T) {
 	}{
 		field: 11,
 	}) {
-		t.Errorf("multiple validators does not validate")
+		t.Errorf("and validators does not validate")
 	}
 
 	if nil != Validate(struct {
@@ -204,13 +266,63 @@ func TestMultiVal(t *testing.T) {
 	}{
 		field: 5,
 	}) {
-		t.Errorf("multiple validators does not validate")
+		t.Errorf("and validators does not validate")
 	}
 
 	if nil == Validate(struct {
 		field int `validate:"min=1;max=-1"`
 	}{
 		field: 0,
+	}) {
+		t.Errorf("and validators does not validate")
+	}
+}
+
+func TestOrVal(t *testing.T) {
+	if nil == Validate(struct {
+		field int `validate:"max=0|min=10"`
+	}{
+		field: 5,
+	}) {
+		t.Errorf("multiple validators does not validate")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:"max=0|min=10"`
+	}{
+		field: -1,
+	}) {
+		t.Errorf("multiple validators does not validate")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:"max=0|min=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("multiple validators does not validate")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:"min=0|max=10"`
+	}{
+		field: 5,
+	}) {
+		t.Errorf("multiple validators does not validate")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:"min=0|max=10"`
+	}{
+		field: -1,
+	}) {
+		t.Errorf("multiple validators does not validate")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:"min=0|max=10"`
+	}{
+		field: 11,
 	}) {
 		t.Errorf("multiple validators does not validate")
 	}

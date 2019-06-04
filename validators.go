@@ -52,6 +52,11 @@ func getValidatorTypeMap() map[ValidatorType]validatorFunc {
 	}
 }
 
+type validator struct {
+	Type  ValidatorType
+	Value string
+}
+
 func validateMin(value reflect.Value, name string, validator string) error {
 	kind := value.Kind()
 	typ := value.Type()

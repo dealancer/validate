@@ -168,17 +168,27 @@ func validateStruct(value reflect.Value) error {
 func validateField(value reflect.Value, fieldName string, validators string) error {
 	kind := value.Kind()
 
+	validatorTypeMap := getValidatorTypeMap()
+
 	// Get validators
 	keyValidators, valueValidators, validators := splitValidators(validators)
-	valueValidatorMap := parseValidators(valueValidators)
+	validatorsAnd := parseValidators(valueValidators)
 
 	// Perform validators
-	validatorTypeMap := getValidatorTypeMap()
-	for validatorType, validator := range valueValidatorMap {
-		if validatorFunc, ok := validatorTypeMap[validatorType]; ok {
-			if err := validatorFunc(value, fieldName, validator); err != nil {
-				return err
+	for _, validatorsOr := range validatorsAnd {
+		var validates bool
+		var lastErr error
+		for _, validator := range validatorsOr {
+			if validatorFunc, ok := validatorTypeMap[validator.Type]; ok {
+				if err := validatorFunc(value, fieldName, validator.Value); err == nil {
+					validates = true
+				} else {
+					lastErr = err
+				}
 			}
+		}
+		if !validates {
+			return lastErr
 		}
 	}
 
@@ -265,24 +275,36 @@ loop:
 	return
 }
 
-// parseValidators parses validators into the hash map
-func parseValidators(validators string) (validatorMap map[ValidatorType]string) {
-	validatorMap = make(map[ValidatorType]string)
+// parseValidator2 parses validators into the slice of slices.
+// First slice acts as AND logic, second array acts as OR logic.
+func parseValidators(validators string) (validatorsAnd [][]validator) {
+	regexpType := regexp.MustCompile(`[[:alnum:]_]+`)
+	regexpValue := regexp.MustCompile(`[^;|=\s]+[^;|=]*[^;|=\s]+|[^;|=\s]+`)
 
-	r := regexp.MustCompile(`([[:alnum:]_\s]+)=?([^=;]*);?`)
-
-	entries := r.FindAllStringSubmatch(validators, -1)
-
-	for _, e := range entries {
-		n := strings.TrimSpace(e[1])
-		v := strings.TrimSpace(e[2])
-
-		if n != "" {
-			validatorMap[ValidatorType(n)] = v
+	entriesAnd := strings.Split(validators, ";")
+	validatorsAnd = make([][]validator, 0, len(entriesAnd))
+	for _, entryAnd := range entriesAnd {
+		entriesOr := strings.Split(entryAnd, "|")
+		validatorsOr := make([]validator, 0, len(entriesOr))
+		for _, entryOr := range entriesOr {
+			entries := strings.Split(entryOr, "=")
+			if len(entries) > 0 {
+				t := regexpType.FindString(entries[0])
+				v := ""
+				if len(entries) == 2 {
+					v = regexpValue.FindString(entries[1])
+				}
+				if len(t) > 0 {
+					validatorsOr = append(validatorsOr, validator{ValidatorType(t), v})
+				}
+			}
+		}
+		if len(validatorsOr) > 0 {
+			validatorsAnd = append(validatorsAnd, validatorsOr)
 		}
 	}
 
-	return validatorMap
+	return
 }
 
 // parseTokens parses tokens into array
