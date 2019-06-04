@@ -31,10 +31,13 @@
 //
 // Multiple validators
 //
-// It is possible to specify multiple validators using a semicolon character.
+// It is possible to specify multiple validators using & (ampersand) or | (vertical bar) operator.
+// & operator is used for logical AND, while | is used for logical OR.
+// & operator has a priority over | operator.
 //
 //  type S struct {
-//  	field int `validate:"gte=0 & lte=10"`
+//      // Check that the value is in the range of -20...-10 or 10...20
+//  	field int `validate:"gte=-20 & lte=-10 | gte=10 & lte=20"`
 //  }
 //
 // Slice and array validation
