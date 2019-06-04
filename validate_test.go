@@ -263,7 +263,8 @@ func TestBasic(t *testing.T) {
 }
 
 type StCustomValidator struct {
-	field int
+	field        int
+	anotherField int `validate:"eq=0"`
 }
 
 func (st StCustomValidator) Validate() error {
@@ -305,6 +306,34 @@ func TestCustomValidator(t *testing.T) {
 
 	if nil == Validate(&StCustomValidator{
 		field: 0,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(StCustomValidator{
+		field:        1,
+		anotherField: 1,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(StCustomValidator{
+		field:        1,
+		anotherField: 1,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(&StCustomValidator{
+		field:        1,
+		anotherField: 1,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(&StCustomValidator{
+		field:        1,
+		anotherField: 1,
 	}) {
 		t.Errorf("custom validator does not validate")
 	}
