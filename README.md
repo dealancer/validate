@@ -53,7 +53,7 @@ Following operators are used. There are listed in the descending order of their 
 * `&` (ampersand) is used to perform multiple validators using AND logic.
 * `|` (vertical bar) is used to perform multiple validators using OR logic.
 * `=` (equal sign) is used to separate validator type from value.
-* `,` (commna) is used to specify multiple tokens for a validator (e.g. `one_of`).
+* `,` (comma) is used to specify multiple tokens for a validator (e.g. `one_of`).
 
 ## Installation
 
