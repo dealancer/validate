@@ -38,6 +38,8 @@ This package supports a wide variety of types.
 
 This package provides the following validators.
 
+* `eq` (equals) validator compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
+* `ne` (not equals) validators compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
 * `gt` (greater than) validator compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
 * `lt` (less than) validators compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
 * `gte` (greater than or equal to) validator compare a numeric value of a number or compare a count of elements in a string, a map, a slice, or an array.
@@ -91,8 +93,8 @@ type Connection struct {
     // SslVerify (pointer) should not be nil
     SslVerify *bool `validate:"nil=false"`
 
-    // Version should be between 5 and 8
-    Version int `validate:"gte=5 & lte=8"`
+    // Version should be between 5 and 8, or 9
+    Version int `validate:"gte=5 & lte=8 | eq=9"`
 }
 
 type Connections struct {
@@ -104,7 +106,7 @@ type Connections struct {
 connections := Connections{
 	Connections: []Connection{
 		Connection{
-			Username: "adgte",
+			Username: "admin",
 		},
 	},
 }

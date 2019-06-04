@@ -428,6 +428,664 @@ func TestFormatVal(t *testing.T) {
 	}
 }
 
+func TestEqValForDuration(t *testing.T) {
+	if nil == Validate(struct {
+		field time.Duration `validate:"eq=0s"`
+	}{
+		field: -time.Second,
+	}) {
+		t.Errorf("eq validator does not validate for time.Duratuon")
+	}
+
+	if nil != Validate(struct {
+		field time.Duration `validate:"eq=0s"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("eq validator does not validate for time.Duratuon")
+	}
+}
+
+func TestEqValForInt(t *testing.T) {
+	if nil != Validate(struct {
+		field int `validate:"eq=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("eq validator does not validate for int")
+	}
+
+	if nil != Validate(struct {
+		field int8 `validate:"eq=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("eq validator does not validate for int8")
+	}
+
+	if nil != Validate(struct {
+		field int16 `validate:"eq=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("eq validator does not validate for int16")
+	}
+
+	if nil != Validate(struct {
+		field int32 `validate:"eq=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("eq validator does not validate for int32")
+	}
+
+	if nil != Validate(struct {
+		field int64 `validate:"eq=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("eq validator does not validate for int64")
+	}
+
+	if nil == Validate(struct {
+		field int `validate:"eq=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("eq validator does not validate for int")
+	}
+
+	if nil == Validate(struct {
+		field int8 `validate:"eq=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("eq validator does not validate for int8")
+	}
+
+	if nil == Validate(struct {
+		field int16 `validate:"eq=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("eq validator does not validate for int16")
+	}
+
+	if nil == Validate(struct {
+		field int32 `validate:"eq=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("eq validator does not validate for int32")
+	}
+
+	if nil == Validate(struct {
+		field int64 `validate:"eq=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("eq validator does not validate for int64")
+	}
+}
+
+func TestEqValForRune(t *testing.T) {
+	if nil != Validate(struct {
+		field rune `validate:"eq=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("eq validator does not validate for rune")
+	}
+
+	if nil == Validate(struct {
+		field rune `validate:"eq=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("eq validator does not validate for rune")
+	}
+}
+
+func TestEqValForUint(t *testing.T) {
+	if nil != Validate(struct {
+		field uint `validate:"eq=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("eq validator does not validate for uint")
+	}
+
+	if nil != Validate(struct {
+		field uint8 `validate:"eq=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("eq validator does not validate for uint8")
+	}
+
+	if nil != Validate(struct {
+		field uint16 `validate:"eq=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("eq validator does not validate for uint16")
+	}
+
+	if nil != Validate(struct {
+		field uint32 `validate:"eq=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("eq validator does not validate for uint32")
+	}
+
+	if nil != Validate(struct {
+		field uint64 `validate:"eq=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("eq validator does not validate for uint64")
+	}
+
+	if nil != Validate(struct {
+		field uintptr `validate:"eq=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("eq validator does not validate for uintptr")
+	}
+
+	if nil == Validate(struct {
+		field uint `validate:"eq=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("eq validator does not validate for uint")
+	}
+
+	if nil == Validate(struct {
+		field uint8 `validate:"eq=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("eq validator does not validate for uint8")
+	}
+
+	if nil == Validate(struct {
+		field uint16 `validate:"eq=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("eq validator does not validate for uint16")
+	}
+
+	if nil == Validate(struct {
+		field uint32 `validate:"eq=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("eq validator does not validate for uint32")
+	}
+
+	if nil == Validate(struct {
+		field uint64 `validate:"eq=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("eq validator does not validate for uint64")
+	}
+
+	if nil == Validate(struct {
+		field uintptr `validate:"eq=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("eq validator does not validate for uintptr")
+	}
+}
+
+func TestEqValForFloat(t *testing.T) {
+	if nil != Validate(struct {
+		field float32 `validate:"eq=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("eq validator does not validate for flaot32")
+	}
+
+	if nil != Validate(struct {
+		field float64 `validate:"eq=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("eq validator does not validate for flaot64")
+	}
+
+	if nil == Validate(struct {
+		field float32 `validate:"eq=0"`
+	}{
+		field: 0.1,
+	}) {
+		t.Errorf("eq validator does not validate for flaot32")
+	}
+
+	if nil == Validate(struct {
+		field float64 `validate:"eq=0"`
+	}{
+		field: 0.1,
+	}) {
+		t.Errorf("eq validator does not validate for flaot64")
+	}
+}
+
+func TestEqValForString(t *testing.T) {
+	if nil != Validate(struct {
+		field string `validate:"eq=2"`
+	}{
+		field: "aa",
+	}) {
+		t.Errorf("eq validator does not validate for string")
+	}
+
+	if nil == Validate(struct {
+		field string `validate:"eq=2"`
+	}{
+		field: "abc",
+	}) {
+		t.Errorf("eq validator does not validate for string")
+	}
+}
+
+func TestEqValForMap(t *testing.T) {
+	if nil != Validate(struct {
+		field map[string]string `validate:"eq=2"`
+	}{
+		field: map[string]string{
+			"a": "a",
+			"b": "b",
+		},
+	}) {
+		t.Errorf("eq validator does not validate for map")
+	}
+
+	if nil == Validate(struct {
+		field map[string]string `validate:"eq=2"`
+	}{
+		field: map[string]string{
+			"a": "a",
+			"b": "b",
+			"c": "c",
+		},
+	}) {
+		t.Errorf("eq validator does not validate for map")
+	}
+}
+
+func TestEqValForSlice(t *testing.T) {
+	if nil != Validate(struct {
+		field []string `validate:"eq=2"`
+	}{
+		field: []string{"a", "b"},
+	}) {
+		t.Errorf("eq validator does not validate for slice")
+	}
+
+	if nil == Validate(struct {
+		field []string `validate:"eq=2"`
+	}{
+		field: []string{"a", "b", "c"},
+	}) {
+		t.Errorf("eq validator does not validate for slice")
+	}
+}
+
+func TestEqValForArray(t *testing.T) {
+	if nil != Validate(struct {
+		field [2]string `validate:"eq=2"`
+	}{
+		field: [2]string{"a", "b"},
+	}) {
+		t.Errorf("eq validator does not validate for string")
+	}
+
+	if nil == Validate(struct {
+		field [3]string `validate:"eq=2"`
+	}{
+		field: [3]string{"a", "b", "c"},
+	}) {
+		t.Errorf("eq validator does not validate for string")
+	}
+}
+
+func TestNeValForDuration(t *testing.T) {
+	if nil != Validate(struct {
+		field time.Duration `validate:"ne=0s"`
+	}{
+		field: -time.Second,
+	}) {
+		t.Errorf("ne validator does not validate for time.Duratuon")
+	}
+
+	if nil == Validate(struct {
+		field time.Duration `validate:"ne=0s"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("ne validator does not validate for time.Duratuon")
+	}
+}
+
+func TestNeValForInt(t *testing.T) {
+	if nil == Validate(struct {
+		field int `validate:"ne=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("ne validator does not validate for int")
+	}
+
+	if nil == Validate(struct {
+		field int8 `validate:"ne=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("ne validator does not validate for int8")
+	}
+
+	if nil == Validate(struct {
+		field int16 `validate:"ne=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("ne validator does not validate for int16")
+	}
+
+	if nil == Validate(struct {
+		field int32 `validate:"ne=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("ne validator does not validate for int32")
+	}
+
+	if nil == Validate(struct {
+		field int64 `validate:"ne=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("ne validator does not validate for int64")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:"ne=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("ne validator does not validate for int")
+	}
+
+	if nil != Validate(struct {
+		field int8 `validate:"ne=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("ne validator does not validate for int8")
+	}
+
+	if nil != Validate(struct {
+		field int16 `validate:"ne=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("ne validator does not validate for int16")
+	}
+
+	if nil != Validate(struct {
+		field int32 `validate:"ne=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("ne validator does not validate for int32")
+	}
+
+	if nil != Validate(struct {
+		field int64 `validate:"ne=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("ne validator does not validate for int64")
+	}
+}
+
+func TestNeValForRune(t *testing.T) {
+	if nil == Validate(struct {
+		field rune `validate:"ne=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("ne validator does not validate for rune")
+	}
+
+	if nil != Validate(struct {
+		field rune `validate:"ne=0"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("ne validator does not validate for rune")
+	}
+}
+
+func TestNeValForUint(t *testing.T) {
+	if nil == Validate(struct {
+		field uint `validate:"ne=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("ne validator does not validate for uint")
+	}
+
+	if nil == Validate(struct {
+		field uint8 `validate:"ne=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("ne validator does not validate for uint8")
+	}
+
+	if nil == Validate(struct {
+		field uint16 `validate:"ne=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("ne validator does not validate for uint16")
+	}
+
+	if nil == Validate(struct {
+		field uint32 `validate:"ne=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("ne validator does not validate for uint32")
+	}
+
+	if nil == Validate(struct {
+		field uint64 `validate:"ne=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("ne validator does not validate for uint64")
+	}
+
+	if nil == Validate(struct {
+		field uintptr `validate:"ne=10"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("ne validator does not validate for uintptr")
+	}
+
+	if nil != Validate(struct {
+		field uint `validate:"ne=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("ne validator does not validate for uint")
+	}
+
+	if nil != Validate(struct {
+		field uint8 `validate:"ne=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("ne validator does not validate for uint8")
+	}
+
+	if nil != Validate(struct {
+		field uint16 `validate:"ne=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("ne validator does not validate for uint16")
+	}
+
+	if nil != Validate(struct {
+		field uint32 `validate:"ne=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("ne validator does not validate for uint32")
+	}
+
+	if nil != Validate(struct {
+		field uint64 `validate:"ne=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("ne validator does not validate for uint64")
+	}
+
+	if nil != Validate(struct {
+		field uintptr `validate:"ne=10"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("ne validator does not validate for uintptr")
+	}
+}
+
+func TestNeValForFloat(t *testing.T) {
+	if nil == Validate(struct {
+		field float32 `validate:"ne=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("ne validator does not validate for flaot32")
+	}
+
+	if nil == Validate(struct {
+		field float64 `validate:"ne=0"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("ne validator does not validate for flaot64")
+	}
+
+	if nil != Validate(struct {
+		field float32 `validate:"ne=0"`
+	}{
+		field: 0.1,
+	}) {
+		t.Errorf("ne validator does not validate for flaot32")
+	}
+
+	if nil != Validate(struct {
+		field float64 `validate:"ne=0"`
+	}{
+		field: 0.1,
+	}) {
+		t.Errorf("ne validator does not validate for flaot64")
+	}
+}
+
+func TestNeValForString(t *testing.T) {
+	if nil == Validate(struct {
+		field string `validate:"ne=2"`
+	}{
+		field: "aa",
+	}) {
+		t.Errorf("ne validator does not validate for string")
+	}
+
+	if nil != Validate(struct {
+		field string `validate:"ne=2"`
+	}{
+		field: "abc",
+	}) {
+		t.Errorf("ne validator does not validate for string")
+	}
+}
+
+func TestNeValForMap(t *testing.T) {
+	if nil == Validate(struct {
+		field map[string]string `validate:"ne=2"`
+	}{
+		field: map[string]string{
+			"a": "a",
+			"b": "b",
+		},
+	}) {
+		t.Errorf("ne validator does not validate for map")
+	}
+
+	if nil != Validate(struct {
+		field map[string]string `validate:"ne=2"`
+	}{
+		field: map[string]string{
+			"a": "a",
+			"b": "b",
+			"c": "c",
+		},
+	}) {
+		t.Errorf("ne validator does not validate for map")
+	}
+}
+
+func TestNeValForSlice(t *testing.T) {
+	if nil == Validate(struct {
+		field []string `validate:"ne=2"`
+	}{
+		field: []string{"a", "b"},
+	}) {
+		t.Errorf("ne validator does not validate for slice")
+	}
+
+	if nil != Validate(struct {
+		field []string `validate:"ne=2"`
+	}{
+		field: []string{"a", "b", "c"},
+	}) {
+		t.Errorf("ne validator does not validate for slice")
+	}
+}
+
+func TestNeValForArray(t *testing.T) {
+	if nil == Validate(struct {
+		field [2]string `validate:"ne=2"`
+	}{
+		field: [2]string{"a", "b"},
+	}) {
+		t.Errorf("ne validator does not validate for string")
+	}
+
+	if nil != Validate(struct {
+		field [3]string `validate:"ne=2"`
+	}{
+		field: [3]string{"a", "b", "c"},
+	}) {
+		t.Errorf("ne validator does not validate for string")
+	}
+}
+
 func TestGtValForDuration(t *testing.T) {
 	if nil == Validate(struct {
 		field time.Duration `validate:"gt=0s"`

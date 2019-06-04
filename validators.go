@@ -13,12 +13,20 @@ type ValidatorType string
 
 // Following validators are available.
 const (
+	// ValidatorEq (equals) compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
+	// E.g. `validate:"eq=1"`
+	ValidatorEq ValidatorType = "eq"
+
+	// ValidatorNe (not equals) compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
+	// E.g. `validate:"ne=0"`
+	ValidatorNe ValidatorType = "ne"
+
 	// ValidatorGt (greater than) compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
-	// E.g. `validate:"gte=0"`
+	// E.g. `validate:"gt=-1"`
 	ValidatorGt ValidatorType = "gt"
 
 	// ValidatorLt (less than) compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
-	// E.g. `validate:"lte=10"`
+	// E.g. `validate:"lt=11"`
 	ValidatorLt ValidatorType = "lt"
 
 	// ValidatorGte (greater than or equal to) compares a numeric value of a number or compares a count of elements in a string, a map, a slice, or an array.
@@ -51,6 +59,8 @@ type validatorFunc func(value reflect.Value, name string, validator string) erro
 
 func getValidatorTypeMap() map[ValidatorType]validatorFunc {
 	return map[ValidatorType]validatorFunc{
+		ValidatorEq:     validateEq,
+		ValidatorNe:     validateNe,
 		ValidatorGt:     validateGt,
 		ValidatorLt:     validateLt,
 		ValidatorGte:    validateGte,
@@ -65,6 +75,78 @@ func getValidatorTypeMap() map[ValidatorType]validatorFunc {
 type validator struct {
 	Type  ValidatorType
 	Value string
+}
+
+func validateEq(value reflect.Value, name string, validator string) error {
+	kind := value.Kind()
+	typ := value.Type()
+
+	switch kind {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		if typ == reflect.TypeOf((time.Duration)(0)) {
+			if token, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) != token {
+				return errors.New(fmt.Sprint(name, " must be equal to ", token))
+			}
+		} else {
+			if token, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() != token {
+				return errors.New(fmt.Sprint(name, " must be equal to ", token))
+			}
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		if token, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() != token {
+			return errors.New(fmt.Sprint(name, " must be equal to ", token))
+		}
+	case reflect.Float32, reflect.Float64:
+		if token, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() != token {
+			return errors.New(fmt.Sprint(name, " must be equal to ", token))
+		}
+	case reflect.String:
+		if token, err := strconv.Atoi(validator); err == nil && value.Len() != token {
+			return errors.New(fmt.Sprint(name, " must contain exactly ", token, " characters"))
+		}
+	case reflect.Map, reflect.Slice, reflect.Array:
+		if token, err := strconv.Atoi(validator); err == nil && value.Len() != token {
+			return errors.New(fmt.Sprint(name, " must contain exactly ", token, " elements"))
+		}
+	}
+
+	return nil
+}
+
+func validateNe(value reflect.Value, name string, validator string) error {
+	kind := value.Kind()
+	typ := value.Type()
+
+	switch kind {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		if typ == reflect.TypeOf((time.Duration)(0)) {
+			if token, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) == token {
+				return errors.New(fmt.Sprint(name, " must not be equal to", token))
+			}
+		} else {
+			if token, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() == token {
+				return errors.New(fmt.Sprint(name, " must not be equal to", token))
+			}
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		if token, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() == token {
+			return errors.New(fmt.Sprint(name, " must not be equal to", token))
+		}
+	case reflect.Float32, reflect.Float64:
+		if token, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() == token {
+			return errors.New(fmt.Sprint(name, " must not be equal to", token))
+		}
+	case reflect.String:
+		if token, err := strconv.Atoi(validator); err == nil && value.Len() == token {
+			return errors.New(fmt.Sprint(name, " must not contain ", token, " characters"))
+		}
+	case reflect.Map, reflect.Slice, reflect.Array:
+		if token, err := strconv.Atoi(validator); err == nil && value.Len() == token {
+			return errors.New(fmt.Sprint(name, " must not contain ", token, " elements"))
+		}
+	}
+
+	return nil
 }
 
 func validateGt(value reflect.Value, name string, validator string) error {
