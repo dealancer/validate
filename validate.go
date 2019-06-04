@@ -34,7 +34,7 @@
 // It is possible to specify multiple validators using a semicolon character.
 //
 //  type S struct {
-//  	field int `validate:"min=0; max=10"`
+//  	field int `validate:"min=0 & max=10"`
 //  }
 //
 // Slice and array validation
@@ -62,7 +62,7 @@
 //
 //  type S struct {
 //  	// Check that the pointer is not nil and the number is between 0 and 10
-//  	field *int `validate:"nil=false > min=0; max=10"`
+//  	field *int `validate:"nil=false > min=0 & max=10"`
 //  }
 //
 // Nested struct validation
@@ -104,7 +104,7 @@
 //  }
 //
 //  type B struct {
-//  	field []map[*string]*A `validate:"min=1; max=2 > empty=false [nil=false > empty=false] > nil=false"`
+//  	field []map[*string]*A `validate:"min=1 & max=2 > empty=false [nil=false > empty=false] > nil=false"`
 //  }
 //
 //  // min=1, max=2 will be applied to the array
@@ -279,9 +279,9 @@ loop:
 // First slice acts as AND logic, second array acts as OR logic.
 func parseValidators(validators string) (validatorsAnd [][]validator) {
 	regexpType := regexp.MustCompile(`[[:alnum:]_]+`)
-	regexpValue := regexp.MustCompile(`[^;|=\s]+[^;|=]*[^;|=\s]+|[^;|=\s]+`)
+	regexpValue := regexp.MustCompile(`[^=\s]+[^=]*[^=\s]+|[^=\s]+`)
 
-	entriesAnd := strings.Split(validators, ";")
+	entriesAnd := strings.Split(validators, "&")
 	validatorsAnd = make([][]validator, 0, len(entriesAnd))
 	for _, entryAnd := range entriesAnd {
 		entriesOr := strings.Split(entryAnd, "|")

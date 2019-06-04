@@ -49,7 +49,7 @@ func TestParseValidators(t *testing.T) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
-	validatorsAnd = parseValidators(";|;,;")
+	validatorsAnd = parseValidators("&|&,&")
 	if !reflect.DeepEqual(validatorsAnd, temp) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
@@ -66,7 +66,7 @@ func TestParseValidators(t *testing.T) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
-	validatorsAnd = parseValidators("  val  ;val_a=a;val_1 = 1  ;  val_b = b , c_d_ , 1.0  ;VAL = V A L U E ¶  ")
+	validatorsAnd = parseValidators("  val  &val_a=a&val_1 = 1  &  val_b = b , c_d_ , 1.0  &VAL = V A L U E ¶  ")
 	if !reflect.DeepEqual(validatorsAnd, [][]validator{
 		[]validator{
 			validator{
@@ -102,7 +102,7 @@ func TestParseValidators(t *testing.T) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
-	validatorsAnd = parseValidators("  val  |val_a=a;val_1 = 1  |  val_b = b , c_d_ , 1.0  |VAL = V A L U E ¶  ")
+	validatorsAnd = parseValidators("  val  |val_a=a&val_1 = 1  |  val_b = b , c_d_ , 1.0  |VAL = V A L U E ¶  ")
 	if !reflect.DeepEqual(validatorsAnd, [][]validator{
 		[]validator{
 			validator{
@@ -246,7 +246,7 @@ func TestBasic(t *testing.T) {
 
 func TestAndVal(t *testing.T) {
 	if nil == Validate(struct {
-		field int `validate:"min=0;max=10"`
+		field int `validate:"min=0&max=10"`
 	}{
 		field: -1,
 	}) {
@@ -254,7 +254,7 @@ func TestAndVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field int `validate:"min=0;max=10"`
+		field int `validate:"min=0&max=10"`
 	}{
 		field: 11,
 	}) {
@@ -262,7 +262,7 @@ func TestAndVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:"min=0;max=10"`
+		field int `validate:"min=0&max=10"`
 	}{
 		field: 5,
 	}) {
@@ -270,7 +270,7 @@ func TestAndVal(t *testing.T) {
 	}
 
 	if nil == Validate(struct {
-		field int `validate:"min=1;max=-1"`
+		field int `validate:"min=1&max=-1"`
 	}{
 		field: 0,
 	}) {
@@ -330,7 +330,7 @@ func TestOrVal(t *testing.T) {
 
 func TestFormatVal(t *testing.T) {
 	if nil == Validate(struct {
-		field int `validate:" min = 0 ; max = 10 ; bla= "`
+		field int `validate:" min = 0 & max = 10 & bla= "`
 	}{
 		field: -1,
 	}) {
@@ -338,7 +338,7 @@ func TestFormatVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:" min = 0 ; max = 10 ; bla = "`
+		field int `validate:" min = 0 & max = 10 & bla = "`
 	}{
 		field: 5,
 	}) {
