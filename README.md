@@ -46,7 +46,8 @@ This package provides the following validators.
 * `[]` (brackets) are used to validate map keys.
 * `>` (arrow) is used to validate values of maps, slices, arrays or to dereference a pointer.
 * `&` (ampersand) is used to perform multiple validators using AND logic.
-* `|` (vertical bar) is used to perform multiple validators using OR logic.
+* `|` (vertical bar) is used to perform multiple validators using OR logic. 
+* `&` operator precedence is lower than `|` one, which means AND expressions will be evaluated before OR expressions.
 * `,` (commna) is used to specify multiple tokens for a validator (e.g. `one_of`).
 
 ## Installation

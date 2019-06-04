@@ -41,21 +41,21 @@ func TestSplitValidators(t *testing.T) {
 }
 
 func TestParseValidators(t *testing.T) {
-	var validatorsAnd [][]validator
+	var validatorsOr [][]validator
 
-	validatorsAnd = parseValidators("")
+	validatorsOr = parseValidators("")
 	temp := make([][]validator, 0)
-	if !reflect.DeepEqual(validatorsAnd, temp) {
+	if !reflect.DeepEqual(validatorsOr, temp) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
-	validatorsAnd = parseValidators("&|&,&")
-	if !reflect.DeepEqual(validatorsAnd, temp) {
+	validatorsOr = parseValidators("&|&,&")
+	if !reflect.DeepEqual(validatorsOr, temp) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
-	validatorsAnd = parseValidators("val_a=a")
-	if !reflect.DeepEqual(validatorsAnd, [][]validator{
+	validatorsOr = parseValidators("val_a=a")
+	if !reflect.DeepEqual(validatorsOr, [][]validator{
 		[]validator{
 			validator{
 				ValidatorType("val_a"),
@@ -66,8 +66,8 @@ func TestParseValidators(t *testing.T) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
-	validatorsAnd = parseValidators("  val  &val_a=a&val_1 = 1  &  val_b = b , c_d_ , 1.0  &VAL = V A L U E ¶  ")
-	if !reflect.DeepEqual(validatorsAnd, [][]validator{
+	validatorsOr = parseValidators("  val  |val_a=a|val_1 = 1  |  val_b = b , c_d_ , 1.0  |VAL = V A L U E ¶  ")
+	if !reflect.DeepEqual(validatorsOr, [][]validator{
 		[]validator{
 			validator{
 				ValidatorType("val"),
@@ -102,8 +102,8 @@ func TestParseValidators(t *testing.T) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
-	validatorsAnd = parseValidators("  val  |val_a=a&val_1 = 1  |  val_b = b , c_d_ , 1.0  |VAL = V A L U E ¶  ")
-	if !reflect.DeepEqual(validatorsAnd, [][]validator{
+	validatorsOr = parseValidators("  val  &val_a=a|val_1 = 1  &  val_b = b , c_d_ , 1.0  &VAL = V A L U E ¶  ")
+	if !reflect.DeepEqual(validatorsOr, [][]validator{
 		[]validator{
 			validator{
 				ValidatorType("val"),

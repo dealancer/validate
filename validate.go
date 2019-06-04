@@ -53,7 +53,7 @@
 //
 //  type S struct {
 //  	// Check that the map contains at least two elements, map keys are not empty, and map values are between 0 and 10
-//  	field map[string]int `validate:"min=2 [empty=false] > min=0; max=10"`
+//  	field map[string]int `validate:"min=2 [empty=false] > min=0 & max=10"`
 //  }
 //
 // Pointer validation
@@ -100,7 +100,7 @@
 // You can use brackets and arrow syntax to deep to as many levels as you need.
 //
 //  type A struct {
-//  	field int `validate:"min=0; max=10"`
+//  	field int `validate:"min=0 & max=10"`
 //  }
 //
 //  type B struct {
@@ -172,24 +172,24 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 
 	// Get validators
 	keyValidators, valueValidators, validators := splitValidators(validators)
-	validatorsAnd := parseValidators(valueValidators)
+	validatorsOr := parseValidators(valueValidators)
 
 	// Perform validators
-	for _, validatorsOr := range validatorsAnd {
-		var validates bool
-		var lastErr error
-		for _, validator := range validatorsOr {
+	var err error
+	for _, validatorsAnd := range validatorsOr {
+		for _, validator := range validatorsAnd {
 			if validatorFunc, ok := validatorTypeMap[validator.Type]; ok {
-				if err := validatorFunc(value, fieldName, validator.Value); err == nil {
-					validates = true
-				} else {
-					lastErr = err
+				if err = validatorFunc(value, fieldName, validator.Value); err != nil {
+					break
 				}
 			}
 		}
-		if !validates {
-			return lastErr
+		if err == nil {
+			break
 		}
+	}
+	if err != nil {
+		return err
 	}
 
 	// Dive one level deep into arrays and pointers
@@ -277,16 +277,16 @@ loop:
 
 // parseValidator2 parses validators into the slice of slices.
 // First slice acts as AND logic, second array acts as OR logic.
-func parseValidators(validators string) (validatorsAnd [][]validator) {
+func parseValidators(validators string) (validatorsOr [][]validator) {
 	regexpType := regexp.MustCompile(`[[:alnum:]_]+`)
 	regexpValue := regexp.MustCompile(`[^=\s]+[^=]*[^=\s]+|[^=\s]+`)
 
-	entriesAnd := strings.Split(validators, "&")
-	validatorsAnd = make([][]validator, 0, len(entriesAnd))
-	for _, entryAnd := range entriesAnd {
-		entriesOr := strings.Split(entryAnd, "|")
-		validatorsOr := make([]validator, 0, len(entriesOr))
-		for _, entryOr := range entriesOr {
+	entriesOr := strings.Split(validators, "|")
+	validatorsOr = make([][]validator, 0, len(entriesOr))
+	for _, entryOr := range entriesOr {
+		entriesAnd := strings.Split(entryOr, "&")
+		validatorsAnd := make([]validator, 0, len(entriesAnd))
+		for _, entryOr := range entriesAnd {
 			entries := strings.Split(entryOr, "=")
 			if len(entries) > 0 {
 				t := regexpType.FindString(entries[0])
@@ -295,12 +295,12 @@ func parseValidators(validators string) (validatorsAnd [][]validator) {
 					v = regexpValue.FindString(entries[1])
 				}
 				if len(t) > 0 {
-					validatorsOr = append(validatorsOr, validator{ValidatorType(t), v})
+					validatorsAnd = append(validatorsAnd, validator{ValidatorType(t), v})
 				}
 			}
 		}
-		if len(validatorsOr) > 0 {
-			validatorsAnd = append(validatorsAnd, validatorsOr)
+		if len(validatorsAnd) > 0 {
+			validatorsOr = append(validatorsOr, validatorsAnd)
 		}
 	}
 
