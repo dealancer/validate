@@ -250,7 +250,7 @@ func TestAndVal(t *testing.T) {
 	}{
 		field: -1,
 	}) {
-		t.Errorf("and validators does not validate")
+		t.Errorf("& operator does not validate")
 	}
 
 	if nil == Validate(struct {
@@ -258,7 +258,7 @@ func TestAndVal(t *testing.T) {
 	}{
 		field: 11,
 	}) {
-		t.Errorf("and validators does not validate")
+		t.Errorf("& operator does not validate")
 	}
 
 	if nil != Validate(struct {
@@ -266,7 +266,7 @@ func TestAndVal(t *testing.T) {
 	}{
 		field: 5,
 	}) {
-		t.Errorf("and validators does not validate")
+		t.Errorf("& operator does not validate")
 	}
 
 	if nil == Validate(struct {
@@ -274,7 +274,7 @@ func TestAndVal(t *testing.T) {
 	}{
 		field: 0,
 	}) {
-		t.Errorf("and validators does not validate")
+		t.Errorf("& operator does not validate")
 	}
 }
 
@@ -284,7 +284,7 @@ func TestOrVal(t *testing.T) {
 	}{
 		field: 5,
 	}) {
-		t.Errorf("multiple validators does not validate")
+		t.Errorf("| operator does not validate")
 	}
 
 	if nil != Validate(struct {
@@ -292,7 +292,7 @@ func TestOrVal(t *testing.T) {
 	}{
 		field: -1,
 	}) {
-		t.Errorf("multiple validators does not validate")
+		t.Errorf("| operator does not validate")
 	}
 
 	if nil != Validate(struct {
@@ -300,7 +300,7 @@ func TestOrVal(t *testing.T) {
 	}{
 		field: 11,
 	}) {
-		t.Errorf("multiple validators does not validate")
+		t.Errorf("| operator does not validate")
 	}
 
 	if nil != Validate(struct {
@@ -308,7 +308,7 @@ func TestOrVal(t *testing.T) {
 	}{
 		field: 5,
 	}) {
-		t.Errorf("multiple validators does not validate")
+		t.Errorf("| operator does not validate")
 	}
 
 	if nil != Validate(struct {
@@ -316,7 +316,7 @@ func TestOrVal(t *testing.T) {
 	}{
 		field: -1,
 	}) {
-		t.Errorf("multiple validators does not validate")
+		t.Errorf("| operator does not validate")
 	}
 
 	if nil != Validate(struct {
@@ -324,7 +324,49 @@ func TestOrVal(t *testing.T) {
 	}{
 		field: 11,
 	}) {
-		t.Errorf("multiple validators does not validate")
+		t.Errorf("| operator does not validate")
+	}
+}
+
+func TestAndOrVal(t *testing.T) {
+	if nil == Validate(struct {
+		field int `validate:"min=0 & max=5 | min=10 & max=15"`
+	}{
+		field: -1,
+	}) {
+		t.Errorf("& and | operators does not validate")
+	}
+
+	if nil == Validate(struct {
+		field int `validate:"min=0 & max=5 | min=10 & max=15"`
+	}{
+		field: 6,
+	}) {
+		t.Errorf("& and | operators does not validate")
+	}
+
+	if nil == Validate(struct {
+		field int `validate:"min=0 & max=5 | min=10 & max=15"`
+	}{
+		field: 16,
+	}) {
+		t.Errorf("& and | operators does not validate")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:"min=0 & max=5 | min=10 & max=15"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("& and | operators does not validate")
+	}
+
+	if nil != Validate(struct {
+		field int `validate:"min=0 & max=5 | min=10 & max=15"`
+	}{
+		field: 11,
+	}) {
+		t.Errorf("& and | operators does not validate")
 	}
 }
 
