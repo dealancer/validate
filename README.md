@@ -122,3 +122,7 @@ if err := validate.Validate(&registrations); err != nil {
 ```
 
 See [GoDoc](https://godoc.org/github.com/dealancer/validate) for the complete reference.
+
+## Credits
+
+This project is written by Vadym Myrgorod. Insipred by [go-playground/validator](https://github.com/go-playground/validator).

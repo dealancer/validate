@@ -118,8 +118,8 @@
 //
 // Custom validation
 //
-// You can specify custom validate method.
-// Custom validation also works for a substuct, if a substruct is defined in an exposed field.
+// You can specify custom validation method.
+// Custom validation also works for a substuct, if a substruct is defined in an exported field.
 //
 //  type S struct {
 //  	field        int
