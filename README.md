@@ -121,7 +121,7 @@ if err := validate.Validate(&registrations); err != nil {
 }
 ```
 
-See [GoDoc]((https://godoc.org/gopkg.in/dealancer/validate.v2) for the complete reference.
+See [GoDoc](https://godoc.org/gopkg.in/dealancer/validate.v2) for the complete reference.
 
 ## Credits
 
