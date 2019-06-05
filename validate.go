@@ -126,7 +126,6 @@
 //  	field        int
 //  }
 //
-//  // Make sure receiver is value, otherwise it won't work
 //  func (s S) Validate() error {
 //  	if s.field <= 0 {
 //  		return errors.New("field should be positive")
@@ -184,13 +183,8 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 	validatorsOr := parseValidators(valueValidators)
 
 	// Call a custom validator
-	if value.CanInterface() {
-		if customValidator, ok := value.Interface().(CustomValidator); ok {
-			err := customValidator.Validate()
-			if err != nil {
-				return err
-			}
-		}
+	if err := callCustomValidator(value); err != nil {
+		return err
 	}
 
 	// Perform validators
@@ -366,4 +360,25 @@ func tokenOneOf(token interface{}, tokens []interface{}) bool {
 	}
 
 	return false
+}
+
+// Call a custom validator
+func callCustomValidator(value reflect.Value) error {
+	if !value.CanInterface() {
+		return nil
+	}
+
+	// Following code won't work in case if Validate is implemented by reference and value is passed by value
+	if customValidator, ok := value.Interface().(CustomValidator); ok {
+		return customValidator.Validate()
+	}
+
+	// Following code is a fallbak if value is passed by value
+	valueCopyPointer := reflect.New(value.Type())
+	valueCopyPointer.Elem().Set(value)
+	if customValidator, ok := valueCopyPointer.Interface().(CustomValidator); ok {
+		return customValidator.Validate()
+	}
+
+	return nil
 }

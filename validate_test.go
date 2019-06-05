@@ -275,6 +275,19 @@ func (st StCustomValidator) Validate() error {
 	return nil
 }
 
+type StCustomValidator2 struct {
+	field        int
+	anotherField int `validate:"eq=0"`
+}
+
+func (st *StCustomValidator2) Validate() error {
+	if st.field <= 0 {
+		return errors.New("field should be positive")
+	}
+
+	return nil
+}
+
 type IntCustomValidator int
 
 func (i IntCustomValidator) Validate() error {
@@ -286,6 +299,7 @@ func (i IntCustomValidator) Validate() error {
 }
 
 func TestCustomValidator(t *testing.T) {
+	// Test a custom validtor wiht a value reciever by value, then by reference
 	if nil != Validate(StCustomValidator{
 		field: 1,
 	}) {
@@ -310,6 +324,32 @@ func TestCustomValidator(t *testing.T) {
 		t.Errorf("custom validator does not validate")
 	}
 
+	// Test a custom validtor with a pointer reciever by value, then by reference
+	if nil != Validate(StCustomValidator2{
+		field: 1,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(StCustomValidator2{
+		field: 0,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil != Validate(&StCustomValidator2{
+		field: 1,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(&StCustomValidator2{
+		field: 0,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	// Test an embedded validator together with a custom validtor with a value reciever by value, then by reference
 	if nil == Validate(StCustomValidator{
 		field:        1,
 		anotherField: 1,
@@ -338,10 +378,40 @@ func TestCustomValidator(t *testing.T) {
 		t.Errorf("custom validator does not validate")
 	}
 
+	// Test an embedded validator together with a custom validtor with a pointer reciever by value, then by reference
+	if nil == Validate(StCustomValidator2{
+		field:        1,
+		anotherField: 1,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(StCustomValidator2{
+		field:        1,
+		anotherField: 1,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(&StCustomValidator2{
+		field:        1,
+		anotherField: 1,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(&StCustomValidator2{
+		field:        1,
+		anotherField: 1,
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	// Test a custom validtor of a subtruct (defined in exported field) with a value reciever by value, then by reference
 	if nil != Validate(struct {
-		field StCustomValidator
+		Field StCustomValidator
 	}{
-		field: StCustomValidator{
+		Field: StCustomValidator{
 			field: 1,
 		},
 	}) {
@@ -378,6 +448,132 @@ func TestCustomValidator(t *testing.T) {
 		t.Errorf("custom validator does not validate")
 	}
 
+	// Test a custom validtor of a subtruct (defined in exported field)  with a pointer reciever by value, then by reference
+	if nil != Validate(struct {
+		Field StCustomValidator2
+	}{
+		Field: StCustomValidator2{
+			field: 1,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(struct {
+		Field StCustomValidator2
+	}{
+		Field: StCustomValidator2{
+			field: 0,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil != Validate(struct {
+		Field *StCustomValidator2
+	}{
+		Field: &StCustomValidator2{
+			field: 1,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil == Validate(struct {
+		Field *StCustomValidator2
+	}{
+		Field: &StCustomValidator2{
+			field: 0,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	// Test a custom validtor of a subtruct (defined in unexported field) with a value reciever by value, then by reference
+	// This will fail, but should not panic
+	if nil != Validate(struct {
+		field StCustomValidator
+	}{
+		field: StCustomValidator{
+			field: 1,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil != Validate(struct {
+		field StCustomValidator
+	}{
+		field: StCustomValidator{
+			field: 0,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil != Validate(struct {
+		field *StCustomValidator
+	}{
+		field: &StCustomValidator{
+			field: 1,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil != Validate(struct {
+		field *StCustomValidator
+	}{
+		field: &StCustomValidator{
+			field: 0,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	// Test a custom validtor of a subtruct (defined in unexported field) with a pointer reciever by value, then by reference
+	// This will fail, but should not panic
+	if nil != Validate(struct {
+		field StCustomValidator2
+	}{
+		field: StCustomValidator2{
+			field: 1,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil != Validate(struct {
+		field StCustomValidator2
+	}{
+		field: StCustomValidator2{
+			field: 0,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil != Validate(struct {
+		field *StCustomValidator2
+	}{
+		field: &StCustomValidator2{
+			field: 1,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	if nil != Validate(struct {
+		field *StCustomValidator2
+	}{
+		field: &StCustomValidator2{
+			field: 0,
+		},
+	}) {
+		t.Errorf("custom validator does not validate")
+	}
+
+	// Test a custom validtor of an artbitrary type
 	one := IntCustomValidator(1)
 	zero := IntCustomValidator(0)
 

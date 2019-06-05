@@ -93,7 +93,7 @@ type Registration struct {
     Complex []map[*string]int `validate:"gte=1 & lte=2 | eq=4 > empty=false [nil=false > empty=false] > ne=0"`
 }
 
-// Custom validation (works only with a value reciever)
+// Custom validation
 func (r Registration) Validate() error {
     if !StrongPass(c.Password) {
         return errors.New("Password should be strong!")
