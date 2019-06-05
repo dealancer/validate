@@ -59,11 +59,11 @@ Following operators are used. There are listed in the descending order of their 
 
 1. Import validate package into your project.
    ```go
-   import "github.com/dealancer/validate"
+   import "gopkg.in/dealancer/validate.v2"
    ```
 2. Additionally use `go get` when not using Go modules.
    ```
-    go get github.com/dealancer/validate
+    go get gopkg.in/dealancer/validate.v2
     ```
 
 ## Usage
