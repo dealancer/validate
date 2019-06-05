@@ -1,5 +1,6 @@
-// Package validate validates fields of the Go struct recursively based on tags.
+// Package validate validates Go structs and types recursively based on tags.
 // It provides powerful syntax to perform validation for substructs, maps, slices, arrays, and pointers.
+// Package also allows to run custom validation methods.
 //
 // Use this package to make sure that the content of the struct is in the format you need.
 // For example, **validate** package is useful when unmarshalling YAML or JSON.

@@ -6,8 +6,8 @@
 [![GitHub release](https://img.shields.io/github/release/dealancer/validate.svg)](https://github.com/dealancer/validate/releases)
 [![License](https://img.shields.io/github/license/dealancer/validate.svg)](./LICENSE)
 
-Package **validate** validates fields of the Go struct recursively based on tags.
-It provides powerful syntax to perform validation for substructs, maps, slices, arrays, and pointers.
+Package **validate** validates Go struct and types recursively based on tags.
+It provides powerful syntax to perform validation for substructs, maps, slices, arrays, and pointers. Package also allows to run custom validation methods.
 
 Use this package to make sure that the content of the struct is in the format you need.
 For example, **validate** package is useful when unmarshalling YAML or JSON.
