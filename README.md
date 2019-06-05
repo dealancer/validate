@@ -70,8 +70,8 @@ Following operators are used. There are listed in the descending order of their 
 
 ```go
 type Registration struct {
-    // Username should be between 3 and 25 characters
-    Username string `validate:"gte=3 & lte=25"`
+    // Username should be between 3 and 25 characters and in alphanumeric unicode format
+    Username string `validate:"gte=3 & lte=25 & format=alnum_unicode"`
 
     // Email should be empty or in the email format
     Email string `validate:"empty=true | format=email"`
