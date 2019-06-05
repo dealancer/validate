@@ -12,6 +12,18 @@ It provides powerful syntax to perform validation for substructs, maps, slices, 
 Use this package to make sure that the content of the struct is in the format you need.
 For example, **validate** package is useful when unmarshalling YAML or JSON.
 
+## Installation
+
+1. Use `go get` to download validate package.
+   ```
+   go get gopkg.in/dealancer/validate.v2
+   ```
+2. Import validate package into your project.
+   ```go
+   import "gopkg.in/dealancer/validate.v2"
+   ```
+
+
 ## Types
 
 This package supports a wide variety of types.
@@ -54,17 +66,6 @@ Following operators are used. There are listed in the descending order of their 
 * `|` (vertical bar) is used to perform multiple validators using OR logic.
 * `=` (equal sign) is used to separate validator type from value.
 * `,` (comma) is used to specify multiple tokens for a validator (e.g. `one_of`).
-
-## Installation
-
-1. Import validate package into your project.
-   ```go
-   import "gopkg.in/dealancer/validate.v2"
-   ```
-2. Additionally use `go get` when not using Go modules.
-   ```
-    go get gopkg.in/dealancer/validate.v2
-    ```
 
 ## Usage
 
