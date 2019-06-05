@@ -126,7 +126,7 @@
 //  	field        int
 //  }
 //
-//  // Make sure reciever is value, otherwise it won't work
+//  // Make sure receiver is value, otherwise it won't work
 //  func (s S) Validate() error {
 //  	if s.field <= 0 {
 //  		return errors.New("field should be positive")
@@ -150,7 +150,7 @@ const MasterTag = "validate"
 type CustomValidator interface {
 
 	// Validate is a custom validation function.
-	// Validate does not work when the reciever is a reference.
+	// Validate does not work when the receiver is a reference.
 	// Validate does not work for nested types obtained from unexported field.
 	Validate() error
 }
