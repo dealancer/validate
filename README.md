@@ -69,44 +69,53 @@ Following operators are used. There are listed in the descending order of their 
 ## Usage
 
 ```go
-type Connection struct {
-    // Name should not be empty
-    Name string `validate:"empty=false"`
+type Registration struct {
+    // Username should be between 3 and 25 characters
+    Username string `validate:"gte=3 & lte=25"`
 
-    // Hosts should not be empty, Hosts values should be in the right format
-    Hosts []string `validate:"empty=false > format=hostname"`
+    // Email should be empty or in the email format
+    Email string `validate:"empty=true | format=email"`
 
-    // Username should be one of "joe", "ivan", or "li"
-    Username string `validate:"one_of=joe,ivan,li"`
+    // Password is validated using a custom validation method
+    Password string
 
-    // Password should be more than or equal to twelve characters
-    Password *string `validate:"> gte=12"`
+    // Role should be one of "admin", "publisher", or "author"
+    Role string `validate:"one_of=admin,publisher,author"`
 
-    // Ssl (pointer) should not be nil
-    Ssl *bool `validate:"nil=false"`
+    // URLs should not be empty, URLs values should be in the url format
+    URLs []string `validate:"empty=false > format=url"`
 
-    // SslVerify (pointer) should not be nil
-    SslVerify *bool `validate:"nil=false"`
+    // Retired (pointer) should not be nil
+    Retired *bool `validate:"nil=false"`
 
-    // Version should be between 5 and 8, or 9
-    Version int `validate:"gte=5 & lte=8 | eq=9"`
+    // Some complex field with validation
+    Complex []map[*string]int `validate:"gte=1 & lte=2 | eq=4 > empty=false [nil=false > empty=false] > ne=0"`
 }
 
-type Connections struct {
-	Connections []Connection `validate:"gte=2"` // There should be at least two connections
+// Custom validation (works only with a value reciever)
+func (r Registration) Validate() error {
+    if !StrongPass(c.Password) {
+        return errors.New("Password should be strong!")
+    }
+
+    return nil
+}
+
+type Registrations struct {
+	r []Registration `validate:"gte=2"` // There should be at least two registrations
 }
 ```
 
 ```go
-connections := Connections{
-	Connections: []Connection{
-		Connection{
+registrations := Registrations{
+	r: []Registration{
+		Registration{
 			Username: "admin",
 		},
 	},
 }
 
-if err := validate.Validate(&connections); err != nil {
+if err := validate.Validate(&registrations); err != nil {
 	panic(err)
 }
 ```

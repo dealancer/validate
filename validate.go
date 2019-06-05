@@ -107,14 +107,32 @@
 //  }
 //
 //  type B struct {
-//  	field []map[*string]*A `validate:"gte=1 & lte=2 > empty=false [nil=false > empty=false] > nil=false"`
+//  	field []map[*string]*A `validate:"gte=1 & lte=2 | eq=4 > empty=false [nil=false > empty=false] > nil=false"`
 //  }
 //
-//  // gte=1 & lte=2 will be applied to the array
+//  // gte=1 & lte=2 | eq=4 will be applied to the array
 //  // empty=false will be applied to the map
 //  // nil=false > empty=false will be applied to the map key (pointer and string)
 //  // nil=false will be applied to the map value
 //  // gte=0 & lte=10 will be applied to the A.field
+//
+// Custom validation
+//
+// You can specify custom validate method.
+// Custom validation also works for a substuct, if a substruct is defined in an exposed field.
+//
+//  type S struct {
+//  	field        int
+//  }
+//
+//  // Make sure reciever is value, otherwise it won't work
+//  func (s S) Validate() error {
+//  	if s.field <= 0 {
+//  		return errors.New("field should be positive")
+//  	}
+//
+//  	return nil
+//  }
 //
 package validate
 
