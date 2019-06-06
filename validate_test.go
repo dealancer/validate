@@ -3762,7 +3762,7 @@ func TestDeepValsForMapValues(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field map[int]*string `validate:"> nil=false]"`
+		field map[int]*string `validate:"> [nil=false]"`
 	}{
 		field: map[int]*string{
 			0: &s,

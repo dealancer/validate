@@ -25,3 +25,13 @@ func (e ErrorValidation) Error() string {
 
 	return fmt.Sprintf("Validation error in value of type \"%v\" using validator \"%v\"", e.FieldValue.Type(), validator)
 }
+
+// ErrorSyntax occurs when validator does not validate.
+type ErrorSyntax struct {
+	Value   string
+	Comment string
+}
+
+func (e ErrorSyntax) Error() string {
+	return fmt.Sprintf("Syntax error in \"%v\": \"%v\"", e.Value, e.Comment)
+}

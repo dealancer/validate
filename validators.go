@@ -86,27 +86,42 @@ func validateEq(value reflect.Value, name string, validator string) error {
 		ValidatorValue: validator,
 	}
 
+	errorSyntax := ErrorSyntax{
+		Value:   validator,
+		Comment: "could not parse",
+	}
+
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if typ == reflect.TypeOf((time.Duration)(0)) {
-			if token, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) != token {
+			if token, err := time.ParseDuration(validator); err != nil {
+				return errorSyntax
+			} else if time.Duration(value.Int()) != token {
 				return errorValidation
 			}
 		} else {
-			if token, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() != token {
+			if token, err := strconv.ParseInt(validator, 10, 64); err != nil {
+				return errorSyntax
+			} else if value.Int() != token {
 				return errorValidation
 			}
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		if token, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() != token {
+		if token, err := strconv.ParseUint(validator, 10, 64); err != nil {
+			return errorSyntax
+		} else if value.Uint() != token {
 			return errorValidation
 		}
 	case reflect.Float32, reflect.Float64:
-		if token, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() != token {
+		if token, err := strconv.ParseFloat(validator, 64); err != nil {
+			return errorSyntax
+		} else if value.Float() != token {
 			return errorValidation
 		}
 	case reflect.String, reflect.Map, reflect.Slice, reflect.Array:
-		if token, err := strconv.Atoi(validator); err == nil && value.Len() != token {
+		if token, err := strconv.Atoi(validator); err != nil {
+			return errorSyntax
+		} else if value.Len() != token {
 			return errorValidation
 		}
 	}
@@ -125,27 +140,42 @@ func validateNe(value reflect.Value, name string, validator string) error {
 		ValidatorValue: validator,
 	}
 
+	errorSyntax := ErrorSyntax{
+		Value:   validator,
+		Comment: "could not parse",
+	}
+
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if typ == reflect.TypeOf((time.Duration)(0)) {
-			if token, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) == token {
+			if token, err := time.ParseDuration(validator); err != nil {
+				return errorSyntax
+			} else if time.Duration(value.Int()) == token {
 				return errorValidation
 			}
 		} else {
-			if token, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() == token {
+			if token, err := strconv.ParseInt(validator, 10, 64); err != nil {
+				return errorSyntax
+			} else if value.Int() == token {
 				return errorValidation
 			}
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		if token, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() == token {
+		if token, err := strconv.ParseUint(validator, 10, 64); err != nil {
+			return errorSyntax
+		} else if value.Uint() == token {
 			return errorValidation
 		}
 	case reflect.Float32, reflect.Float64:
-		if token, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() == token {
+		if token, err := strconv.ParseFloat(validator, 64); err != nil {
+			return errorSyntax
+		} else if value.Float() == token {
 			return errorValidation
 		}
 	case reflect.String, reflect.Map, reflect.Slice, reflect.Array:
-		if token, err := strconv.Atoi(validator); err == nil && value.Len() == token {
+		if token, err := strconv.Atoi(validator); err != nil {
+			return errorSyntax
+		} else if value.Len() == token {
 			return errorValidation
 		}
 	}
@@ -164,27 +194,42 @@ func validateGt(value reflect.Value, name string, validator string) error {
 		ValidatorValue: validator,
 	}
 
+	errorSyntax := ErrorSyntax{
+		Value:   validator,
+		Comment: "could not parse",
+	}
+
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if typ == reflect.TypeOf((time.Duration)(0)) {
-			if token, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) <= token {
+			if token, err := time.ParseDuration(validator); err != nil {
+				return errorSyntax
+			} else if time.Duration(value.Int()) <= token {
 				return errorValidation
 			}
 		} else {
-			if token, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() <= token {
+			if token, err := strconv.ParseInt(validator, 10, 64); err != nil {
+				return errorSyntax
+			} else if value.Int() <= token {
 				return errorValidation
 			}
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		if token, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() <= token {
+		if token, err := strconv.ParseUint(validator, 10, 64); err != nil {
+			return errorSyntax
+		} else if value.Uint() <= token {
 			return errorValidation
 		}
 	case reflect.Float32, reflect.Float64:
-		if token, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() <= token {
+		if token, err := strconv.ParseFloat(validator, 64); err != nil {
+			return errorSyntax
+		} else if value.Float() <= token {
 			return errorValidation
 		}
 	case reflect.String, reflect.Map, reflect.Slice, reflect.Array:
-		if token, err := strconv.Atoi(validator); err == nil && value.Len() <= token {
+		if token, err := strconv.Atoi(validator); err != nil {
+			return errorSyntax
+		} else if value.Len() <= token {
 			return errorValidation
 		}
 	}
@@ -203,27 +248,42 @@ func validateLt(value reflect.Value, name string, validator string) error {
 		ValidatorValue: validator,
 	}
 
+	errorSyntax := ErrorSyntax{
+		Value:   validator,
+		Comment: "could not parse",
+	}
+
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if typ == reflect.TypeOf((time.Duration)(0)) {
-			if token, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) >= token {
+			if token, err := time.ParseDuration(validator); err != nil {
+				return errorSyntax
+			} else if time.Duration(value.Int()) >= token {
 				return errorValidation
 			}
 		} else {
-			if token, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() >= token {
+			if token, err := strconv.ParseInt(validator, 10, 64); err != nil {
+				return errorSyntax
+			} else if value.Int() >= token {
 				return errorValidation
 			}
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		if token, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() >= token {
+		if token, err := strconv.ParseUint(validator, 10, 64); err != nil {
+			return errorSyntax
+		} else if value.Uint() >= token {
 			return errorValidation
 		}
 	case reflect.Float32, reflect.Float64:
-		if token, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() >= token {
+		if token, err := strconv.ParseFloat(validator, 64); err != nil {
+			return errorSyntax
+		} else if value.Float() >= token {
 			return errorValidation
 		}
 	case reflect.String, reflect.Map, reflect.Slice, reflect.Array:
-		if token, err := strconv.Atoi(validator); err == nil && value.Len() >= token {
+		if token, err := strconv.Atoi(validator); err != nil {
+			return errorSyntax
+		} else if value.Len() >= token {
 			return errorValidation
 		}
 	}
@@ -242,27 +302,42 @@ func validateGte(value reflect.Value, name string, validator string) error {
 		ValidatorValue: validator,
 	}
 
+	errorSyntax := ErrorSyntax{
+		Value:   validator,
+		Comment: "could not parse",
+	}
+
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if typ == reflect.TypeOf((time.Duration)(0)) {
-			if token, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) < token {
+			if token, err := time.ParseDuration(validator); err != nil {
+				return errorSyntax
+			} else if time.Duration(value.Int()) < token {
 				return errorValidation
 			}
 		} else {
-			if token, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() < token {
+			if token, err := strconv.ParseInt(validator, 10, 64); err != nil {
+				return errorSyntax
+			} else if value.Int() < token {
 				return errorValidation
 			}
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		if token, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() < token {
+		if token, err := strconv.ParseUint(validator, 10, 64); err != nil {
+			return errorSyntax
+		} else if value.Uint() < token {
 			return errorValidation
 		}
 	case reflect.Float32, reflect.Float64:
-		if token, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() < token {
+		if token, err := strconv.ParseFloat(validator, 64); err != nil {
+			return errorSyntax
+		} else if value.Float() < token {
 			return errorValidation
 		}
 	case reflect.String, reflect.Map, reflect.Slice, reflect.Array:
-		if token, err := strconv.Atoi(validator); err == nil && value.Len() < token {
+		if token, err := strconv.Atoi(validator); err != nil {
+			return errorSyntax
+		} else if value.Len() < token {
 			return errorValidation
 		}
 	}
@@ -281,27 +356,42 @@ func validateLte(value reflect.Value, name string, validator string) error {
 		ValidatorValue: validator,
 	}
 
+	errorSyntax := ErrorSyntax{
+		Value:   validator,
+		Comment: "could not parse",
+	}
+
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if typ == reflect.TypeOf((time.Duration)(0)) {
-			if token, err := time.ParseDuration(validator); err == nil && time.Duration(value.Int()) > token {
+			if token, err := time.ParseDuration(validator); err != nil {
+				return errorSyntax
+			} else if time.Duration(value.Int()) > token {
 				return errorValidation
 			}
 		} else {
-			if token, err := strconv.ParseInt(validator, 10, 64); err == nil && value.Int() > token {
+			if token, err := strconv.ParseInt(validator, 10, 64); err != nil {
+				return errorSyntax
+			} else if value.Int() > token {
 				return errorValidation
 			}
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		if token, err := strconv.ParseUint(validator, 10, 64); err == nil && value.Uint() > token {
+		if token, err := strconv.ParseUint(validator, 10, 64); err != nil {
+			return errorSyntax
+		} else if value.Uint() > token {
 			return errorValidation
 		}
 	case reflect.Float32, reflect.Float64:
-		if token, err := strconv.ParseFloat(validator, 64); err == nil && value.Float() > token {
+		if token, err := strconv.ParseFloat(validator, 64); err != nil {
+			return errorSyntax
+		} else if value.Float() > token {
 			return errorValidation
 		}
 	case reflect.String, reflect.Map, reflect.Slice, reflect.Array:
-		if token, err := strconv.Atoi(validator); err == nil && value.Len() > token {
+		if token, err := strconv.Atoi(validator); err != nil {
+			return errorSyntax
+		} else if value.Len() > token {
 			return errorValidation
 		}
 	}
@@ -319,14 +409,19 @@ func validateEmpty(value reflect.Value, name string, validator string) error {
 		ValidatorValue: validator,
 	}
 
+	errorSyntax := ErrorSyntax{
+		Value:   validator,
+		Comment: "could not parse",
+	}
+
 	switch kind {
 	case reflect.String, reflect.Map, reflect.Slice, reflect.Array:
-		if isEmpty, err := strconv.ParseBool(validator); err == nil {
-			if isEmpty && value.Len() > 0 {
-				return errorValidation
-			} else if !isEmpty && value.Len() == 0 {
-				return errorValidation
-			}
+		if isEmpty, err := strconv.ParseBool(validator); err != nil {
+			return errorSyntax
+		} else if isEmpty && value.Len() > 0 {
+			return errorValidation
+		} else if !isEmpty && value.Len() == 0 {
+			return errorValidation
 		}
 	}
 
@@ -343,14 +438,19 @@ func validateNil(value reflect.Value, name string, validator string) error {
 		ValidatorValue: validator,
 	}
 
+	errorSyntax := ErrorSyntax{
+		Value:   validator,
+		Comment: "could not parse",
+	}
+
 	switch kind {
 	case reflect.Ptr:
-		if isNil, err := strconv.ParseBool(validator); err == nil {
-			if isNil && !value.IsNil() {
-				return errorValidation
-			} else if !isNil && value.IsNil() {
-				return errorValidation
-			}
+		if isNil, err := strconv.ParseBool(validator); err != nil {
+			return errorSyntax
+		} else if isNil && !value.IsNil() {
+			return errorValidation
+		} else if !isNil && value.IsNil() {
+			return errorValidation
 		}
 	}
 
@@ -368,13 +468,20 @@ func validateOneOf(value reflect.Value, name string, validator string) error {
 		ValidatorValue: validator,
 	}
 
+	errorSyntax := ErrorSyntax{
+		Value:   validator,
+		Comment: "could not parse",
+	}
+
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if typ == reflect.TypeOf((time.Duration)(0)) {
 			if tokens := parseTokens(validator); len(tokens) > 0 {
 				for i, token := range tokens {
 					tokens[i] = nil
-					if token, err := time.ParseDuration(token.(string)); err == nil {
+					if token, err := time.ParseDuration(token.(string)); err != nil {
+						return errorSyntax
+					} else {
 						tokens[i] = token
 					}
 				}
@@ -386,7 +493,9 @@ func validateOneOf(value reflect.Value, name string, validator string) error {
 			if tokens := parseTokens(validator); len(tokens) > 0 {
 				for i, token := range tokens {
 					tokens[i] = nil
-					if token, err := strconv.ParseInt(token.(string), 10, 64); err == nil {
+					if token, err := strconv.ParseInt(token.(string), 10, 64); err != nil {
+						return errorSyntax
+					} else {
 						tokens[i] = token
 					}
 				}
@@ -399,7 +508,9 @@ func validateOneOf(value reflect.Value, name string, validator string) error {
 		if tokens := parseTokens(validator); len(tokens) > 0 {
 			for i, token := range tokens {
 				tokens[i] = nil
-				if token, err := strconv.ParseUint(token.(string), 10, 64); err == nil {
+				if token, err := strconv.ParseUint(token.(string), 10, 64); err != nil {
+					return errorSyntax
+				} else {
 					tokens[i] = token
 				}
 			}
@@ -411,7 +522,9 @@ func validateOneOf(value reflect.Value, name string, validator string) error {
 		if tokens := parseTokens(validator); len(tokens) > 0 {
 			for i, token := range tokens {
 				tokens[i] = nil
-				if token, err := strconv.ParseFloat(token.(string), 64); err == nil {
+				if token, err := strconv.ParseFloat(token.(string), 64); err != nil {
+					return errorSyntax
+				} else {
 					tokens[i] = token
 				}
 			}
@@ -440,13 +553,18 @@ func validateFormat(value reflect.Value, name string, validator string) error {
 		ValidatorValue: validator,
 	}
 
+	errorSyntax := ErrorSyntax{
+		Value:   validator,
+		Comment: "could not find format",
+	}
+
 	switch kind {
 	case reflect.String:
 		formatTypeMap := getFormatTypeMap()
-		if formatFunc, ok := formatTypeMap[FormatType(validator)]; ok {
-			if !formatFunc(value.String()) {
-				return errorValidation
-			}
+		if formatFunc, ok := formatTypeMap[FormatType(validator)]; !ok {
+			return errorSyntax
+		} else if !formatFunc(value.String()) {
+			return errorValidation
 		}
 	}
 
