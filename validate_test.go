@@ -262,6 +262,20 @@ func TestBasic(t *testing.T) {
 	}
 }
 
+func TestErrors(t *testing.T) {
+	err := Validate([]struct {
+		field map[time.Duration]int `validate:"gte=2 [eq=0s]"`
+	}{{
+		field: map[time.Duration]int{-time.Second: 1},
+	}})
+
+	switch err.(type) {
+	case ErrorValidation:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+}
+
 type StCustomValidator struct {
 	field        int
 	anotherField int `validate:"eq=0"`
