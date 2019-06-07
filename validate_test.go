@@ -263,6 +263,7 @@ func TestBasic(t *testing.T) {
 
 func TestErrors(t *testing.T) {
 	var err error
+	zero := 0
 
 	err = Validate(struct {
 		field map[time.Duration]int `validate:"gte=2 [eq=0s]"`
@@ -388,6 +389,114 @@ func TestErrors(t *testing.T) {
 		field map[time.Duration]int `validate:"gte=0=0"`
 	}{
 		field: map[time.Duration]int{-time.Second: 0},
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field int `validate:"empty=true"`
+	}{
+		field: 0,
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field int `validate:"nil=true"`
+	}{
+		field: 0,
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field *int `validate:"eq=0"`
+	}{
+		field: &zero,
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field *int `validate:"ne=0"`
+	}{
+		field: &zero,
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field *int `validate:"gt=0"`
+	}{
+		field: &zero,
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field *int `validate:"lt=0"`
+	}{
+		field: &zero,
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field *int `validate:"gte=0"`
+	}{
+		field: &zero,
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field *int `validate:"lte=0"`
+	}{
+		field: &zero,
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field *int `validate:"format=email"`
+	}{
+		field: &zero,
 	})
 
 	switch err.(type) {
@@ -5068,25 +5177,5 @@ func TestDeepDeepStructVal(t *testing.T) {
 		},
 	}) {
 		t.Errorf("complex validator does not validate")
-	}
-}
-
-func TestIncorrectDeepVal(t *testing.T) {
-	one := 1
-
-	if nil != Validate(struct {
-		field []int `validate:"gte=0"`
-	}{
-		field: []int{-1},
-	}) {
-		t.Errorf("gte validator validates one level deep for slice")
-	}
-
-	if nil != Validate(struct {
-		field *int `validate:"lte=0"`
-	}{
-		field: &one,
-	}) {
-		t.Errorf("lte validator validates one level deep for pointer")
 	}
 }

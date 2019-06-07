@@ -88,7 +88,7 @@ func validateEq(value reflect.Value, validator string) ErrorField {
 	errorSyntax := ErrorSyntax{
 		expression: validator,
 		near:       string(ValidatorEq),
-		comment:    "could not parse",
+		comment:    "could not parse or run",
 	}
 
 	switch kind {
@@ -124,6 +124,8 @@ func validateEq(value reflect.Value, validator string) ErrorField {
 		} else if value.Len() != token {
 			return errorValidation
 		}
+	default:
+		return errorSyntax
 	}
 
 	return nil
@@ -142,7 +144,7 @@ func validateNe(value reflect.Value, validator string) ErrorField {
 	errorSyntax := ErrorSyntax{
 		expression: validator,
 		near:       string(ValidatorNe),
-		comment:    "could not parse",
+		comment:    "could not parse or run",
 	}
 
 	switch kind {
@@ -178,6 +180,8 @@ func validateNe(value reflect.Value, validator string) ErrorField {
 		} else if value.Len() == token {
 			return errorValidation
 		}
+	default:
+		return errorSyntax
 	}
 
 	return nil
@@ -196,7 +200,7 @@ func validateGt(value reflect.Value, validator string) ErrorField {
 	errorSyntax := ErrorSyntax{
 		expression: validator,
 		near:       string(ValidatorGt),
-		comment:    "could not parse",
+		comment:    "could not parse or run",
 	}
 
 	switch kind {
@@ -232,6 +236,8 @@ func validateGt(value reflect.Value, validator string) ErrorField {
 		} else if value.Len() <= token {
 			return errorValidation
 		}
+	default:
+		return errorSyntax
 	}
 
 	return nil
@@ -250,7 +256,7 @@ func validateLt(value reflect.Value, validator string) ErrorField {
 	errorSyntax := ErrorSyntax{
 		expression: validator,
 		near:       string(ValidatorLt),
-		comment:    "could not parse",
+		comment:    "could not parse or run",
 	}
 
 	switch kind {
@@ -286,6 +292,8 @@ func validateLt(value reflect.Value, validator string) ErrorField {
 		} else if value.Len() >= token {
 			return errorValidation
 		}
+	default:
+		return errorSyntax
 	}
 
 	return nil
@@ -304,7 +312,7 @@ func validateGte(value reflect.Value, validator string) ErrorField {
 	errorSyntax := ErrorSyntax{
 		expression: validator,
 		near:       string(ValidatorGte),
-		comment:    "could not parse",
+		comment:    "could not parse or run",
 	}
 
 	switch kind {
@@ -340,6 +348,8 @@ func validateGte(value reflect.Value, validator string) ErrorField {
 		} else if value.Len() < token {
 			return errorValidation
 		}
+	default:
+		return errorSyntax
 	}
 
 	return nil
@@ -358,7 +368,7 @@ func validateLte(value reflect.Value, validator string) ErrorField {
 	errorSyntax := ErrorSyntax{
 		expression: validator,
 		near:       string(ValidatorLte),
-		comment:    "could not parse",
+		comment:    "could not parse or run",
 	}
 
 	switch kind {
@@ -394,6 +404,8 @@ func validateLte(value reflect.Value, validator string) ErrorField {
 		} else if value.Len() > token {
 			return errorValidation
 		}
+	default:
+		return errorSyntax
 	}
 
 	return nil
@@ -411,7 +423,7 @@ func validateEmpty(value reflect.Value, validator string) ErrorField {
 	errorSyntax := ErrorSyntax{
 		expression: validator,
 		near:       string(ValidatorEmpty),
-		comment:    "could not parse",
+		comment:    "could not parse or run",
 	}
 
 	switch kind {
@@ -423,6 +435,8 @@ func validateEmpty(value reflect.Value, validator string) ErrorField {
 		} else if !isEmpty && value.Len() == 0 {
 			return errorValidation
 		}
+	default:
+		return errorSyntax
 	}
 
 	return nil
@@ -440,7 +454,7 @@ func validateNil(value reflect.Value, validator string) ErrorField {
 	errorSyntax := ErrorSyntax{
 		expression: validator,
 		near:       string(ValidatorNil),
-		comment:    "could not parse",
+		comment:    "could not parse or run",
 	}
 
 	switch kind {
@@ -452,6 +466,8 @@ func validateNil(value reflect.Value, validator string) ErrorField {
 		} else if !isNil && value.IsNil() {
 			return errorValidation
 		}
+	default:
+		return errorSyntax
 	}
 
 	return nil
@@ -470,7 +486,7 @@ func validateOneOf(value reflect.Value, validator string) ErrorField {
 	errorSyntax := ErrorSyntax{
 		expression: validator,
 		near:       string(ValidatorOneOf),
-		comment:    "could not parse",
+		comment:    "could not parse or run",
 	}
 
 	switch kind {
@@ -548,6 +564,8 @@ func validateOneOf(value reflect.Value, validator string) ErrorField {
 		if !tokenOneOf(value.String(), tokens) {
 			return errorValidation
 		}
+	default:
+		return errorSyntax
 	}
 
 	return nil
@@ -576,6 +594,8 @@ func validateFormat(value reflect.Value, validator string) ErrorField {
 		} else if !formatFunc(value.String()) {
 			return errorValidation
 		}
+	default:
+		return errorSyntax
 	}
 
 	return nil
