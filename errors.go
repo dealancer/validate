@@ -13,7 +13,7 @@ type ErrorField interface {
 
 // errorField is a setter interface
 type errorField interface {
-	SetFieldName(string)
+	setFieldName(string)
 }
 
 // ErrorValidation occurs when validator does not validate.
@@ -29,8 +29,8 @@ func (e ErrorValidation) FieldName() string {
 	return e.fieldName
 }
 
-// SetFieldName sets a field name.
-func (e *ErrorValidation) SetFieldName(fieldName string) {
+// setFieldName sets a field name.
+func (e *ErrorValidation) setFieldName(fieldName string) {
 	e.fieldName = fieldName
 }
 
@@ -47,7 +47,7 @@ func (e ErrorValidation) Error() string {
 	return fmt.Sprintf("Validation error in value of type \"%v\" using validator \"%v\"", e.fieldValue.Type(), validator)
 }
 
-// ErrorSyntax occurs when validator does not validate.
+// ErrorSyntax occurs when there is a syntax error.
 type ErrorSyntax struct {
 	fieldName  string
 	expression string
@@ -60,8 +60,8 @@ func (e ErrorSyntax) FieldName() string {
 	return e.fieldName
 }
 
-// SetFieldName sets a field name.
-func (e *ErrorSyntax) SetFieldName(fieldName string) {
+// setFieldName sets a field name.
+func (e *ErrorSyntax) setFieldName(fieldName string) {
 	e.fieldName = fieldName
 }
 
@@ -79,12 +79,12 @@ func setFieldName(err ErrorField, fieldName string) ErrorField {
 	case ErrorValidation:
 		e := err.(ErrorValidation)
 		var i interface{} = &e
-		(i).(errorField).SetFieldName(fieldName)
+		(i).(errorField).setFieldName(fieldName)
 		return e
 	case ErrorSyntax:
 		e := err.(ErrorSyntax)
 		var i interface{} = &e
-		(i).(errorField).SetFieldName(fieldName)
+		(i).(errorField).setFieldName(fieldName)
 		return e
 	}
 
