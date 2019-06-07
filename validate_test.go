@@ -10,32 +10,32 @@ import (
 func TestSplitValidators(t *testing.T) {
 	key, val, validators := "", "", ""
 
-	key, val, validators = splitValidators("")
+	key, val, validators, _ = splitValidators("")
 	if key != "" || val != "" || validators != "" {
 		t.Errorf("splitValidators incorrectly splits validators")
 	}
 
-	key, val, validators = splitValidators("[]>")
+	key, val, validators, _ = splitValidators("[]>")
 	if key != "" || val != "" || validators != "" {
 		t.Errorf("splitValidators incorrectly splits validators")
 	}
 
-	key, val, validators = splitValidators(" [ ] > ")
+	key, val, validators, _ = splitValidators(" [ ] > ")
 	if key != " " || val != "   " || validators != " " {
 		t.Errorf("splitValidators incorrectly splits validators")
 	}
 
-	key, val, validators = splitValidators("[[>]]>>")
+	key, val, validators, _ = splitValidators("[[>]]>>")
 	if key != "[>]" || val != "" || validators != ">" {
 		t.Errorf("splitValidators incorrectly splits validators")
 	}
 
-	key, val, validators = splitValidators("val_a=a val_b=b")
+	key, val, validators, _ = splitValidators("val_a=a val_b=b")
 	if key != "" || val != "val_a=a val_b=b" || validators != "" {
 		t.Errorf("splitValidators incorrectly splits validators")
 	}
 
-	key, val, validators = splitValidators("val_a=a val_b=b [[val_c=c] > val_d=d] val_e=e > val_f=f [val_g=g] > val_h=h")
+	key, val, validators, _ = splitValidators("val_a=a val_b=b [[val_c=c] > val_d=d] val_e=e > val_f=f [val_g=g] > val_h=h")
 	if key != "[val_c=c] > val_d=d" || val != "val_a=a val_b=b   val_e=e " || validators != " val_f=f [val_g=g] > val_h=h" {
 		t.Errorf("splitValidators incorrectly splits validators")
 	}
@@ -44,18 +44,17 @@ func TestSplitValidators(t *testing.T) {
 func TestParseValidators(t *testing.T) {
 	var validatorsOr [][]validator
 
-	validatorsOr = parseValidators("")
-	temp := make([][]validator, 0)
-	if !reflect.DeepEqual(validatorsOr, temp) {
+	validatorsOr, _ = parseValidators("")
+	if len(validatorsOr) > 0 {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
-	validatorsOr = parseValidators("&|&,&")
-	if !reflect.DeepEqual(validatorsOr, temp) {
+	validatorsOr, _ = parseValidators("&|&,&")
+	if len(validatorsOr) > 0 {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
-	validatorsOr = parseValidators("val_a=a")
+	validatorsOr, _ = parseValidators("val_a=a")
 	if !reflect.DeepEqual(validatorsOr, [][]validator{
 		[]validator{
 			validator{
@@ -67,7 +66,7 @@ func TestParseValidators(t *testing.T) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
-	validatorsOr = parseValidators("  val  |val_a=a|val_1 = 1  |  val_b = b , c_d_ , 1.0  |VAL = V A L U E ¶  ")
+	validatorsOr, _ = parseValidators("  val  |val_a=a|val_1 = 1  |  val_b = b , c_d_ , 1.0  |VAL = V A L U E ¶  ")
 	if !reflect.DeepEqual(validatorsOr, [][]validator{
 		[]validator{
 			validator{
@@ -103,7 +102,7 @@ func TestParseValidators(t *testing.T) {
 		t.Errorf("parseValidators incorrectly parses validators")
 	}
 
-	validatorsOr = parseValidators("  val  &val_a=a|val_1 = 1  &  val_b = b , c_d_ , 1.0  &VAL = V A L U E ¶  ")
+	validatorsOr, _ = parseValidators("  val  &val_a=a|val_1 = 1  &  val_b = b , c_d_ , 1.0  &VAL = V A L U E ¶  ")
 	if !reflect.DeepEqual(validatorsOr, [][]validator{
 		[]validator{
 			validator{
@@ -263,14 +262,136 @@ func TestBasic(t *testing.T) {
 }
 
 func TestErrors(t *testing.T) {
-	err := Validate([]struct {
+	var err error
+
+	err = Validate(struct {
 		field map[time.Duration]int `validate:"gte=2 [eq=0s]"`
-	}{{
+	}{
 		field: map[time.Duration]int{-time.Second: 1},
-	}})
+	})
 
 	switch err.(type) {
 	case ErrorValidation:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field map[time.Duration]int `validate:"gte=2 [eq=0s"`
+	}{
+		field: map[time.Duration]int{-time.Second: 0},
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field map[time.Duration]int `validate:"gte=2 [eq=0s]]"`
+	}{
+		field: map[time.Duration]int{-time.Second: 0},
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field map[time.Duration]int `validate:"&&"`
+	}{
+		field: map[time.Duration]int{-time.Second: 0},
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field map[time.Duration]int `validate:"||"`
+	}{
+		field: map[time.Duration]int{-time.Second: 0},
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field map[time.Duration]int `validate:">"`
+	}{
+		field: map[time.Duration]int{-time.Second: 0},
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field map[time.Duration]int `validate:">>gte=0"`
+	}{
+		field: map[time.Duration]int{-time.Second: -1},
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field map[time.Duration]int `validate:">[gte=0]"`
+	}{
+		field: map[time.Duration]int{-time.Second: -1},
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field map[time.Duration]int `validate:"abc"`
+	}{
+		field: map[time.Duration]int{-time.Second: 0},
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field map[time.Duration]int `validate:"gte"`
+	}{
+		field: map[time.Duration]int{-time.Second: 0},
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
+	default:
+		t.Errorf("error of the wrong type")
+	}
+
+	err = Validate(struct {
+		field map[time.Duration]int `validate:"gte=0=0"`
+	}{
+		field: map[time.Duration]int{-time.Second: 0},
+	})
+
+	switch err.(type) {
+	case ErrorSyntax:
 	default:
 		t.Errorf("error of the wrong type")
 	}
@@ -744,19 +865,11 @@ func TestFormatVal(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field int `validate:" gte = 0 & lte = 10 & bla = "`
+		field int `validate:" gte = 0 & lte = 10 "`
 	}{
 		field: 5,
 	}) {
 		t.Errorf("validators with spaces does not validate")
-	}
-
-	if nil != Validate(struct {
-		field int `validate:"1234567890=!@#$%^&*()"`
-	}{
-		field: 5,
-	}) {
-		t.Errorf("incorrect validator must not validate")
 	}
 
 	if nil != Validate(struct {
@@ -3762,7 +3875,7 @@ func TestDeepValsForMapValues(t *testing.T) {
 	}
 
 	if nil != Validate(struct {
-		field map[int]*string `validate:"> [nil=false]"`
+		field map[int]*string `validate:"> nil=false"`
 	}{
 		field: map[int]*string{
 			0: &s,

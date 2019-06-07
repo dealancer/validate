@@ -43,21 +43,38 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 	validatorTypeMap := getValidatorTypeMap()
 
 	// Get validators
-	keyValidators, valueValidators, validators := splitValidators(validators)
-	validatorsOr := parseValidators(valueValidators)
+	keyValidators, valueValidators, validators, err := splitValidators(validators)
+	if err != nil {
+		err = setFieldName(err, fieldName)
+		return err
+	}
 
 	// Call a custom validator
 	if err := callCustomValidator(value); err != nil {
 		return err
 	}
 
+	// Parse validators
+	validatorsOr, err := parseValidators(valueValidators)
+	if err != nil {
+		err = setFieldName(err, fieldName)
+		return err
+	}
+
 	// Perform validators
-	var err error
 	for _, validatorsAnd := range validatorsOr {
 		for _, validator := range validatorsAnd {
 			if validatorFunc, ok := validatorTypeMap[validator.Type]; ok {
-				if err = validatorFunc(value, fieldName, validator.Value); err != nil {
+				if err = validatorFunc(value, validator.Value); err != nil {
+					err = setFieldName(err, fieldName)
 					break
+				}
+			} else {
+				return ErrorSyntax{
+					fieldName:  fieldName,
+					expression: string(validator.Type),
+					near:       valueValidators,
+					comment:    "could not find a validator",
 				}
 			}
 		}
@@ -98,6 +115,28 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 		}
 	}
 
+	if kind != reflect.Map {
+		if len(keyValidators) > 0 {
+			return ErrorSyntax{
+				fieldName:  fieldName,
+				expression: validators,
+				near:       "",
+				comment:    "unexpexted expression",
+			}
+		}
+	}
+
+	if kind != reflect.Map && kind != reflect.Slice && kind != reflect.Array && kind != reflect.Ptr {
+		if len(validators) > 0 {
+			return ErrorSyntax{
+				fieldName:  fieldName,
+				expression: validators,
+				near:       "",
+				comment:    "unexpexted expression",
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -123,7 +162,8 @@ func getValidators(tag reflect.StructTag) string {
 }
 
 // splitValidators splits validators into key validators, value validators and remaning validators of the next level
-func splitValidators(validators string) (keyValidators string, valValidators string, remaningValidators string) {
+func splitValidators(validators string) (keyValidators string, valValidators string, remaningValidators string, err ErrorField) {
+	gt := 0
 	bracket := 0
 	bracketStart := 0
 	bracketEnd := -1
@@ -134,6 +174,7 @@ loop:
 		switch validators[i] {
 		case '>':
 			if bracket == 0 {
+				gt++
 				break loop
 			}
 		case '[':
@@ -147,6 +188,22 @@ loop:
 				bracketEnd = i
 			}
 		}
+	}
+
+	if bracket > 0 {
+		err = ErrorSyntax{
+			expression: "",
+			near:       validators,
+			comment:    "expected \"]\"",
+		}
+		return
+	} else if bracket < 0 {
+		err = ErrorSyntax{
+			expression: "",
+			near:       validators,
+			comment:    "unexpected \"]\"",
+		}
+		return
 	}
 
 	if bracketStart <= len(validators) {
@@ -165,14 +222,27 @@ loop:
 		remaningValidators = validators[i+1:]
 	}
 
+	if gt > 0 && len(remaningValidators) == 0 {
+		err = ErrorSyntax{
+			expression: "",
+			near:       validators,
+			comment:    "expected expression",
+		}
+		return
+	}
+
 	return
 }
 
-// parseValidator2 parses validators into the slice of slices.
+// parseValidator parses validators into the slice of slices.
 // First slice acts as AND logic, second array acts as OR logic.
-func parseValidators(validators string) (validatorsOr [][]validator) {
+func parseValidators(validators string) (validatorsOr [][]validator, err ErrorField) {
 	regexpType := regexp.MustCompile(`[[:alnum:]_]+`)
 	regexpValue := regexp.MustCompile(`[^=\s]+[^=]*[^=\s]+|[^=\s]+`)
+
+	if len(validators) == 0 {
+		return
+	}
 
 	entriesOr := strings.Split(validators, "|")
 	validatorsOr = make([][]validator, 0, len(entriesOr))
@@ -181,16 +251,27 @@ func parseValidators(validators string) (validatorsOr [][]validator) {
 		validatorsAnd := make([]validator, 0, len(entriesAnd))
 		for _, entryOr := range entriesAnd {
 			entries := strings.Split(entryOr, "=")
-			if len(entries) > 0 {
-				t := regexpType.FindString(entries[0])
-				v := ""
-				if len(entries) == 2 {
-					v = regexpValue.FindString(entries[1])
+			if len(entries) == 0 || len(entries) > 2 {
+				err = ErrorSyntax{
+					expression: validators,
+					comment:    "could not parse",
 				}
-				if len(t) > 0 {
-					validatorsAnd = append(validatorsAnd, validator{ValidatorType(t), v})
-				}
+				return
 			}
+			t := regexpType.FindString(entries[0])
+			if len(t) == 0 {
+				err = ErrorSyntax{
+					expression: entries[0],
+					near:       validators,
+					comment:    "could not parse",
+				}
+				return
+			}
+			v := ""
+			if len(entries) == 2 {
+				v = regexpValue.FindString(entries[1])
+			}
+			validatorsAnd = append(validatorsAnd, validator{ValidatorType(t), v})
 		}
 		if len(validatorsAnd) > 0 {
 			validatorsOr = append(validatorsOr, validatorsAnd)

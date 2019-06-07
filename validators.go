@@ -53,7 +53,7 @@ const (
 )
 
 // validatorFunc is an interface for validator func
-type validatorFunc func(value reflect.Value, name string, validator string) error
+type validatorFunc func(value reflect.Value, validator string) ErrorField
 
 func getValidatorTypeMap() map[ValidatorType]validatorFunc {
 	return map[ValidatorType]validatorFunc{
@@ -75,20 +75,20 @@ type validator struct {
 	Value string
 }
 
-func validateEq(value reflect.Value, name string, validator string) error {
+func validateEq(value reflect.Value, validator string) ErrorField {
 	kind := value.Kind()
 	typ := value.Type()
 
 	errorValidation := ErrorValidation{
-		FieldName:      name,
-		FieldValue:     value,
-		ValidatorType:  ValidatorEq,
-		ValidatorValue: validator,
+		fieldValue:     value,
+		validatorType:  ValidatorEq,
+		validatorValue: validator,
 	}
 
 	errorSyntax := ErrorSyntax{
-		Value:   validator,
-		Comment: "could not parse",
+		expression: validator,
+		near:       string(ValidatorEq),
+		comment:    "could not parse",
 	}
 
 	switch kind {
@@ -129,20 +129,20 @@ func validateEq(value reflect.Value, name string, validator string) error {
 	return nil
 }
 
-func validateNe(value reflect.Value, name string, validator string) error {
+func validateNe(value reflect.Value, validator string) ErrorField {
 	kind := value.Kind()
 	typ := value.Type()
 
 	errorValidation := ErrorValidation{
-		FieldName:      name,
-		FieldValue:     value,
-		ValidatorType:  ValidatorNe,
-		ValidatorValue: validator,
+		fieldValue:     value,
+		validatorType:  ValidatorNe,
+		validatorValue: validator,
 	}
 
 	errorSyntax := ErrorSyntax{
-		Value:   validator,
-		Comment: "could not parse",
+		expression: validator,
+		near:       string(ValidatorNe),
+		comment:    "could not parse",
 	}
 
 	switch kind {
@@ -183,20 +183,20 @@ func validateNe(value reflect.Value, name string, validator string) error {
 	return nil
 }
 
-func validateGt(value reflect.Value, name string, validator string) error {
+func validateGt(value reflect.Value, validator string) ErrorField {
 	kind := value.Kind()
 	typ := value.Type()
 
 	errorValidation := ErrorValidation{
-		FieldName:      name,
-		FieldValue:     value,
-		ValidatorType:  ValidatorGt,
-		ValidatorValue: validator,
+		fieldValue:     value,
+		validatorType:  ValidatorGt,
+		validatorValue: validator,
 	}
 
 	errorSyntax := ErrorSyntax{
-		Value:   validator,
-		Comment: "could not parse",
+		expression: validator,
+		near:       string(ValidatorGt),
+		comment:    "could not parse",
 	}
 
 	switch kind {
@@ -237,20 +237,20 @@ func validateGt(value reflect.Value, name string, validator string) error {
 	return nil
 }
 
-func validateLt(value reflect.Value, name string, validator string) error {
+func validateLt(value reflect.Value, validator string) ErrorField {
 	kind := value.Kind()
 	typ := value.Type()
 
 	errorValidation := ErrorValidation{
-		FieldName:      name,
-		FieldValue:     value,
-		ValidatorType:  ValidatorLt,
-		ValidatorValue: validator,
+		fieldValue:     value,
+		validatorType:  ValidatorLt,
+		validatorValue: validator,
 	}
 
 	errorSyntax := ErrorSyntax{
-		Value:   validator,
-		Comment: "could not parse",
+		expression: validator,
+		near:       string(ValidatorLt),
+		comment:    "could not parse",
 	}
 
 	switch kind {
@@ -291,20 +291,20 @@ func validateLt(value reflect.Value, name string, validator string) error {
 	return nil
 }
 
-func validateGte(value reflect.Value, name string, validator string) error {
+func validateGte(value reflect.Value, validator string) ErrorField {
 	kind := value.Kind()
 	typ := value.Type()
 
 	errorValidation := ErrorValidation{
-		FieldName:      name,
-		FieldValue:     value,
-		ValidatorType:  ValidatorGte,
-		ValidatorValue: validator,
+		fieldValue:     value,
+		validatorType:  ValidatorGte,
+		validatorValue: validator,
 	}
 
 	errorSyntax := ErrorSyntax{
-		Value:   validator,
-		Comment: "could not parse",
+		expression: validator,
+		near:       string(ValidatorGte),
+		comment:    "could not parse",
 	}
 
 	switch kind {
@@ -345,20 +345,20 @@ func validateGte(value reflect.Value, name string, validator string) error {
 	return nil
 }
 
-func validateLte(value reflect.Value, name string, validator string) error {
+func validateLte(value reflect.Value, validator string) ErrorField {
 	kind := value.Kind()
 	typ := value.Type()
 
 	errorValidation := ErrorValidation{
-		FieldName:      name,
-		FieldValue:     value,
-		ValidatorType:  ValidatorLte,
-		ValidatorValue: validator,
+		fieldValue:     value,
+		validatorType:  ValidatorLte,
+		validatorValue: validator,
 	}
 
 	errorSyntax := ErrorSyntax{
-		Value:   validator,
-		Comment: "could not parse",
+		expression: validator,
+		near:       string(ValidatorLte),
+		comment:    "could not parse",
 	}
 
 	switch kind {
@@ -399,19 +399,19 @@ func validateLte(value reflect.Value, name string, validator string) error {
 	return nil
 }
 
-func validateEmpty(value reflect.Value, name string, validator string) error {
+func validateEmpty(value reflect.Value, validator string) ErrorField {
 	kind := value.Kind()
 
 	errorValidation := ErrorValidation{
-		FieldName:      name,
-		FieldValue:     value,
-		ValidatorType:  ValidatorEmpty,
-		ValidatorValue: validator,
+		fieldValue:     value,
+		validatorType:  ValidatorEmpty,
+		validatorValue: validator,
 	}
 
 	errorSyntax := ErrorSyntax{
-		Value:   validator,
-		Comment: "could not parse",
+		expression: validator,
+		near:       string(ValidatorEmpty),
+		comment:    "could not parse",
 	}
 
 	switch kind {
@@ -428,19 +428,19 @@ func validateEmpty(value reflect.Value, name string, validator string) error {
 	return nil
 }
 
-func validateNil(value reflect.Value, name string, validator string) error {
+func validateNil(value reflect.Value, validator string) ErrorField {
 	kind := value.Kind()
 
 	errorValidation := ErrorValidation{
-		FieldName:      name,
-		FieldValue:     value,
-		ValidatorType:  ValidatorNil,
-		ValidatorValue: validator,
+		fieldValue:     value,
+		validatorType:  ValidatorNil,
+		validatorValue: validator,
 	}
 
 	errorSyntax := ErrorSyntax{
-		Value:   validator,
-		Comment: "could not parse",
+		expression: validator,
+		near:       string(ValidatorNil),
+		comment:    "could not parse",
 	}
 
 	switch kind {
@@ -457,20 +457,20 @@ func validateNil(value reflect.Value, name string, validator string) error {
 	return nil
 }
 
-func validateOneOf(value reflect.Value, name string, validator string) error {
+func validateOneOf(value reflect.Value, validator string) ErrorField {
 	kind := value.Kind()
 	typ := value.Type()
 
 	errorValidation := ErrorValidation{
-		FieldName:      name,
-		FieldValue:     value,
-		ValidatorType:  ValidatorOneOf,
-		ValidatorValue: validator,
+		fieldValue:     value,
+		validatorType:  ValidatorOneOf,
+		validatorValue: validator,
 	}
 
 	errorSyntax := ErrorSyntax{
-		Value:   validator,
-		Comment: "could not parse",
+		expression: validator,
+		near:       string(ValidatorEq),
+		comment:    "could not parse",
 	}
 
 	switch kind {
@@ -543,19 +543,19 @@ func validateOneOf(value reflect.Value, name string, validator string) error {
 	return nil
 }
 
-func validateFormat(value reflect.Value, name string, validator string) error {
+func validateFormat(value reflect.Value, validator string) ErrorField {
 	kind := value.Kind()
 
 	errorValidation := ErrorValidation{
-		FieldName:      name,
-		FieldValue:     value,
-		ValidatorType:  ValidatorFormat,
-		ValidatorValue: validator,
+		fieldValue:     value,
+		validatorType:  ValidatorFormat,
+		validatorValue: validator,
 	}
 
 	errorSyntax := ErrorSyntax{
-		Value:   validator,
-		Comment: "could not find format",
+		expression: validator,
+		near:       string(ValidatorFormat),
+		comment:    "could not find format",
 	}
 
 	switch kind {

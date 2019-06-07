@@ -5,33 +5,88 @@ import (
 	"reflect"
 )
 
+// ErrorField is an error interface for field/value validation .
+type ErrorField interface {
+	error
+	FieldName() string
+}
+
+// errorField is a setter interface
+type errorField interface {
+	SetFieldName(string)
+}
+
 // ErrorValidation occurs when validator does not validate.
 type ErrorValidation struct {
-	FieldName      string
-	FieldValue     reflect.Value
-	ValidatorType  ValidatorType
-	ValidatorValue string
+	fieldName      string
+	fieldValue     reflect.Value
+	validatorType  ValidatorType
+	validatorValue string
+}
+
+// FieldName gets a field name.
+func (e ErrorValidation) FieldName() string {
+	return e.fieldName
+}
+
+// SetFieldName sets a field name.
+func (e *ErrorValidation) SetFieldName(fieldName string) {
+	e.fieldName = fieldName
 }
 
 func (e ErrorValidation) Error() string {
-	validator := string(e.ValidatorType)
-	if len(e.ValidatorValue) > 0 {
-		validator += "=" + e.ValidatorValue
+	validator := string(e.validatorType)
+	if len(e.validatorValue) > 0 {
+		validator += "=" + e.validatorValue
 	}
 
-	if len(e.FieldName) > 0 {
-		return fmt.Sprintf("Validation error in field \"%v\" of type \"%v\" using validator \"%v\"", e.FieldName, e.FieldValue.Type(), validator)
+	if len(e.fieldName) > 0 {
+		return fmt.Sprintf("Validation error in field \"%v\" of type \"%v\" using validator \"%v\"", e.fieldName, e.fieldValue.Type(), validator)
 	}
 
-	return fmt.Sprintf("Validation error in value of type \"%v\" using validator \"%v\"", e.FieldValue.Type(), validator)
+	return fmt.Sprintf("Validation error in value of type \"%v\" using validator \"%v\"", e.fieldValue.Type(), validator)
 }
 
 // ErrorSyntax occurs when validator does not validate.
 type ErrorSyntax struct {
-	Value   string
-	Comment string
+	fieldName  string
+	expression string
+	near       string
+	comment    string
+}
+
+// FieldName gets a field name.
+func (e ErrorSyntax) FieldName() string {
+	return e.fieldName
+}
+
+// SetFieldName sets a field name.
+func (e *ErrorSyntax) SetFieldName(fieldName string) {
+	e.fieldName = fieldName
 }
 
 func (e ErrorSyntax) Error() string {
-	return fmt.Sprintf("Syntax error in \"%v\": \"%v\"", e.Value, e.Comment)
+	if len(e.fieldName) > 0 {
+		return fmt.Sprintf("Syntax error when validating field \"%v\", expression \"%v\" near \"%v\": %v", e.fieldName, e.expression, e.near, e.comment)
+	}
+
+	return fmt.Sprintf("Syntax error when validating value, expression \"%v\" near \"%v\": %v", e.expression, e.near, e.comment)
+}
+
+// Set field name
+func setFieldName(err ErrorField, fieldName string) ErrorField {
+	switch (err).(type) {
+	case ErrorValidation:
+		e := err.(ErrorValidation)
+		var i interface{} = &e
+		(i).(errorField).SetFieldName(fieldName)
+		return e
+	case ErrorSyntax:
+		e := err.(ErrorSyntax)
+		var i interface{} = &e
+		(i).(errorField).SetFieldName(fieldName)
+		return e
+	}
+
+	return err
 }
