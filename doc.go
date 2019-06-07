@@ -133,5 +133,27 @@ Custom validation also works for a substuct, if a substruct is defined in an exp
 		}
 		return nil
 	}
+
+Handling errors
+
+Validate method returns two types of errors: ErrorSyntax and ErrorValidation.
+You can handle an error type using switch syntax.
+
+	type S struct {
+		field *string `validate:"empty=false"`
+	}
+
+	var err error
+
+	if err = validate.Validate(S{nil}); err != nil {
+		switch err.(type) {
+		case validate.ErrorSyntax:
+			// Handle syntax error
+		case validate.ErrorValidation:
+			// Handle validation error
+		default:
+			// Handle other errors
+		}
+	}
 */
 package validate
