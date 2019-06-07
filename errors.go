@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-// ErrorField is an error interface for field/value validation .
+// ErrorField is an error interface for field/value error.
 type ErrorField interface {
 	error
 	FieldName() string
