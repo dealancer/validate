@@ -896,8 +896,16 @@ func TestFormatVal(t *testing.T) {
 		t.Errorf("validators with spaces does not validate")
 	}
 
-	if nil != Validate(struct {
+	if nil == Validate(struct {
 		field int `validate:"one_of="`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("empty one_of validate should not validate")
+	}
+
+	if nil == Validate(struct {
+		field int `validate:"one_of"`
 	}{
 		field: 0,
 	}) {
@@ -906,6 +914,14 @@ func TestFormatVal(t *testing.T) {
 }
 
 func TestEqValForDuration(t *testing.T) {
+	if nil == Validate(struct {
+		field time.Duration `validate:"eq=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("eq validator does not validate for time.Duratuon")
+	}
+
 	if nil == Validate(struct {
 		field time.Duration `validate:"eq=0s"`
 	}{
@@ -924,6 +940,14 @@ func TestEqValForDuration(t *testing.T) {
 }
 
 func TestEqValForInt(t *testing.T) {
+	if nil == Validate(struct {
+		field int `validate:"eq=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("eq validator does not validate for int")
+	}
+
 	if nil != Validate(struct {
 		field int `validate:"eq=0"`
 	}{
@@ -1006,6 +1030,14 @@ func TestEqValForInt(t *testing.T) {
 }
 
 func TestEqValForRune(t *testing.T) {
+	if nil == Validate(struct {
+		field rune `validate:"eq=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("eq validator does not validate for rune")
+	}
+
 	if nil != Validate(struct {
 		field rune `validate:"eq=0"`
 	}{
@@ -1024,6 +1056,14 @@ func TestEqValForRune(t *testing.T) {
 }
 
 func TestEqValForUint(t *testing.T) {
+	if nil == Validate(struct {
+		field uint `validate:"eq=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("eq validator does not validate for uint")
+	}
+
 	if nil != Validate(struct {
 		field uint `validate:"eq=10"`
 	}{
@@ -1122,6 +1162,14 @@ func TestEqValForUint(t *testing.T) {
 }
 
 func TestEqValForFloat(t *testing.T) {
+	if nil == Validate(struct {
+		field float32 `validate:"eq=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("eq validator does not validate for flaot32")
+	}
+
 	if nil != Validate(struct {
 		field float32 `validate:"eq=0"`
 	}{
@@ -1156,6 +1204,14 @@ func TestEqValForFloat(t *testing.T) {
 }
 
 func TestEqValForString(t *testing.T) {
+	if nil == Validate(struct {
+		field string `validate:"eq=abc"`
+	}{
+		field: "aa",
+	}) {
+		t.Errorf("eq validator does not validate for string")
+	}
+
 	if nil != Validate(struct {
 		field string `validate:"eq=2"`
 	}{
@@ -1174,6 +1230,17 @@ func TestEqValForString(t *testing.T) {
 }
 
 func TestEqValForMap(t *testing.T) {
+	if nil == Validate(struct {
+		field map[string]string `validate:"eq=abc"`
+	}{
+		field: map[string]string{
+			"a": "a",
+			"b": "b",
+		},
+	}) {
+		t.Errorf("eq validator does not validate for map")
+	}
+
 	if nil != Validate(struct {
 		field map[string]string `validate:"eq=2"`
 	}{
@@ -1199,6 +1266,14 @@ func TestEqValForMap(t *testing.T) {
 }
 
 func TestEqValForSlice(t *testing.T) {
+	if nil == Validate(struct {
+		field []string `validate:"eq=abc"`
+	}{
+		field: []string{"a", "b"},
+	}) {
+		t.Errorf("eq validator does not validate for slice")
+	}
+
 	if nil != Validate(struct {
 		field []string `validate:"eq=2"`
 	}{
@@ -1217,6 +1292,14 @@ func TestEqValForSlice(t *testing.T) {
 }
 
 func TestEqValForArray(t *testing.T) {
+	if nil == Validate(struct {
+		field [2]string `validate:"eq=abc"`
+	}{
+		field: [2]string{"a", "b"},
+	}) {
+		t.Errorf("eq validator does not validate for string")
+	}
+
 	if nil != Validate(struct {
 		field [2]string `validate:"eq=2"`
 	}{
@@ -1235,6 +1318,14 @@ func TestEqValForArray(t *testing.T) {
 }
 
 func TestNeValForDuration(t *testing.T) {
+	if nil == Validate(struct {
+		field time.Duration `validate:"ne=abc"`
+	}{
+		field: -time.Second,
+	}) {
+		t.Errorf("ne validator does not validate for time.Duratuon")
+	}
+
 	if nil != Validate(struct {
 		field time.Duration `validate:"ne=0s"`
 	}{
@@ -1253,6 +1344,14 @@ func TestNeValForDuration(t *testing.T) {
 }
 
 func TestNeValForInt(t *testing.T) {
+	if nil == Validate(struct {
+		field int `validate:"ne=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("ne validator does not validate for int")
+	}
+
 	if nil == Validate(struct {
 		field int `validate:"ne=0"`
 	}{
@@ -1336,6 +1435,14 @@ func TestNeValForInt(t *testing.T) {
 
 func TestNeValForRune(t *testing.T) {
 	if nil == Validate(struct {
+		field rune `validate:"ne=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("ne validator does not validate for rune")
+	}
+
+	if nil == Validate(struct {
 		field rune `validate:"ne=0"`
 	}{
 		field: 0,
@@ -1353,6 +1460,14 @@ func TestNeValForRune(t *testing.T) {
 }
 
 func TestNeValForUint(t *testing.T) {
+	if nil == Validate(struct {
+		field uint `validate:"ne=abc"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("ne validator does not validate for uint")
+	}
+
 	if nil == Validate(struct {
 		field uint `validate:"ne=10"`
 	}{
@@ -1452,6 +1567,14 @@ func TestNeValForUint(t *testing.T) {
 
 func TestNeValForFloat(t *testing.T) {
 	if nil == Validate(struct {
+		field float32 `validate:"ne=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("ne validator does not validate for flaot32")
+	}
+
+	if nil == Validate(struct {
 		field float32 `validate:"ne=0"`
 	}{
 		field: 0,
@@ -1486,6 +1609,14 @@ func TestNeValForFloat(t *testing.T) {
 
 func TestNeValForString(t *testing.T) {
 	if nil == Validate(struct {
+		field string `validate:"ne=abc"`
+	}{
+		field: "aa",
+	}) {
+		t.Errorf("ne validator does not validate for string")
+	}
+
+	if nil == Validate(struct {
 		field string `validate:"ne=2"`
 	}{
 		field: "aa",
@@ -1503,6 +1634,17 @@ func TestNeValForString(t *testing.T) {
 }
 
 func TestNeValForMap(t *testing.T) {
+	if nil == Validate(struct {
+		field map[string]string `validate:"ne=abc"`
+	}{
+		field: map[string]string{
+			"a": "a",
+			"b": "b",
+		},
+	}) {
+		t.Errorf("ne validator does not validate for map")
+	}
+
 	if nil == Validate(struct {
 		field map[string]string `validate:"ne=2"`
 	}{
@@ -1529,6 +1671,14 @@ func TestNeValForMap(t *testing.T) {
 
 func TestNeValForSlice(t *testing.T) {
 	if nil == Validate(struct {
+		field []string `validate:"ne=abc"`
+	}{
+		field: []string{"a", "b"},
+	}) {
+		t.Errorf("ne validator does not validate for slice")
+	}
+
+	if nil == Validate(struct {
 		field []string `validate:"ne=2"`
 	}{
 		field: []string{"a", "b"},
@@ -1547,6 +1697,14 @@ func TestNeValForSlice(t *testing.T) {
 
 func TestNeValForArray(t *testing.T) {
 	if nil == Validate(struct {
+		field [2]string `validate:"ne=abc"`
+	}{
+		field: [2]string{"a", "b"},
+	}) {
+		t.Errorf("ne validator does not validate for string")
+	}
+
+	if nil == Validate(struct {
 		field [2]string `validate:"ne=2"`
 	}{
 		field: [2]string{"a", "b"},
@@ -1564,6 +1722,14 @@ func TestNeValForArray(t *testing.T) {
 }
 
 func TestGtValForDuration(t *testing.T) {
+	if nil == Validate(struct {
+		field time.Duration `validate:"gt=abc"`
+	}{
+		field: -time.Second,
+	}) {
+		t.Errorf("gt validator does not validate for time.Duratuon")
+	}
+
 	if nil == Validate(struct {
 		field time.Duration `validate:"gt=0s"`
 	}{
@@ -1599,6 +1765,14 @@ func TestGtValForDuration(t *testing.T) {
 
 func TestLtValForDuration(t *testing.T) {
 	if nil == Validate(struct {
+		field time.Duration `validate:"lt=abc"`
+	}{
+		field: time.Second,
+	}) {
+		t.Errorf("lt validator does not validate for time.Duratuon")
+	}
+
+	if nil == Validate(struct {
 		field time.Duration `validate:"lt=0s"`
 	}{
 		field: time.Second,
@@ -1632,6 +1806,14 @@ func TestLtValForDuration(t *testing.T) {
 }
 
 func TestGtValForInt(t *testing.T) {
+	if nil == Validate(struct {
+		field int `validate:"gt=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("gt validator does not validate for int")
+	}
+
 	if nil == Validate(struct {
 		field int `validate:"gt=0"`
 	}{
@@ -1715,6 +1897,14 @@ func TestGtValForInt(t *testing.T) {
 
 func TestLtValForInt(t *testing.T) {
 	if nil == Validate(struct {
+		field int `validate:"lt=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for int")
+	}
+
+	if nil == Validate(struct {
 		field int `validate:"lt=0"`
 	}{
 		field: 0,
@@ -1797,6 +1987,14 @@ func TestLtValForInt(t *testing.T) {
 
 func TestGtValForRune(t *testing.T) {
 	if nil == Validate(struct {
+		field rune `validate:"gt=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("gt validator does not validate for rune")
+	}
+
+	if nil == Validate(struct {
 		field rune `validate:"gt=0"`
 	}{
 		field: 0,
@@ -1815,6 +2013,14 @@ func TestGtValForRune(t *testing.T) {
 
 func TestLtValForRune(t *testing.T) {
 	if nil == Validate(struct {
+		field rune `validate:"lt=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for rune")
+	}
+
+	if nil == Validate(struct {
 		field rune `validate:"lt=0"`
 	}{
 		field: 0,
@@ -1832,6 +2038,14 @@ func TestLtValForRune(t *testing.T) {
 }
 
 func TestGtValForUint(t *testing.T) {
+	if nil == Validate(struct {
+		field uint `validate:"gt=abc"`
+	}{
+		field: 10,
+	}) {
+		t.Errorf("gt validator does not validate for uint")
+	}
+
 	if nil == Validate(struct {
 		field uint `validate:"gt=10"`
 	}{
@@ -1931,6 +2145,14 @@ func TestGtValForUint(t *testing.T) {
 
 func TestLtValForUint(t *testing.T) {
 	if nil == Validate(struct {
+		field uint `validate:"lt=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for uint")
+	}
+
+	if nil == Validate(struct {
 		field uint `validate:"lt=0"`
 	}{
 		field: 0,
@@ -2029,6 +2251,14 @@ func TestLtValForUint(t *testing.T) {
 
 func TestGtValForFloat(t *testing.T) {
 	if nil == Validate(struct {
+		field float32 `validate:"gt=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("gt validator does not validate for flaot32")
+	}
+
+	if nil == Validate(struct {
 		field float32 `validate:"gt=0"`
 	}{
 		field: 0,
@@ -2062,6 +2292,14 @@ func TestGtValForFloat(t *testing.T) {
 }
 
 func TestLtValForFloat(t *testing.T) {
+	if nil == Validate(struct {
+		field float32 `validate:"lt=abc"`
+	}{
+		field: 0,
+	}) {
+		t.Errorf("lt validator does not validate for flaot32")
+	}
+
 	if nil == Validate(struct {
 		field float32 `validate:"lt=0"`
 	}{
@@ -2097,6 +2335,14 @@ func TestLtValForFloat(t *testing.T) {
 
 func TestGtValForString(t *testing.T) {
 	if nil == Validate(struct {
+		field string `validate:"gt=abc"`
+	}{
+		field: "aa",
+	}) {
+		t.Errorf("gt validator does not validate for string")
+	}
+
+	if nil == Validate(struct {
 		field string `validate:"gt=2"`
 	}{
 		field: "aa",
@@ -2115,6 +2361,14 @@ func TestGtValForString(t *testing.T) {
 
 func TestLtValForString(t *testing.T) {
 	if nil == Validate(struct {
+		field string `validate:"lt=abc"`
+	}{
+		field: "ab",
+	}) {
+		t.Errorf("lt validator does not validate for string")
+	}
+
+	if nil == Validate(struct {
 		field string `validate:"lt=2"`
 	}{
 		field: "ab",
@@ -2132,6 +2386,17 @@ func TestLtValForString(t *testing.T) {
 }
 
 func TestGtValForMap(t *testing.T) {
+	if nil == Validate(struct {
+		field map[string]string `validate:"gt=abc"`
+	}{
+		field: map[string]string{
+			"a": "a",
+			"b": "b",
+		},
+	}) {
+		t.Errorf("gt validator does not validate for map")
+	}
+
 	if nil == Validate(struct {
 		field map[string]string `validate:"gt=2"`
 	}{
@@ -2158,6 +2423,17 @@ func TestGtValForMap(t *testing.T) {
 
 func TestLtForMap(t *testing.T) {
 	if nil == Validate(struct {
+		field map[string]string `validate:"lt=abc"`
+	}{
+		field: map[string]string{
+			"a": "a",
+			"b": "b",
+		},
+	}) {
+		t.Errorf("lt validator does not validate for map")
+	}
+
+	if nil == Validate(struct {
 		field map[string]string `validate:"lt=2"`
 	}{
 		field: map[string]string{
@@ -2181,6 +2457,14 @@ func TestLtForMap(t *testing.T) {
 
 func TestGtValForSlice(t *testing.T) {
 	if nil == Validate(struct {
+		field []string `validate:"gt=abc"`
+	}{
+		field: []string{"a", "b"},
+	}) {
+		t.Errorf("gt validator does not validate for slice")
+	}
+
+	if nil == Validate(struct {
 		field []string `validate:"gt=2"`
 	}{
 		field: []string{"a", "b"},
@@ -2198,6 +2482,14 @@ func TestGtValForSlice(t *testing.T) {
 }
 
 func TestLtValForSlice(t *testing.T) {
+	if nil == Validate(struct {
+		field []string `validate:"lt=abc"`
+	}{
+		field: []string{"a", "b"},
+	}) {
+		t.Errorf("gt validator does not validate for slice")
+	}
+
 	if nil == Validate(struct {
 		field []string `validate:"lt=2"`
 	}{
@@ -2217,6 +2509,14 @@ func TestLtValForSlice(t *testing.T) {
 
 func TestGtValForArray(t *testing.T) {
 	if nil == Validate(struct {
+		field [2]string `validate:"gt=abc"`
+	}{
+		field: [2]string{"a", "b"},
+	}) {
+		t.Errorf("gt validator does not validate for string")
+	}
+
+	if nil == Validate(struct {
 		field [2]string `validate:"gt=2"`
 	}{
 		field: [2]string{"a", "b"},
@@ -2235,6 +2535,14 @@ func TestGtValForArray(t *testing.T) {
 
 func TestLtValForArray(t *testing.T) {
 	if nil == Validate(struct {
+		field [2]string `validate:"lt=abc"`
+	}{
+		field: [2]string{"a", "b"},
+	}) {
+		t.Errorf("gt validator does not validate for array")
+	}
+
+	if nil == Validate(struct {
 		field [2]string `validate:"lt=2"`
 	}{
 		field: [2]string{"a", "b"},
@@ -2252,6 +2560,14 @@ func TestLtValForArray(t *testing.T) {
 }
 
 func TestGteValForDuration(t *testing.T) {
+	if nil == Validate(struct {
+		field time.Duration `validate:"gte=abc"`
+	}{
+		field: -time.Second,
+	}) {
+		t.Errorf("gte validator does not validate for time.Duratuon")
+	}
+
 	if nil == Validate(struct {
 		field time.Duration `validate:"gte=0s"`
 	}{
@@ -2287,6 +2603,14 @@ func TestGteValForDuration(t *testing.T) {
 
 func TestLteValForDuration(t *testing.T) {
 	if nil == Validate(struct {
+		field time.Duration `validate:"lte=abc"`
+	}{
+		field: time.Second,
+	}) {
+		t.Errorf("lte validator does not validate for time.Duratuon")
+	}
+
+	if nil == Validate(struct {
 		field time.Duration `validate:"lte=0s"`
 	}{
 		field: time.Second,
@@ -2320,6 +2644,14 @@ func TestLteValForDuration(t *testing.T) {
 }
 
 func TestGteValForInt(t *testing.T) {
+	if nil == Validate(struct {
+		field int `validate:"gte=abc"`
+	}{
+		field: -1,
+	}) {
+		t.Errorf("gte validator does not validate for int")
+	}
+
 	if nil == Validate(struct {
 		field int `validate:"gte=0"`
 	}{
@@ -2403,6 +2735,14 @@ func TestGteValForInt(t *testing.T) {
 
 func TestLteValForInt(t *testing.T) {
 	if nil == Validate(struct {
+		field int `validate:"lte=abc"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("lte validator does not validate for int")
+	}
+
+	if nil == Validate(struct {
 		field int `validate:"lte=0"`
 	}{
 		field: 1,
@@ -2485,6 +2825,14 @@ func TestLteValForInt(t *testing.T) {
 
 func TestGteValForRune(t *testing.T) {
 	if nil == Validate(struct {
+		field rune `validate:"gte=abc"`
+	}{
+		field: -1,
+	}) {
+		t.Errorf("gte validator does not validate for rune")
+	}
+
+	if nil == Validate(struct {
 		field rune `validate:"gte=0"`
 	}{
 		field: -1,
@@ -2503,6 +2851,14 @@ func TestGteValForRune(t *testing.T) {
 
 func TestLteValForRune(t *testing.T) {
 	if nil == Validate(struct {
+		field rune `validate:"lte=abc"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("lte validator does not validate for rune")
+	}
+
+	if nil == Validate(struct {
 		field rune `validate:"lte=0"`
 	}{
 		field: 1,
@@ -2520,6 +2876,14 @@ func TestLteValForRune(t *testing.T) {
 }
 
 func TestGteValForUint(t *testing.T) {
+	if nil == Validate(struct {
+		field uint `validate:"gte=abc"`
+	}{
+		field: 9,
+	}) {
+		t.Errorf("gte validator does not validate for uint")
+	}
+
 	if nil == Validate(struct {
 		field uint `validate:"gte=10"`
 	}{
@@ -2619,6 +2983,14 @@ func TestGteValForUint(t *testing.T) {
 
 func TestLteValForUint(t *testing.T) {
 	if nil == Validate(struct {
+		field uint `validate:"lte=abc"`
+	}{
+		field: 1,
+	}) {
+		t.Errorf("lte validator does not validate for uint")
+	}
+
+	if nil == Validate(struct {
 		field uint `validate:"lte=0"`
 	}{
 		field: 1,
@@ -2717,6 +3089,14 @@ func TestLteValForUint(t *testing.T) {
 
 func TestGteValForFloat(t *testing.T) {
 	if nil == Validate(struct {
+		field float32 `validate:"gte=abc"`
+	}{
+		field: -0.1,
+	}) {
+		t.Errorf("gte validator does not validate for flaot32")
+	}
+
+	if nil == Validate(struct {
 		field float32 `validate:"gte=0"`
 	}{
 		field: -0.1,
@@ -2750,6 +3130,14 @@ func TestGteValForFloat(t *testing.T) {
 }
 
 func TestLteValForFloat(t *testing.T) {
+	if nil == Validate(struct {
+		field float32 `validate:"lte=abc"`
+	}{
+		field: 0.1,
+	}) {
+		t.Errorf("lte validator does not validate for flaot32")
+	}
+
 	if nil == Validate(struct {
 		field float32 `validate:"lte=0"`
 	}{
@@ -2785,6 +3173,14 @@ func TestLteValForFloat(t *testing.T) {
 
 func TestGteValForString(t *testing.T) {
 	if nil == Validate(struct {
+		field string `validate:"gte=abc"`
+	}{
+		field: "a",
+	}) {
+		t.Errorf("gte validator does not validate for string")
+	}
+
+	if nil == Validate(struct {
 		field string `validate:"gte=2"`
 	}{
 		field: "a",
@@ -2803,6 +3199,14 @@ func TestGteValForString(t *testing.T) {
 
 func TestLteValForString(t *testing.T) {
 	if nil == Validate(struct {
+		field string `validate:"lte=abc"`
+	}{
+		field: "abc",
+	}) {
+		t.Errorf("lte validator does not validate for string")
+	}
+
+	if nil == Validate(struct {
 		field string `validate:"lte=2"`
 	}{
 		field: "abc",
@@ -2820,6 +3224,16 @@ func TestLteValForString(t *testing.T) {
 }
 
 func TestGteValForMap(t *testing.T) {
+	if nil == Validate(struct {
+		field map[string]string `validate:"gte=abc"`
+	}{
+		field: map[string]string{
+			"a": "a",
+		},
+	}) {
+		t.Errorf("gte validator does not validate for map")
+	}
+
 	if nil == Validate(struct {
 		field map[string]string `validate:"gte=2"`
 	}{
@@ -2843,6 +3257,18 @@ func TestGteValForMap(t *testing.T) {
 }
 
 func TestLteForMap(t *testing.T) {
+	if nil == Validate(struct {
+		field map[string]string `validate:"lte=abc"`
+	}{
+		field: map[string]string{
+			"a": "a",
+			"b": "b",
+			"c": "c",
+		},
+	}) {
+		t.Errorf("lte validator does not validate for map")
+	}
+
 	if nil == Validate(struct {
 		field map[string]string `validate:"lte=2"`
 	}{
@@ -2869,6 +3295,14 @@ func TestLteForMap(t *testing.T) {
 
 func TestGteValForSlice(t *testing.T) {
 	if nil == Validate(struct {
+		field []string `validate:"gte=abc"`
+	}{
+		field: []string{"a"},
+	}) {
+		t.Errorf("gte validator does not validate for slice")
+	}
+
+	if nil == Validate(struct {
 		field []string `validate:"gte=2"`
 	}{
 		field: []string{"a"},
@@ -2886,6 +3320,14 @@ func TestGteValForSlice(t *testing.T) {
 }
 
 func TestLteValForSlice(t *testing.T) {
+	if nil == Validate(struct {
+		field []string `validate:"lte=abc"`
+	}{
+		field: []string{"a", "b", "c"},
+	}) {
+		t.Errorf("gte validator does not validate for slice")
+	}
+
 	if nil == Validate(struct {
 		field []string `validate:"lte=2"`
 	}{
@@ -2905,6 +3347,14 @@ func TestLteValForSlice(t *testing.T) {
 
 func TestGteValForArray(t *testing.T) {
 	if nil == Validate(struct {
+		field [1]string `validate:"gte=abc"`
+	}{
+		field: [1]string{"a"},
+	}) {
+		t.Errorf("gte validator does not validate for string")
+	}
+
+	if nil == Validate(struct {
 		field [1]string `validate:"gte=2"`
 	}{
 		field: [1]string{"a"},
@@ -2923,6 +3373,14 @@ func TestGteValForArray(t *testing.T) {
 
 func TestLteValForArray(t *testing.T) {
 	if nil == Validate(struct {
+		field [3]string `validate:"lte=abc"`
+	}{
+		field: [3]string{"a", "b", "c"},
+	}) {
+		t.Errorf("gte validator does not validate for array")
+	}
+
+	if nil == Validate(struct {
 		field [3]string `validate:"lte=2"`
 	}{
 		field: [3]string{"a", "b", "c"},
@@ -2940,6 +3398,14 @@ func TestLteValForArray(t *testing.T) {
 }
 
 func TestEmptyValForString(t *testing.T) {
+	if nil == Validate(struct {
+		field string `validate:"empty=abc"`
+	}{
+		field: "a",
+	}) {
+		t.Errorf("empty validator does not validate for string")
+	}
+
 	if nil == Validate(struct {
 		field string `validate:"empty=true"`
 	}{
@@ -2975,6 +3441,14 @@ func TestEmptyValForString(t *testing.T) {
 
 func TestEmptyValForMap(t *testing.T) {
 	if nil == Validate(struct {
+		field map[string]string `validate:"empty=abc"`
+	}{
+		field: map[string]string{"a": "a"},
+	}) {
+		t.Errorf("empty validator does not validate for map")
+	}
+
+	if nil == Validate(struct {
 		field map[string]string `validate:"empty=true"`
 	}{
 		field: map[string]string{"a": "a"},
@@ -3008,6 +3482,16 @@ func TestEmptyValForMap(t *testing.T) {
 }
 
 func TestEmptyValForSlice(t *testing.T) {
+	if nil == Validate(struct {
+		field []string `validate:"empty=abc"`
+	}{
+		field: []string{
+			"a",
+		},
+	}) {
+		t.Errorf("empty validator does not validate for slice")
+	}
+
 	if nil == Validate(struct {
 		field []string `validate:"empty=true"`
 	}{
@@ -3045,6 +3529,16 @@ func TestEmptyValForSlice(t *testing.T) {
 
 func TestEmptyValForArray(t *testing.T) {
 	if nil == Validate(struct {
+		field [1]string `validate:"empty=abc"`
+	}{
+		field: [1]string{
+			"a",
+		},
+	}) {
+		t.Errorf("empty validator does not validate for array")
+	}
+
+	if nil == Validate(struct {
 		field [1]string `validate:"empty=true"`
 	}{
 		field: [1]string{
@@ -3081,6 +3575,14 @@ func TestEmptyValForArray(t *testing.T) {
 
 func TestNilValForPtr(t *testing.T) {
 	if nil == Validate(struct {
+		field *int `validate:"nil=abc"`
+	}{
+		field: new(int),
+	}) {
+		t.Errorf("nil validator does not validate for pointer")
+	}
+
+	if nil == Validate(struct {
 		field *int `validate:"nil=true"`
 	}{
 		field: new(int),
@@ -3115,6 +3617,22 @@ func TestNilValForPtr(t *testing.T) {
 
 func TestOneOfValForDuration(t *testing.T) {
 	if nil == Validate(struct {
+		field time.Duration `validate:"one_of="`
+	}{
+		field: 4 * time.Second,
+	}) {
+		t.Errorf("one_of validator does not validate for time.Duration")
+	}
+
+	if nil == Validate(struct {
+		field time.Duration `validate:"one_of=abc"`
+	}{
+		field: 4 * time.Second,
+	}) {
+		t.Errorf("one_of validator does not validate for time.Duration")
+	}
+
+	if nil == Validate(struct {
 		field time.Duration `validate:"one_of=1s,2s,3s"`
 	}{
 		field: 4 * time.Second,
@@ -3132,6 +3650,22 @@ func TestOneOfValForDuration(t *testing.T) {
 }
 
 func TestOneOfValForInt(t *testing.T) {
+	if nil == Validate(struct {
+		field int `validate:"one_of="`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("one_of validator does not validate for int")
+	}
+
+	if nil == Validate(struct {
+		field int `validate:"one_of=abc"`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("one_of validator does not validate for int")
+	}
+
 	if nil == Validate(struct {
 		field int `validate:"one_of=1,2,3"`
 	}{
@@ -3215,6 +3749,22 @@ func TestOneOfValForInt(t *testing.T) {
 
 func TestOneOfValForUint(t *testing.T) {
 	if nil == Validate(struct {
+		field uint `validate:"one_of="`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("one_of validator does not validate for uint")
+	}
+
+	if nil == Validate(struct {
+		field uint `validate:"one_of=abc"`
+	}{
+		field: 4,
+	}) {
+		t.Errorf("one_of validator does not validate for uint")
+	}
+
+	if nil == Validate(struct {
 		field uint `validate:"one_of=1,2,3"`
 	}{
 		field: 4,
@@ -3297,6 +3847,22 @@ func TestOneOfValForUint(t *testing.T) {
 
 func TestOneOfValForFloat(t *testing.T) {
 	if nil == Validate(struct {
+		field float32 `validate:"one_of="`
+	}{
+		field: 4.0,
+	}) {
+		t.Errorf("one_of validator does not validate for float32")
+	}
+
+	if nil == Validate(struct {
+		field float32 `validate:"one_of=abc"`
+	}{
+		field: 4.0,
+	}) {
+		t.Errorf("one_of validator does not validate for float32")
+	}
+
+	if nil == Validate(struct {
 		field float32 `validate:"one_of=1.0,2.0,3.0"`
 	}{
 		field: 4.0,
@@ -3331,6 +3897,14 @@ func TestOneOfValForFloat(t *testing.T) {
 
 func TestOneOfValForString(t *testing.T) {
 	if nil == Validate(struct {
+		field string `validate:"one_of="`
+	}{
+		field: "four",
+	}) {
+		t.Errorf("one_of validator does not validate for string")
+	}
+
+	if nil == Validate(struct {
 		field string `validate:"one_of=one,two,three"`
 	}{
 		field: "four",
@@ -3348,6 +3922,14 @@ func TestOneOfValForString(t *testing.T) {
 }
 
 func TestFormatValForString(t *testing.T) {
+	if nil == Validate(struct {
+		field string `validate:"format=abc"`
+	}{
+		field: "abc",
+	}) {
+		t.Errorf("format validator does not validate for string")
+	}
+
 	if nil == Validate(struct {
 		field string `validate:"format=email"`
 	}{

@@ -469,74 +469,84 @@ func validateOneOf(value reflect.Value, validator string) ErrorField {
 
 	errorSyntax := ErrorSyntax{
 		expression: validator,
-		near:       string(ValidatorEq),
+		near:       string(ValidatorOneOf),
 		comment:    "could not parse",
 	}
 
 	switch kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if typ == reflect.TypeOf((time.Duration)(0)) {
-			if tokens := parseTokens(validator); len(tokens) > 0 {
-				for i, token := range tokens {
-					tokens[i] = nil
-					if token, err := time.ParseDuration(token.(string)); err != nil {
-						return errorSyntax
-					} else {
-						tokens[i] = token
-					}
-				}
-				if !tokenOneOf(time.Duration(value.Int()), tokens) {
-					return errorValidation
+			var tokens []interface{}
+			if tokens = parseTokens(validator); len(tokens) == 0 {
+				return errorSyntax
+			}
+			for i, token := range tokens {
+				tokens[i] = nil
+				if token, err := time.ParseDuration(token.(string)); err != nil {
+					return errorSyntax
+				} else {
+					tokens[i] = token
 				}
 			}
+			if !tokenOneOf(time.Duration(value.Int()), tokens) {
+				return errorValidation
+			}
 		} else {
-			if tokens := parseTokens(validator); len(tokens) > 0 {
-				for i, token := range tokens {
-					tokens[i] = nil
-					if token, err := strconv.ParseInt(token.(string), 10, 64); err != nil {
-						return errorSyntax
-					} else {
-						tokens[i] = token
-					}
+			var tokens []interface{}
+			if tokens = parseTokens(validator); len(tokens) == 0 {
+				return errorSyntax
+			}
+			for i, token := range tokens {
+				tokens[i] = nil
+				if token, err := strconv.ParseInt(token.(string), 10, 64); err != nil {
+					return errorSyntax
+				} else {
+					tokens[i] = token
 				}
-				if !tokenOneOf(value.Int(), tokens) {
-					return errorValidation
-				}
+			}
+			if !tokenOneOf(value.Int(), tokens) {
+				return errorValidation
 			}
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		if tokens := parseTokens(validator); len(tokens) > 0 {
-			for i, token := range tokens {
-				tokens[i] = nil
-				if token, err := strconv.ParseUint(token.(string), 10, 64); err != nil {
-					return errorSyntax
-				} else {
-					tokens[i] = token
-				}
+		var tokens []interface{}
+		if tokens = parseTokens(validator); len(tokens) == 0 {
+			return errorSyntax
+		}
+		for i, token := range tokens {
+			tokens[i] = nil
+			if token, err := strconv.ParseUint(token.(string), 10, 64); err != nil {
+				return errorSyntax
+			} else {
+				tokens[i] = token
 			}
-			if !tokenOneOf(value.Uint(), tokens) {
-				return errorValidation
-			}
+		}
+		if !tokenOneOf(value.Uint(), tokens) {
+			return errorValidation
 		}
 	case reflect.Float32, reflect.Float64:
-		if tokens := parseTokens(validator); len(tokens) > 0 {
-			for i, token := range tokens {
-				tokens[i] = nil
-				if token, err := strconv.ParseFloat(token.(string), 64); err != nil {
-					return errorSyntax
-				} else {
-					tokens[i] = token
-				}
-			}
-			if !tokenOneOf(value.Float(), tokens) {
-				return errorValidation
+		var tokens []interface{}
+		if tokens = parseTokens(validator); len(tokens) == 0 {
+			return errorSyntax
+		}
+		for i, token := range tokens {
+			tokens[i] = nil
+			if token, err := strconv.ParseFloat(token.(string), 64); err != nil {
+				return errorSyntax
+			} else {
+				tokens[i] = token
 			}
 		}
+		if !tokenOneOf(value.Float(), tokens) {
+			return errorValidation
+		}
 	case reflect.String:
-		if tokens := parseTokens(validator); len(tokens) > 0 {
-			if !tokenOneOf(value.String(), tokens) {
-				return errorValidation
-			}
+		var tokens []interface{}
+		if tokens = parseTokens(validator); len(tokens) == 0 {
+			return errorSyntax
+		}
+		if !tokenOneOf(value.String(), tokens) {
+			return errorValidation
 		}
 	}
 
