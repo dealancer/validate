@@ -34,6 +34,7 @@ func (e *ErrorValidation) setFieldName(fieldName string) {
 	e.fieldName = fieldName
 }
 
+// Error returns an error.
 func (e ErrorValidation) Error() string {
 	validator := string(e.validatorType)
 	if len(e.validatorValue) > 0 {
@@ -65,6 +66,7 @@ func (e *ErrorSyntax) setFieldName(fieldName string) {
 	e.fieldName = fieldName
 }
 
+// Error returns an error.
 func (e ErrorSyntax) Error() string {
 	if len(e.fieldName) > 0 {
 		return fmt.Sprintf("Syntax error when validating field \"%v\", expression \"%v\" near \"%v\": %v", e.fieldName, e.expression, e.near, e.comment)
