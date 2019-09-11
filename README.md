@@ -95,7 +95,7 @@ type Registration struct {
 
 // Custom validation
 func (r Registration) Validate() error {
-    if !StrongPass(c.Password) {
+    if !StrongPass(r.Password) {
         return errors.New("Password should be strong!")
     }
 

@@ -804,6 +804,14 @@ func getFormatTestGroups() []FormatTestGroup {
 				{"%%a%%", false},
 			},
 		},
+		FormatTestGroup{
+			FormatPostcode, []FormatTest{
+				{"PO32 6QN", true},
+				{"PO30 1JQ", true},
+				{"WC2H", false},
+				{"WC2H 7LTa", false},
+			},
+		},
 	}
 }
 

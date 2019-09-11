@@ -64,6 +64,7 @@ const (
 	FormatFQDN                 FormatType = "fqdn"
 	FormatURLEncoded           FormatType = "url_encoded"
 	FormatDir                  FormatType = "dir"
+	FormatPostcode             FormatType = "postcode"
 )
 
 // formatFunc is an interface for format validator func
@@ -118,6 +119,7 @@ func getFormatTypeMap() map[FormatType]formatFunc {
 		FormatFQDN:                 formatFQDN,
 		FormatURLEncoded:           formatURLEncoded,
 		FormatDir:                  formatDir,
+		FormatPostcode:             formatPostcode,
 	}
 }
 
@@ -586,4 +588,9 @@ func formatDir(value string) bool {
 	}
 
 	return fileInfo.IsDir()
+}
+
+// formatPostcode is the validation function for validating if the current field's value is a valid postcode.
+func formatPostcode(value string) bool {
+	return postcodeRegex.MatchString(value)
 }
