@@ -1,6 +1,7 @@
 package validate
 
 import (
+	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
@@ -37,6 +38,7 @@ func Validate(element interface{}) error {
 
 // validateField validates a struct field
 func validateField(value reflect.Value, fieldName string, validators string) error {
+	var errors []error
 	kind := value.Kind()
 
 	// Get validator type Map
@@ -67,7 +69,8 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 			if validatorFunc, ok := validatorTypeMap[validator.Type]; ok {
 				if err = validatorFunc(value, validator.Value); err != nil {
 					err = setFieldName(err, fieldName)
-					break
+					errors = append(errors, err)
+					continue
 				}
 			} else {
 				return ErrorSyntax{
@@ -78,39 +81,33 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 				}
 			}
 		}
-		if err == nil {
-			break
-		}
-	}
-	if err != nil {
-		return err
 	}
 
 	// Dive one level deep into arrays and pointers
 	switch kind {
 	case reflect.Struct:
 		if err := validateStruct(value); err != nil {
-			return err
+			errors = append(errors, err)
 		}
 	case reflect.Map:
 		for _, key := range value.MapKeys() {
 			if err := validateField(key, fieldName, keyValidators); err != nil {
-				return err
+				errors = append(errors, err)
 			}
 			if err := validateField(value.MapIndex(key), fieldName, validators); err != nil {
-				return err
+				errors = append(errors, err)
 			}
 		}
 	case reflect.Slice, reflect.Array:
 		for i := 0; i < value.Len(); i++ {
 			if err := validateField(value.Index(i), fieldName, validators); err != nil {
-				return err
+				errors = append(errors, err)
 			}
 		}
 	case reflect.Ptr:
 		if !value.IsNil() {
 			if err := validateField(value.Elem(), fieldName, validators); err != nil {
-				return err
+				errors = append(errors, err)
 			}
 		}
 	}
@@ -121,7 +118,7 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 				fieldName:  fieldName,
 				expression: validators,
 				near:       "",
-				comment:    "unexpexted expression",
+				comment:    "unexpected expression",
 			}
 		}
 	}
@@ -132,9 +129,16 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 				fieldName:  fieldName,
 				expression: validators,
 				near:       "",
-				comment:    "unexpexted expression",
+				comment:    "unexpected expression",
 			}
 		}
+	}
+
+	if len(errors) > 0 {
+		if fieldName != "" {
+			return fmt.Errorf("%s/%v", fieldName, errors)
+		}
+		return fmt.Errorf("%v", errors)
 	}
 
 	return nil
@@ -142,6 +146,7 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 
 // validateStruct validates a struct
 func validateStruct(value reflect.Value) error {
+	var errors []error
 	typ := value.Type()
 
 	// Iterate over struct fields
@@ -149,8 +154,12 @@ func validateStruct(value reflect.Value) error {
 		validators := getValidators(typ.Field(i).Tag)
 		fieldName := typ.Field(i).Name
 		if err := validateField(value.Field(i), fieldName, validators); err != nil {
-			return err
+			errors = append(errors, err)
 		}
+	}
+
+	if len(errors) > 0 {
+		return fmt.Errorf("%v", errors)
 	}
 
 	return nil
