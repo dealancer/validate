@@ -161,8 +161,8 @@ func getValidators(tag reflect.StructTag) string {
 	return tag.Get(MasterTag)
 }
 
-// splitValidators splits validators into key validators, value validators and remaning validators of the next level
-func splitValidators(validators string) (keyValidators string, valValidators string, remaningValidators string, err ErrorField) {
+// splitValidators splits validators into key validators, value validators and remaining validators of the next level
+func splitValidators(validators string) (keyValidators string, valValidators string, remainingValidators string, err ErrorField) {
 	gt := 0
 	bracket := 0
 	bracketStart := 0
@@ -219,10 +219,10 @@ loop:
 		keyValidators = validators[bracketStart+1 : bracketEnd]
 	}
 	if i+1 <= len(validators) {
-		remaningValidators = validators[i+1:]
+		remainingValidators = validators[i+1:]
 	}
 
-	if gt > 0 && len(remaningValidators) == 0 {
+	if gt > 0 && len(remainingValidators) == 0 {
 		err = ErrorSyntax{
 			expression: "",
 			near:       validators,
