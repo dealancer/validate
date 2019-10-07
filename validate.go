@@ -1,7 +1,6 @@
 package validate
 
 import (
-	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
@@ -38,7 +37,6 @@ func Validate(element interface{}) error {
 
 // validateField validates a struct field
 func validateField(value reflect.Value, fieldName string, validators string) error {
-	var errors []error
 	kind := value.Kind()
 
 	// Get validator type Map
@@ -69,8 +67,7 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 			if validatorFunc, ok := validatorTypeMap[validator.Type]; ok {
 				if err = validatorFunc(value, validator.Value); err != nil {
 					err = setFieldName(err, fieldName)
-					errors = append(errors, err)
-					continue
+					break
 				}
 			} else {
 				return ErrorSyntax{
@@ -81,33 +78,39 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 				}
 			}
 		}
+		if err == nil {
+			break
+		}
+	}
+	if err != nil {
+		return err
 	}
 
 	// Dive one level deep into arrays and pointers
 	switch kind {
 	case reflect.Struct:
 		if err := validateStruct(value); err != nil {
-			errors = append(errors, err)
+			return err
 		}
 	case reflect.Map:
 		for _, key := range value.MapKeys() {
 			if err := validateField(key, fieldName, keyValidators); err != nil {
-				errors = append(errors, err)
+				return err
 			}
 			if err := validateField(value.MapIndex(key), fieldName, validators); err != nil {
-				errors = append(errors, err)
+				return err
 			}
 		}
 	case reflect.Slice, reflect.Array:
 		for i := 0; i < value.Len(); i++ {
 			if err := validateField(value.Index(i), fieldName, validators); err != nil {
-				errors = append(errors, err)
+				return err
 			}
 		}
 	case reflect.Ptr:
 		if !value.IsNil() {
 			if err := validateField(value.Elem(), fieldName, validators); err != nil {
-				errors = append(errors, err)
+				return err
 			}
 		}
 	}
@@ -118,7 +121,7 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 				fieldName:  fieldName,
 				expression: validators,
 				near:       "",
-				comment:    "unexpected expression",
+				comment:    "unexpexted expression",
 			}
 		}
 	}
@@ -129,16 +132,9 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 				fieldName:  fieldName,
 				expression: validators,
 				near:       "",
-				comment:    "unexpected expression",
+				comment:    "unexpexted expression",
 			}
 		}
-	}
-
-	if len(errors) > 0 {
-		if fieldName != "" {
-			return fmt.Errorf("%s/%v", fieldName, errors)
-		}
-		return fmt.Errorf("%v", errors)
 	}
 
 	return nil
@@ -146,7 +142,6 @@ func validateField(value reflect.Value, fieldName string, validators string) err
 
 // validateStruct validates a struct
 func validateStruct(value reflect.Value) error {
-	var errors []error
 	typ := value.Type()
 
 	// Iterate over struct fields
@@ -154,12 +149,8 @@ func validateStruct(value reflect.Value) error {
 		validators := getValidators(typ.Field(i).Tag)
 		fieldName := typ.Field(i).Name
 		if err := validateField(value.Field(i), fieldName, validators); err != nil {
-			errors = append(errors, err)
+			return err
 		}
-	}
-
-	if len(errors) > 0 {
-		return fmt.Errorf("%v", errors)
 	}
 
 	return nil
@@ -170,8 +161,8 @@ func getValidators(tag reflect.StructTag) string {
 	return tag.Get(MasterTag)
 }
 
-// splitValidators splits validators into key validators, value validators and remaining validators of the next level
-func splitValidators(validators string) (keyValidators string, valValidators string, remainingValidators string, err ErrorField) {
+// splitValidators splits validators into key validators, value validators and remaning validators of the next level
+func splitValidators(validators string) (keyValidators string, valValidators string, remaningValidators string, err ErrorField) {
 	gt := 0
 	bracket := 0
 	bracketStart := 0
@@ -228,10 +219,10 @@ loop:
 		keyValidators = validators[bracketStart+1 : bracketEnd]
 	}
 	if i+1 <= len(validators) {
-		remainingValidators = validators[i+1:]
+		remaningValidators = validators[i+1:]
 	}
 
-	if gt > 0 && len(remainingValidators) == 0 {
+	if gt > 0 && len(remaningValidators) == 0 {
 		err = ErrorSyntax{
 			expression: "",
 			near:       validators,
